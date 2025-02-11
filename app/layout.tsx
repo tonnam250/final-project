@@ -1,19 +1,25 @@
-import Navbar from "@/components/Navbar"
-import './globals.css'
-import { Raleway as RalewayFont } from 'next/font/google'
+"use client";
 
-const Raleway = RalewayFont({
+// app/layout.tsx
+import { usePathname } from 'next/navigation';
+import HomeNav from '../components/HomeNav';
+import Navbar from '../components/Navbar';
+import './globals.css'; // Ensure the correct path to the CSS file
+import { Raleway } from 'next/font/google';
+
+const raleway = Raleway({
   subsets: ['latin'],
-})
+});
 
-const layout = ( {children} ) => {
+export default function Layout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
   return (
     <html lang="en">
-      <body className={Raleway.className}>
-        <Navbar />
+      <body>
+        {pathname === '/' ? <HomeNav /> : <Navbar />}
         {children}
       </body>
     </html>
-  )
+  );
 }
-export default layout
