@@ -1,13 +1,13 @@
 [
     {
-        "No:": 1,
+        "tankNo": "001",
         "status": "recieved",
-        "PersonInCharge": "John Doe"
+        "personInCharge": "John Doe"
     },
 
     {
-        "No:" : 2,
+        "tankNo" : "002",
         "status": "Not recieved",
-        "PersonInCharge": "Jane Doe"
+        "personInCharge": "Jane Doe"
     }
 ]

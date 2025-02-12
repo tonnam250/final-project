@@ -1,6 +1,20 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
+
+interface GeoData {
+    id: number;
+    provinceCode: number;
+    provinceNameEn: string;
+    provinceNameTh: string;
+    districtCode: number;
+    districtNameEn: string;
+    districtNameTh: string;
+    subdistrictCode: number;
+    subdistrictNameEn: string;
+    subdistrictNameTh: string;
+    postalCode: number;
+}
 
 
 const FarmGeneralInfo = () => {
@@ -14,6 +28,56 @@ const FarmGeneralInfo = () => {
             setFileNames(["ยังไม่ได้เลือกไฟล์"]);
         }
     };
+
+    const [geoData, setGeoData] = useState<GeoData[]>([]);
+    const [provinceList, setProvinceList] = useState<string[]>([]);
+    const [districtList, setDistrictList] = useState<string[]>([]);
+    const [subDistrictList, setSubDistrictList] = useState<string[]>([]);
+
+    const [selectedProvince, setSelectedProvince] = useState<string>("");
+    const [selectedDistrict, setSelectedDistrict] = useState<string>("");
+    const [selectedSubDistrict, setSelectedSubDistrict] = useState<string>("");
+
+    useEffect(() => {
+        fetch("/data/geography.json")
+            .then((res) => res.json())
+            .then((data: GeoData[]) => {
+                setGeoData(data);
+
+                // ดึงจังหวัดที่ไม่ซ้ำ (ใช้ภาษาไทยให้ตรงกับ selectedProvince)
+                const provinces = Array.from(new Set(data.map((item) => item.provinceNameEn)));
+                setProvinceList(provinces);
+            })
+            .catch((err) => console.error("Fetch error:", err));
+    }, []);
+
+    useEffect(() => {
+        if (selectedProvince) {
+            const filteredDistricts = Array.from(
+                new Set(
+                    geoData.filter((item) => item.provinceNameEn === selectedProvince).map((item) => item.districtNameEn)
+                )
+            );
+
+            setDistrictList(filteredDistricts);
+            setSelectedDistrict("");
+            setSubDistrictList([]);
+            setSelectedSubDistrict("");
+        }
+    }, [selectedProvince]);
+
+    useEffect(() => {
+        if (selectedDistrict) {
+            const filteredSubDistricts = Array.from(
+                new Set(
+                    geoData.filter((item) => item.districtNameEn === selectedDistrict).map((item) => item.subdistrictName)
+                )
+            );
+
+            setSubDistrictList(filteredSubDistricts);
+            setSelectedSubDistrict("");
+        }
+    }, [selectedDistrict]);
 
     return (
         <div className="flex flex-col text-center w-full justify-center items-center text-lg">
@@ -106,8 +170,15 @@ const FarmGeneralInfo = () => {
                     {/* province */}
                     <div className="flex flex-col w-full text-start font-medium">
                         <label htmlFor="province">Province</label>
-                        <select name="province" id="province" className="border border-gray-300 rounded-md p-2 text-center">
-                            <option value="">Province</option>
+                        <select name="province" id="province" className="border border-gray-300 rounded-md p-2 text-center"
+                            value={selectedProvince}
+                            onChange={(e) => setSelectedProvince(e.target.value)}>
+                            <option value="">Select province</option>
+                            {provinceList.map((prov, index) => (
+                                <option key={index} value={prov}>
+                                    {prov}
+                                </option>
+                            ))}
                         </select>
                     </div>
                     {/* end province */}
@@ -116,15 +187,31 @@ const FarmGeneralInfo = () => {
                     <div className="flex flex-row w-full gap-4">
                         <div className="flex flex-col text-start font-medium w-6/12">
                             <label htmlFor="district">District</label>
-                            <select name="district" id="district" className="border border-gray-300 rounded-md p-2 text-center">
-                                <option value="bangkholaem">bang kho laem</option>
+                            <select name="district" id="district" className="border border-gray-300 rounded-md p-2 text-center"
+                                value={selectedDistrict}
+                                onChange={(e) => setSelectedDistrict(e.target.value)}
+                                disabled={!selectedProvince}>
+                                <option value="">Select district</option>
+                                {districtList.map((dist, index) => (
+                                    <option key={index} value={dist}>
+                                        {dist}
+                                    </option>
+                                ))}
                             </select>
                         </div>
 
                         <div className="flex flex-col text-start font-medium w-6/12">
                             <label htmlFor="subDistrict">Sub-District</label>
-                            <select name="subDistrict" id="subDistrict" className="border border-gray-300 rounded-md p-2 text-center">
-                                <option value="ิbangkholaem">bang kho laem</option>
+                            <select name="subDistrict" id="subDistrict" className="border border-gray-300 rounded-md p-2 text-center"
+                                value={selectedSubDistrict}
+                                onChange={(e) => setSelectedSubDistrict(e.target.value)}
+                                disabled={!selectedDistrict}>
+                                <option value="">Select sub-district</option>
+                                {subDistrictList.map((subDist, index) => (
+                                    <option key={index} value={subDist}>
+                                        {subDist}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                     </div>
