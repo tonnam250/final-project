@@ -70,7 +70,7 @@ const FarmGeneralInfo = () => {
         if (selectedDistrict) {
             const filteredSubDistricts = Array.from(
                 new Set(
-                    geoData.filter((item) => item.districtNameEn === selectedDistrict).map((item) => item.subdistrictName)
+                    geoData.filter((item) => item.districtNameEn === selectedDistrict).map((item) => item.subdistrictNameEn)
                 )
             );
 
