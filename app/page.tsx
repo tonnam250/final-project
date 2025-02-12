@@ -180,7 +180,7 @@ const page = async () => {
                 <p className="text-xl">64070266@kmitl.ac.th</p>
               </div>
 
-              <a className="bg-[#df7a5f] w-full h-full rounded-b-3xl text-xl font-semibold p-3">Direction</a>
+              <a className="bg-[#df7a5f] w-full h-full rounded-b-3xl text-xl font-semibold p-3 cursor-pointer">Direction</a>
             </div>
             <img src="/images/WorldMap.svg" alt="WorldMap" className="absolute z-0 w-1/2" />
           </div>

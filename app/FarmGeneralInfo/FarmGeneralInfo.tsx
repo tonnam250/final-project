@@ -16,7 +16,7 @@ const FarmGeneralInfo = () => {
     };
 
     return (
-        <div className="flex flex-col text-center w-full justify-center items-center">
+        <div className="flex flex-col text-center w-full justify-center items-center text-lg">
             <h1 className="text-4xl font-bold my-8">General Information</h1>
             <div className="flex h-full w-8/12 h-11/12 p-5 shadow-xl justify-center items-center border rounded-2xl m-5">
                 <form action="" className="flex flex-col gap-4 w-full">

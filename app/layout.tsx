@@ -3,7 +3,7 @@
 // app/layout.tsx
 import { usePathname } from 'next/navigation';
 import HomeNav from '../components/HomeNav';
-import Navbar from '../components/Navbar';
+import FarmerNavbar from '../components/FarmerNavbar';
 import './globals.css'; // Ensure the correct path to the CSS file
 import { Raleway } from 'next/font/google';
 
@@ -17,7 +17,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        {pathname === '/' ? <HomeNav /> : <Navbar />}
+        {pathname === '/' ? <HomeNav /> : <FarmerNavbar />}
         {children}
       </body>
     </html>
