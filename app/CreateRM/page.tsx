@@ -1,9 +1,10 @@
-const CreateRM = () => {
+import CreateRawMilk from "./CreateRM";
+
+const Page = () => {
     return (
         <div>
-            <h1>Create RM</h1>
+            <CreateRawMilk />
         </div>
     );
-};
-
-export default CreateRM;
+}
+export default Page;

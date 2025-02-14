@@ -16,7 +16,6 @@ interface GeoData {
     postalCode: number;
 }
 
-
 const FarmGeneralInfo = () => {
     const [fileNames, setFileNames] = useState<string[]>(["No file selected."]);
 
@@ -79,11 +78,16 @@ const FarmGeneralInfo = () => {
         }
     }, [selectedDistrict]);
 
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        // Handle form submission logic here
+    };
+
     return (
         <div className="flex flex-col text-center w-full justify-center items-center text-lg">
             <h1 className="text-4xl font-bold my-8">General Information</h1>
             <div className="flex h-full w-8/12 h-11/12 p-5 shadow-xl justify-center items-center border rounded-2xl m-5">
-                <form action="" className="flex flex-col gap-4 w-full">
+                <form action="" className="flex flex-col gap-4 w-full" onSubmit={handleSubmit}>
                     <div className="flex flex-row gap-5 text-start w-full">
 
                         {/* first name */}
