@@ -1,13 +1,19 @@
 [
     {
         "tankNo": "001",
-        "status": "recieved",
+        "status": "Recieved",
         "personInCharge": "John Doe"
     },
 
     {
         "tankNo" : "002",
-        "status": "Not recieved",
+        "status": "Pending",
         "personInCharge": "Jane Doe"
+    },
+    
+    {
+        "tankNo" : "003",
+        "status": "Pending",
+        "personInCharge": "Jam Doe"
     }
 ]

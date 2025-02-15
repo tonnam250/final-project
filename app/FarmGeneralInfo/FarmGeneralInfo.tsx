@@ -84,14 +84,14 @@ const FarmGeneralInfo = () => {
     };
 
     return (
-        <div className="flex flex-col text-center w-full justify-center items-center text-lg">
-            <h1 className="text-4xl font-bold my-8">General Information</h1>
-            <div className="flex h-full w-8/12 h-11/12 p-5 shadow-xl justify-center items-center border rounded-2xl m-5">
+        <div className="flex flex-col text-center w-full justify-center items-center text- h-full pt-20">
+            <h1 className="text-3xl md:text-4xl font-bold my-4 md:my-8">General Information</h1>
+            <div className="flex h-full w-11/12 md:w-8/12 h-11/12 p-4 md:p-5 shadow-xl justify-center items-center border rounded-2xl m-2 md:m-5">
                 <form action="" className="flex flex-col gap-4 w-full" onSubmit={handleSubmit}>
-                    <div className="flex flex-row gap-5 text-start w-full">
+                    <div className="flex flex-col md:flex-row gap-4 md:gap-5 text-start w-full">
 
                         {/* first name */}
-                        <div className="flex flex-col text-start w-6/12">
+                        <div className="flex flex-col text-start w-full md:w-6/12">
                             <label htmlFor="fName" className="font-medium">First Name</label>
                             <input
                                 type="text"
@@ -104,7 +104,7 @@ const FarmGeneralInfo = () => {
                         {/* end first name */}
 
                         {/* lastName */}
-                        <div className="flex flex-col text-start w-6/12">
+                        <div className="flex flex-col text-start w-full md:w-6/12">
                             <label htmlFor="lName" className="font-medium">Last Name</label>
                             <input
                                 type="text"
@@ -134,7 +134,7 @@ const FarmGeneralInfo = () => {
                     {/* Phone Number */}
                     <div className="flex flex-col text-start">
                         <label htmlFor="tel" className="font-medium">Phone Number</label>
-                        <div className="flex flex-row gap-2">
+                        <div className="flex flex-col md:flex-row gap-2">
 
                             {/* Area Code */}
                             <div className="flex flex-col">
@@ -142,7 +142,7 @@ const FarmGeneralInfo = () => {
                                 <select
                                     name="areaCode"
                                     id="areaCode"
-                                    className="border border-gray-300 rounded-md p-2 w-20 text-center"
+                                    className="border border-gray-300 rounded-md p-2 w-full md:w-20 text-center"
                                     required
                                 >
                                     <option value="+66">+66</option>
@@ -188,8 +188,8 @@ const FarmGeneralInfo = () => {
                     {/* end province */}
 
                     {/* district + Sub-District */}
-                    <div className="flex flex-row w-full gap-4">
-                        <div className="flex flex-col text-start font-medium w-6/12">
+                    <div className="flex flex-col md:flex-row w-full gap-4">
+                        <div className="flex flex-col text-start font-medium w-full md:w-6/12">
                             <label htmlFor="district">District</label>
                             <select name="district" id="district" className="border border-gray-300 rounded-md p-2 text-center"
                                 value={selectedDistrict}
@@ -204,7 +204,7 @@ const FarmGeneralInfo = () => {
                             </select>
                         </div>
 
-                        <div className="flex flex-col text-start font-medium w-6/12">
+                        <div className="flex flex-col text-start font-medium w-full md:w-6/12">
                             <label htmlFor="subDistrict">Sub-District</label>
                             <select name="subDistrict" id="subDistrict" className="border border-gray-300 rounded-md p-2 text-center"
                                 value={selectedSubDistrict}
@@ -222,7 +222,7 @@ const FarmGeneralInfo = () => {
                     {/* end district + sub-district */}
 
                     {/* Upload Organic certification */}
-                    <div className="flex items-center justify-start gap-2 border p-2">
+                    <div className="flex flex-col md:flex-row items-center justify-start gap-2 border p-2">
                         <label
                             htmlFor="file-upload"
                             className="cursor-pointer px-4 py-2 bg-[#abc32f] text-white rounded-lg hover:bg-[#607c3c] transition"
@@ -247,6 +247,8 @@ const FarmGeneralInfo = () => {
                         <label htmlFor="location">Location</label>
                         <input type="text" name="location" id="location" className="border border-gray-300 rounded-md p-2 flex-1 w-full" />
                     </div>
+
+                    <button className="text- md:text-xl bg-[#abc32f] w-full md:w-1/6 rounded-full  p-2 px-3 text-white self-center">Save</button>
                 </form>
             </div>
         </div>

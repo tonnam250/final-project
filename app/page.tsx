@@ -15,7 +15,7 @@ const page = async () => {
         <div className="flex w-full min-h-screen" id="home">
           <div className="w-1/2 flex flex-col justify-center items-start p-10 text-white pl-20">
             <div className="flex flex-col gap-3">
-              <h1 className="text-4xl font-bold">Welcom to our Final Project</h1>
+              <h1 className="text-4xl font-bold">Welcome to our Final Project</h1>
               <h1 className="text-5xl font-bold">Purely Trace is</h1>
               <p className="text-5xl font-bold">Organic</p>
             </div>
@@ -212,7 +212,6 @@ const page = async () => {
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );
