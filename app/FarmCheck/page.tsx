@@ -1,9 +1,9 @@
-import CreateRawMilk from "./CreateRM";
+import FarmCheck from './FarmCheck'
 
 const Page = () => {
     return (
         <div>
-            <CreateRawMilk />
+            <FarmCheck />
         </div>
     );
 }

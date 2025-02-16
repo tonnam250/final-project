@@ -1,7 +1,7 @@
 import React from "react";
 import Link from 'next/link';
 
-const RawMilk = async () => {
+const FarmRawMilk = async () => {
 
   const res = await fetch('http://localhost:3000/data/RMdata.json');
   const data = await res.json();
@@ -15,7 +15,7 @@ const RawMilk = async () => {
         <h1 className="text-4xl md:text-6xl font-semibold">Raw Milk</h1>
         <div className="flex justify-center items-center w-full h-full gap-5 mt-10 px-8">
           <input type="search" name="search" id="search" placeholder="Search..." className="p-3 border-2 rounded-full w-1/2 text-xl" />
-          <Link href={'/CreateRM'} className="bg-[#5E929E] text-white font-semibold p-3 w-fit text-xl rounded-full text-center">+ Add</Link>
+          <Link href={'/FarmCreateRM'} className="bg-[#5E929E] text-white font-semibold p-3 w-fit text-xl rounded-full text-center">+ Add</Link>
         </div>
 
         {/* Raw milk item */}
@@ -45,4 +45,4 @@ const RawMilk = async () => {
     </div>
   );
 }
-export default RawMilk;
+export default FarmRawMilk;
