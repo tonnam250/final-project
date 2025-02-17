@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 
-const FarmCheck = () => {
+const FarmDetails = () => {
+
     const [data, setData] = useState([]);
 
     useEffect(() => {
@@ -15,10 +16,10 @@ const FarmCheck = () => {
     return (
         <div className="flex flex-col w-full h-full min-h-screen items-center justify-center pt-24 bg-gray-100">
             {data.map((item, index) => (
-                <div key={index} className="flex flex-col md:flex-row justify-between gap-10 w-full p-4 md:p-14">
+                <div key={index} className="flex flex-col md:flex-row justify-between gap-10 w-full p-4 md:p-14 text-gray-500">
                     {/* Milk tank info */}
                     <div className="flex flex-col gap-4 md:gap-10 w-full md:w-1/2 bg-white p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
-                        <h1 className="text-xl md:text-3xl font-bold text-center">Milk Tank Info</h1>
+                        <h1 className="text-xl md:text-3xl font-bold text-center text-black">Milk Tank Info</h1>
                         <div className="flex flex-col space-y-2 gap-3">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Tank ID:</p>
@@ -93,7 +94,7 @@ const FarmCheck = () => {
 
                     {/* Shipping Address */}
                     <div className="flex flex-col gap-4 md:gap-10 w-full md:w-1/2 bg-white p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
-                        <h1 className="text-xl md:text-3xl font-bold text-center">Shipping Address</h1>
+                        <h1 className="text-xl md:text-3xl font-bold text-center text-black">Shipping Address</h1>
                         <div className="flex flex-col space-y-2 gap-3">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Address:</p>
@@ -131,9 +132,13 @@ const FarmCheck = () => {
                     </div>
                 </div>
             ))}
-            <button type="submit" className="text-xl bg-emerald-400 p-3 mb-5 self-end mx-14 rounded-3xl text-whtie font-semibold">Submit</button>
+
+            {/* Qrcode generate section: Require API */}
+            <div className="flex">
+                <h1 className="text-6xl">Qrcode Generate Section</h1>
+            </div>
         </div>
     );
 }
 
-export default FarmCheck;
+export default FarmDetails;

@@ -31,17 +31,17 @@ const FarmerNavbar = () => {
       </div>
 
       <div className={`flex-col md:flex-row md:flex gap-4 md:gap-24 justify-end items-center w-full md:w-1/2 ${isMenuOpen ? 'flex' : 'hidden'} md:flex`}>
-        <Link href={'/FarmGeneralInfo'} className={`hover:text-[#7B9B9E] ${pathname === "/FarmGeneralInfo" ? "text-[#7B9B9E]" : ""}`}>General Info</Link>
-        <Link href={'/FarmRawMilk'} className={`hover:text-[#7B9B9E] ${pathname === "/FarmRawMilk" ? "text-[#7B9B9E]" : ""}`}>Raw Milk</Link>
+        <Link href={'/Farmer/FarmGeneralInfo'} className={`hover:text-[#7B9B9E] ${pathname === "/Farmer/FarmGeneralInfo" ? "text-[#7B9B9E]" : ""}`}>General Info</Link>
+        <Link href={'/Farmer/FarmRawMilk'} className={`hover:text-[#7B9B9E] ${pathname === "/Farmer/FarmRawMilk" ? "text-[#7B9B9E]" : ""}`}>Raw Milk</Link>
         {/* Profile section moved to the top only when menu is collapsed on medium devices */}
-        <div className={`flex flex-wrap m-2 items-center border-2 border-[#EFE4DC] rounded-full px-2 md:px-3 py-1 md:py-2 justify-center shadow-md gap-2 md:gap-3 cursor-pointer hover:text-[#7B9B9E] hover:bg-[#E1EABB] ${isMenuOpen ? 'order-first' : ''}`}>
+        <Link href={'/Profile'} className={`flex flex-wrap m-2 items-center border-2 border-[#EFE4DC] rounded-full px-2 md:px-3 py-1 md:py-2 justify-center shadow-md gap-2 md:gap-3 cursor-pointer hover:text-[#7B9B9E] hover:bg-[#E1EABB] ${isMenuOpen ? 'order-first' : ''}`}>
           <div className="flex flex-wrap w-8 md:w-10 h-8 md:h-10 bg-slate-200 rounded-full">
             <svg xmlns="http://www.w3.org/2000/svg" className="w-8 md:w-10 h-8 md:h-10" viewBox="0 0 24 24">
               <path fill="#999999" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4s-4 1.79-4 4s1.79 4 4 4m0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4" />
             </svg>
           </div>
           <p className="text-base md:text-lg">Profile</p>
-        </div>
+        </Link>
       </div>
     </div>
   );
