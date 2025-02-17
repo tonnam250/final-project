@@ -2,20 +2,11 @@
     {
         "milkTankInfo": {
             "tankId": "T1",
-            "tankCapacity": 1000,
-            "tankCurrentVolume": 500,
+            "tankVolume": 500,
             "tankTemperature": 4,
             "tankPh": 6.5,
-            "tankConductivity": 0.5,
-            "tankTds": 0.5,
-            "tankTurbidity": 0.5,
             "tankFat": 4.5,
-            "tankSnf": 8.5,
             "tankProtein": 3.5,
-            "tankLactose": 4.5,
-            "tankWater": 0.5,
-            "tankUrea": 0.5,
-            "tankFreezingPoint": 0.5,
             "tankAddedBy": "Admin",
             "tankAddedOn": "2021-06-01T12:00:00.000Z"
         },

@@ -26,12 +26,8 @@ const FarmDetails = () => {
                                 <p>{item.milkTankInfo.tankId}</p>
                             </div>
                             <div className="flex justify-between">
-                                <p className="font-semibold">Capacity:</p>
-                                <p>{item.milkTankInfo.tankCapacity}</p>
-                            </div>
-                            <div className="flex justify-between">
                                 <p className="font-semibold">Current Volume:</p>
-                                <p>{item.milkTankInfo.tankCurrentVolume}</p>
+                                <p>{item.milkTankInfo.tankVolume}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Temperature:</p>
@@ -42,44 +38,12 @@ const FarmDetails = () => {
                                 <p>{item.milkTankInfo.tankPh}</p>
                             </div>
                             <div className="flex justify-between">
-                                <p className="font-semibold">Conductivity:</p>
-                                <p>{item.milkTankInfo.tankConductivity}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">TDS:</p>
-                                <p>{item.milkTankInfo.tankTds}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Turbidity:</p>
-                                <p>{item.milkTankInfo.tankTurbidity}</p>
-                            </div>
-                            <div className="flex justify-between">
                                 <p className="font-semibold">Fat:</p>
                                 <p>{item.milkTankInfo.tankFat}</p>
                             </div>
                             <div className="flex justify-between">
-                                <p className="font-semibold">SNF:</p>
-                                <p>{item.milkTankInfo.tankSnf}</p>
-                            </div>
-                            <div className="flex justify-between">
                                 <p className="font-semibold">Protein:</p>
                                 <p>{item.milkTankInfo.tankProtein}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Lactose:</p>
-                                <p>{item.milkTankInfo.tankLactose}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Water:</p>
-                                <p>{item.milkTankInfo.tankWater}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Urea:</p>
-                                <p>{item.milkTankInfo.tankUrea}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Freezing Point:</p>
-                                <p>{item.milkTankInfo.tankFreezingPoint}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Added By:</p>
