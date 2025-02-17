@@ -35,7 +35,7 @@ const FarmRawMilk = async () => {
               </div>
               <div className="flex flex-col md:flex-row justify-between items-center w-full h-1/2">
                 <span className="text-xl md:text-2xl font-semibold">Person In Charge: <p className="inline font-normal">{tank.personInCharge}</p></span>
-                <a className="text-lg md:text-xl underline italic cursor-pointer mt-2 md:mt-0">More info</a>
+                <Link href={'/Farmer/FarmDetails'} className="text-lg md:text-xl underline italic cursor-pointer mt-2 md:mt-0">More info</Link>
               </div>
             </div>
           ))}
