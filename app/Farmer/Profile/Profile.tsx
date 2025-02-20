@@ -68,8 +68,19 @@ const Profile = () => {
                                 ) : (
                                     <p className="text-lg text-left w-full">{showPassword ? password : "*****"}</p>
                                 )}
-                                <button onClick={() => setShowPassword(!showPassword)} className="text-sm text-blue-500">
-                                    {showPassword ? "Hide" : "Show"}
+                                <button onClick={() => setShowPassword(!showPassword)} className="text-sm text-gray-500">
+                                    {showPassword ? (
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                            <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">
+                                                <path d="M3 13c3.6-8 14.4-8 18 0"/>
+                                                <path fill="currentColor" d="M12 17a3 3 0 1 1 0-6a3 3 0 0 1 0 6"/>
+                                            </g>
+                                        </svg>
+                                    ) : (
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                            <path fill="currentColor" fillRule="evenodd" d="M1.606 6.08a1 1 0 0 1 1.313.526L2 7l.92-.394v-.001l.003.009l.021.045l.094.194c.086.172.219.424.4.729a13.4 13.4 0 0 0 1.67 2.237a12 12 0 0 0 .59.592C7.18 11.8 9.251 13 12 13a8.7 8.7 0 0 0 3.22-.602c1.227-.483 2.254-1.21 3.096-1.998a13 13 0 0 0 2.733-3.725l.027-.058l.005-.011a1 1 0 0 1 1.838.788L22 7l.92.394l-.003.005l-.004.008l-.011.026l-.04.087a14 14 0 0 1-.741 1.348a15.4 15.4 0 0 1-1.711 2.256l.797.797a1 1 0 0 1-1.414 1.415l-.84-.84a12 12 0 0 1-1.897 1.256l.782 1.202a1 1 0 1 1-1.676 1.091l-.986-1.514c-.679.208-1.404.355-2.176.424V16.5a1 1 0 0 1-2 0v-1.544c-.775-.07-1.5-.217-2.177-.425l-.985 1.514a1 1 0 0 1-1.676-1.09l.782-1.203c-.7-.37-1.332-.8-1.897-1.257l-.84.84a1 1 0 0 1-1.414-1.414l.797-.797a15.4 15.4 0 0 1-1.87-2.519a14 14 0 0 1-.591-1.107l-.033-.072l-.01-.021l-.002-.007l-.001-.002v-.001C1.08 7.395 1.08 7.394 2 7l-.919.395a1 1 0 0 1 .525-1.314" clipRule="evenodd"/>
+                                        </svg>
+                                    )}
                                 </button>
                             </div>
                         </div>
@@ -105,8 +116,15 @@ const Profile = () => {
                         </div>
                     </div>
                 </div>
-                <button type="button" onClick={handleEditClick} className='bg-emerald-400 p-2 text-white rounded-full w-16 hover:bg-green-700'>
-                    {isEditing ? "Save" : "Edit"}
+                <button type="button" onClick={handleEditClick} className='bg-emerald-400 p-2 text-white rounded-full w-24 hover:bg-green-700 flex items-center justify-center gap-2'>
+                    {isEditing ? "Save" : (
+                        <>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                <path fill="currentColor" d="m14.06 9l.94.94L5.92 19H5v-.92zm3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83l3.75 3.75l1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94z"/>
+                            </svg>
+                            Edit
+                        </>
+                    )}
                 </button>
             </div>
         </div>

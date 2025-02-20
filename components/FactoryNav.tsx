@@ -41,7 +41,7 @@ const FactoryNav = () => {
                 <Link href={'/Factory/FactoryGeneral'} className={`hover:text-[#ffa19d] ${pathname === "/Factory/FactoryGeneral" ? "text-[#ffa19d]" : ""}`}>General Information</Link>
 
                 <div className="relative">
-                    <button onClick={toggleDropdown} className={`hover:text-[#ffa19d] ${pathname.startsWith("/Factory") ? "text-[#ffa19d]" : ""}`}>
+                    <button onClick={toggleDropdown} className={`hover:text-[#ffa19d] ${pathname.startsWith("/Factory") ? "้hover:text-[#ffa19d]" : ""}`}>
                         Revieve RM
                     </button>
                     {isDropdownOpen && (
