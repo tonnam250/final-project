@@ -1,0 +1,77 @@
+[
+    {
+        "id": "1",
+        "status": "Received",
+        "milkTankInfo": {
+            "tankId": "T1",
+            "personInCharge": "John Doe",
+            "tankVolume": 500,
+            "tankTemperature": 4,
+            "tankPh": 6.5,
+            "tankFat": 4.5,
+            "tankProtein": 3.5,
+            "tankAddedBy": "Admin",
+            "tankAddedOn": "2021-06-01T12:00:00.000Z"
+        },
+        "shippingAddress": {
+            "address": "123, ABC Street, XYZ City, PQR State, 123456",
+            "contactPerson": "John Doe",
+            "contactNumber": "1234567890",
+            "email": "johndoe@gmail.com",
+            "postalCode": "123456",
+            "locationUrl": "https://www.google.com/maps",
+            "shippingDate": "2021-06-01T12:00:00.000Z",
+            "shippingBy": "Admin"
+        }
+    },
+    {
+        "id": "2",
+        "status": "Received",
+        "milkTankInfo": {
+            "tankId": "T2",
+            "personInCharge": "Jane Smith",
+            "tankVolume": 600,
+            "tankTemperature": 5,
+            "tankPh": 6.6,
+            "tankFat": 4.6,
+            "tankProtein": 3.6,
+            "tankAddedBy": "Admin",
+            "tankAddedOn": "2021-06-02T12:00:00.000Z"
+        },
+        "shippingAddress": {
+            "address": "456, DEF Street, UVW City, STU State, 654321",
+            "contactPerson": "Jane Smith",
+            "contactNumber": "0987654321",
+            "email": "janesmith@gmail.com",
+            "postalCode": "654321",
+            "locationUrl": "https://www.google.com/maps",
+            "shippingDate": "2021-06-02T12:00:00.000Z",
+            "shippingBy": "Admin"
+        }
+    },
+    {
+        "id": "3",
+        "status": "Received",
+        "milkTankInfo": {
+            "tankId": "T3",
+            "personInCharge": "Alice Johnson",
+            "tankVolume": 700,
+            "tankTemperature": 6,
+            "tankPh": 6.7,
+            "tankFat": 4.7,
+            "tankProtein": 3.7,
+            "tankAddedBy": "Admin",
+            "tankAddedOn": "2021-06-03T12:00:00.000Z"
+        },
+        "shippingAddress": {
+            "address": "789, GHI Street, RST City, OPQ State, 789012",
+            "contactPerson": "Alice Johnson",
+            "contactNumber": "1122334455",
+            "email": "alicejohnson@gmail.com",
+            "postalCode": "789012",
+            "locationUrl": "https://www.google.com/maps",
+            "shippingDate": "2021-06-03T12:00:00.000Z",
+            "shippingBy": "Admin"
+        }
+    }
+]
