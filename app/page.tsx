@@ -1,6 +1,43 @@
+"use client"; // ✅ ใช้ Client Component
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { getUserRole, getRedirectUrl } from "../services/authService"; 
 
-const page = async () => {
+
+export default function HomePage() {
+  const [role, setRole] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true); // ✅ เพิ่ม Loading State
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const userRole = await getUserRole();
+        if (userRole) {
+          setRole(userRole);
+          const redirectUrl = getRedirectUrl(userRole);
+          if (redirectUrl) {
+            router.push(redirectUrl); // ✅ Redirect เฉพาะถ้ามี URL ที่ถูกต้อง
+          }
+        }
+      } catch (error) {
+        console.error("❌ [Auth Check Error]:", error);
+      } finally {
+        setIsLoading(false); // ✅ หยุด Loading เมื่อเช็คเสร็จ
+      }
+    };
+
+    checkAuth();
+  }, []); // ✅ เพิ่ม Dependency Array ให้ useEffect ทำงานแค่ครั้งเดียว
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col w-full h-screen justify-center items-center">
+        <p className="text-xl text-gray-700">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col w-full h-full">
@@ -215,5 +252,5 @@ const page = async () => {
       </div>
     </div>
   );
-};
-export default page;
+}
+

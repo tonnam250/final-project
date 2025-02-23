@@ -2,10 +2,17 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { login, getRedirectUrl } from "../services/authService";
+import { useRouter } from "next/navigation"; // ✅ ใช้สำหรับ Redirect
+
 
 const HomeNav = () => {
   const [hasScrolled, setHasScrolled] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [email, setEmail] = useState(""); // ✅ เก็บ Email
+  const [password, setPassword] = useState(""); // ✅ เก็บ Password
+  const [error, setError] = useState(""); // ✅ แสดง Error Message
+  const router = useRouter(); // ✅ ใช้สำหรับ Redirect
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,6 +41,20 @@ const HomeNav = () => {
   const hideLoginSidebar = () => {
     setShowLogin(false);
   };
+
+    // ✅ ฟังก์ชัน Login
+    const handleLogin = async () => {
+      try {
+        setError(""); // ✅ เคลียร์ Error ก่อน Login
+        const { role, redirectUrl } = await login(email, password); // ✅ เรียกจาก Service
+    
+        console.log("🔄 Redirecting to:", redirectUrl);
+        router.push(redirectUrl); // ✅ Redirect ไปตาม Role
+      } catch (err: any) {
+        setError(err.message || "Login failed"); // ✅ แสดง Error Message
+      }
+    };
+  
 
   return (
     <div className={`fixed w-full h-24 flex justify-between px-5 items-center text-white text-xl z-50 transition-all duration-300 ${hasScrolled ? "bg-[#3D405B] shadow-md" : "bg-transparent"
@@ -73,14 +94,14 @@ const HomeNav = () => {
               </div>
               <div className="flex flex-col gap-3 mt-5 text-[#3D405B]">
                 <label className="text-xl mt-5">Email</label>
-                <input type="email" className="rounded-full p-2" placeholder="Email" />
+                <input type="email" className="rounded-full p-2" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
                 <label htmlFor="password" className="text-xl mt-3">Password</label>
-                <input type="password" className="rounded-full p-2" placeholder="Password" />
+                <input type="password" className="rounded-full p-2" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
                 <div className="flex items-center gap-2">
                   <input type="checkbox" className="rounded-xl w-5 h-5" name="rememberMe" id="rememberMe" />
                   <label htmlFor="rememberMe">Remember Me</label>
                 </div>
-                <button className="bg-[#f2cc8f] text-white rounded-full p-2 w-1/3 self-center mt-5 hover:bg-[#F98715]">Sign In</button>
+                <button className="bg-[#f2cc8f] text-white rounded-full p-2 w-1/3 self-center mt-5 hover:bg-[#F98715]" onClick={handleLogin} >Sign In</button>
                 <a className="text-center mt-5 cursor-pointer">Forgot password?</a>
                 <Link href={'/SignUp'} className="text-center mt-3 cursor-pointer">Don't have an account?</Link>
               </div>

@@ -1,8 +1,8 @@
-const API_URL = "http://127.0.0.1:8080/api/v1/farmers/me";
+const API_URL = "http://127.0.0.1:8080/api/v1/farmers";
 
 // ✅ ฟังก์ชันดึงข้อมูลฟาร์ม
 export const getFarmInfo = async (): Promise<any | null> => {
-    const response = await fetch("http://127.0.0.1:8080/api/v1/farmers/me", {
+    const response = await fetch(`${API_URL}/me`, {
         method: "GET",
         credentials: "include", // ✅ ต้องใช้ Cookie
         headers: {
@@ -18,12 +18,11 @@ export const getFarmInfo = async (): Promise<any | null> => {
     return await response.json();
 };
 
-
 // ✅ ฟังก์ชันอัปเดตข้อมูลฟาร์ม
 export const updateFarmInfo = async (farmData: any): Promise<boolean> => {
     console.log("📡 [UpdateFarmInfo] Updating farm data...");
 
-    const response = await fetch(`${API_URL}/farmers/update`, {
+    const response = await fetch(`${API_URL}/update`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

@@ -67,12 +67,12 @@ export const getUserRole = async (): Promise<string | null> => {
 };
 
 // ✅ ฟังก์ชันเลือก URL ตาม Role
-const getRedirectUrl = (userRole: string) => {
+export const getRedirectUrl = (userRole: string) => {
     console.log("🔄 [Redirect] User Role:", userRole);
 
     switch (userRole) {
         case "farmer":
-            return "/FarmGeneralInfo";
+            return "/Farmer/Profile";
         case "factory":
             return "/FactoryDashboard";
         case "logistics":
@@ -83,3 +83,43 @@ const getRedirectUrl = (userRole: string) => {
             return "/dashboard"; // ✅ Default
     }
 };
+
+export const getUserInfo = async (): Promise<{ email: string; password: string } | null> => {
+    console.log("📡 [GetUserInfo] Fetching user info...");
+
+    const response = await fetch(`${API_URL}/user-info`, {
+        method: "GET",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+    });
+
+    if (!response.ok) {
+        console.error("❌ [GetUserInfo] Failed to fetch user info:", response.status);
+        return null;
+    }
+
+    const data = await response.json();
+    console.log("✅ [GetUserInfo] User info:", data);
+    return data;
+};
+
+// ✅ ฟังก์ชันอัปเดตข้อมูลผู้ใช้ (email, password) ไปยัง Backend
+export const updateUserInfo = async (email: string, password: string): Promise<boolean> => {
+    console.log("📡 [UpdateUserInfo] Updating user info...");
+
+    const response = await fetch(`${API_URL}/update-user`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) {
+        console.error("❌ [UpdateUserInfo] Failed to update user info:", response.status);
+        return false;
+    }
+
+    console.log("✅ [UpdateUserInfo] User info updated successfully");
+    return true;
+};
+
