@@ -302,7 +302,7 @@ const AddProduct = () => {
                     {/* Description */}
                     <div className="flex flex-col w-full items-start gap-3">
                         <label htmlFor="description" className="font-semibold">Description</label>
-                        <input type="text" id="description" placeholder="Write description" className="border rounded-full p-3 w-full"
+                        <input type="text" id="description" placeholder="Write description of product" className="border rounded-full p-3 w-full"
                             name="RecipientInfo.description" value={recievedForm.RecipientInfo.description} onChange={handleFormDataChange} />
                     </div>
                     {/* Quauntity per unit */}
@@ -390,9 +390,9 @@ const AddProduct = () => {
                             <div className="flex flex-col w-full items-start gap-3">
                                 <label htmlFor="temp" className="font-semibold">Temperature</label>
                                 <div className="flex w-full items-start gap-3">
-                                    <input type="number" name="Quantity.temp" id="temp" className="p-3 rounded-full borcder w-4/5" placeholder="0.00" step="0.01"
+                                    <input type="number" name="Quantity.temp" id="temp" className="p-3 rounded-full borcder w-11/12" placeholder="0.00" step="0.01"
                                         value={recievedForm.Quantity.temp} onChange={handleFormDataChange} />
-                                    <select name="Quantity.tempUnit" id="tempUnit" className="border rounded-full p-3 w-1/6 font-semibold"
+                                    <select name="Quantity.tempUnit" id="tempUnit" className="border rounded-full p-3 w-1/12 font-semibold"
                                         value={recievedForm.Quantity.tempUnit} onChange={handleFormDataChange}>
                                         <option value="Celcius">°C</option>
                                         <option value="Farenheit">°F</option>

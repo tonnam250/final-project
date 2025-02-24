@@ -41,7 +41,7 @@ const CheckDetails = () => {
     }
 
     return (
-        <div className="flex flex-col justify-center items-center w-full h-full min-h-screen">
+        <div className="flex flex-col justify-center items-center w-full h-full min-h-screen pt-24">
             {/* Detail Status */}
             <div className="flex items-center w-full h-full p-10">
                 <div className="flex border shadow-xl w-full h-full p-5 rounded-3xl gap-8">

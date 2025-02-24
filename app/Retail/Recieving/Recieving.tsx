@@ -210,7 +210,7 @@ const Recieving = () => {
     return (
         <div className="flex flex-col w-full h-full min-h-screen items-center justify-center pt-24 bg-gray-100">
             {/* Detail Status */}
-            <div className="flex items-center w-full mt-28 h-full p-10">
+            <div className="flex items-center w-full mt-10 h-full p-10">
                 <div className="flex border shadow-xl w-full h-full p-5 rounded-3xl gap-8">
                     {/* First Step */}
                     <div className="flex flex-col w-1/3 h-full">

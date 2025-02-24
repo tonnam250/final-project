@@ -81,7 +81,6 @@ const HomeNav = () => {
                   <label htmlFor="rememberMe">Remember Me</label>
                 </div>
                 <button className="bg-[#f2cc8f] text-white rounded-full p-2 w-1/3 self-center mt-5 hover:bg-[#F98715]">Sign In</button>
-                <a className="text-center mt-5 cursor-pointer">Forgot password?</a>
                 <Link href={'/SignUp'} className="text-center mt-3 cursor-pointer">Don't have an account?</Link>
               </div>
             </div>

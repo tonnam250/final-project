@@ -17,7 +17,7 @@ const page = async () => {
             <div className="flex flex-col gap-3">
               <h1 className="text-4xl font-bold">Welcome to our Final Project</h1>
               <h1 className="text-5xl font-bold">Purely Trace is</h1>
-              <p className="text-5xl font-bold">Organic</p>
+              <span className="text-5xl font-bold">Organic <p className="inline text-5xl font-bold text-[#ffc260]">Blockchain</p></span>
             </div>
             <a href="#" className="text-xl mt-8 bg-[#f2cc8f] p-2 px-3 rounded-full font-semibold">Our Story</a>
             <div className="flex flex-wrap align-middle items-center gap-3 mt-5">

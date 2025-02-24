@@ -42,7 +42,7 @@ const FactoryNav = () => {
 
                 <div className="relative w-full md:w-auto text-center">
                     <button onClick={toggleDropdown} className={`whitespace-nowrap hover:text-[#ffa19d] ${pathname.startsWith("/Factory") ? "้hover:text-[#ffa19d]" : ""}`}>
-                        Revieve RM
+                        Recieve RM
                     </button>
                     {isDropdownOpen && (
                         <div className="absolute mt-2 w-full md:w-40 bg-white rounded-md shadow-lg left-0 md:left-auto">

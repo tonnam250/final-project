@@ -103,11 +103,6 @@ const FactoryDetails = () => {
                     </div>
                 </div>
             )}
-
-            {/* Qrcode generate section: Require API */}
-            <div className="flex">
-                <h1 className="text-6xl text-black">Qrcode Generate Section</h1>
-            </div>
         </div>
     );
 }

@@ -292,6 +292,7 @@ const FarmGeneralInfo = () => {
                     {/* end district + sub-district */}
 
                     {/* Upload Organic certification */}
+                    <label htmlFor="" className="text-start font-semibold">Uplaod Organic Certification</label>
                     <div className="flex flex-col md:flex-row items-center justify-start gap-2 border p-2">
                         <label
                             htmlFor="file-upload"

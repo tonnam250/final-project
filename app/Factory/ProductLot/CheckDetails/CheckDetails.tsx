@@ -1,7 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 const CheckDetails = () => {
+
+    const router = useRouter();
 
     const [data, setData] = useState(null);
     
@@ -14,6 +17,7 @@ const CheckDetails = () => {
 
     return (
         <div className="flex flex-col w-full h-full min-h-screen items-center justify-center pt-24 bg-gray-100 text-gray-500">
+            <h1 className="text-5xl font-bold mt-10 text-black">Product Lot Check Detail</h1>
             {data && (
                 <div className="flex flex-col md:flex-row justify-between gap-10 w-full p-4 md:p-14">
                     {/* Recipient Info */}
@@ -103,11 +107,8 @@ const CheckDetails = () => {
                     </div>
                 </div>
             )}
-
-            {/* Qrcode generate section: Require API */}
-            <div className="flex">
-                <h1 className="text-6xl text-black">Qrcode Generate Section</h1>
-            </div>
+            <button className="bg-emerald-500 text-white rounded-full p-3"
+            onClick={() => router.push('/Factory/ProductLot/Details')}>Submit</button>
         </div>
     );
 };

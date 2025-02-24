@@ -251,6 +251,7 @@ const FactoryGeneral = () => {
                     {/* end district + sub-district */}
 
                     {/* Upload Organic certification */}
+                    <label htmlFor="" className="font-semibold text-start">Upload Organic Certification</label>
                     <div className="flex flex-col md:flex-row items-center justify-start gap-2 border p-2">
                         <label
                             htmlFor="file-upload"
