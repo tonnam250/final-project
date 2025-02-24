@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-const FactoryDetails = () => {
+const Details = () => {
     const [data, setData] = useState(null);
 
     useEffect(() => {
@@ -112,4 +112,4 @@ const FactoryDetails = () => {
     );
 }
 
-export default FactoryDetails;
+export default Details;

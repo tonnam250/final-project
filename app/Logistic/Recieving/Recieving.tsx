@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useRouter } from 'next/navigation';
-import { Dialog } from '@headlessui/react';
-import { resolve } from "path";
+import { useRouter } from "next/navigation";
 
 interface GeoData {
     id: number;
@@ -19,14 +17,10 @@ interface GeoData {
     postalCode: number;
 }
 
-declare global {
-    interface Window {
-        google: any;
-        initMap: () => void;
-    }
-}
+const Recieving = () => {
 
-const FarmCreateRM = () => {
+    const router = useRouter();
+
     // for province fetching
     const [geoData, setGeoData] = useState<GeoData[]>([]);
     const [provinceList, setProvinceList] = useState<string[]>([]);
@@ -100,8 +94,6 @@ const FarmCreateRM = () => {
             shippingAddressRef.current?.scrollIntoView({ behavior: "smooth" });
         }, 100); // Delay to ensure the section is rendered
     }
-
-    const router = useRouter();
 
     // save form Data
     const [formData, setFormData] = useState({
@@ -228,61 +220,6 @@ const FarmCreateRM = () => {
     };
     // end save form Data
 
-    // show map wiht url input
-    const [location, setLocation] = useState<string>(""); // ค่าที่อยู่
-    const [loaded, setLoaded] = useState<boolean>(false); // ✅ เพิ่ม useState ให้ใช้งานได้
-    const mapRef = useRef<HTMLDivElement | null>(null);
-    const [scriptLoaded, setScriptLoaded] = useState<boolean>(false);
-    const [geocodeError, setGeocodeError] = useState<string>("");
-
-    const handleLocationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setLocation(event.target.value);
-    };
-
-    // useEffect(() => {
-    //     if (!window.google) {
-    //         const script = document.createElement("script");
-    //         script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDv2_GeZtaAKIrztx8eAa5NxJoZWwMuEfM&callback=initMap`;
-    //         script.async = true;
-    //         script.defer = true;
-    //         document.head.appendChild(script);
-
-    //         window.initMap = () => {
-    //             setScriptLoaded(true);
-    //         };
-
-    //         return () => {
-    //             document.head.removeChild(script);
-    //         };
-    //     } else {
-    //         setScriptLoaded(true);
-    //     }
-    // }, []);
-
-    // useEffect(() => {
-    //     if (scriptLoaded && mapRef.current && location) {
-    //         const geocoder = new window.google.maps.Geocoder();
-    //         geocoder.geocode({ address: location }, (results, status) => {
-    //             if (status === window.google.maps.GeocoderStatus.OK) {
-    //                 const map = new window.google.maps.Map(mapRef.current, {
-    //                     zoom: 15,
-    //                     center: results[0].geometry.location,
-    //                 });
-
-    //                 new window.google.maps.Marker({
-    //                     position: results[0].geometry.location,
-    //                     map: map,
-    //                     title: location,
-    //                 });
-    //                 setGeocodeError(""); // Clear any previous error
-    //             } else {
-    //                 console.error("Geocoding failed:", status);
-    //                 setGeocodeError("Geocoding failed: No results found for the provided location.");
-    //             }
-    //         });
-    //     }
-    // }, [location, scriptLoaded]); // เรียกใช้เมื่อ location หรือ scriptLoaded เปลี่ยน
-
     return (
         <div className="flex flex-col justify-center items-center w-full min-h-screen">
             {/* Detail Status */}
@@ -299,7 +236,7 @@ const FarmCreateRM = () => {
                             <div className={`h-2 rounded-full ${stepStatus.step1 === 'completed' ? 'bg-emerald-500 w-full' : 'bg-yellow-400 w-1/5'}`}></div>
                         </div>
                         <p className="text-xl font-semibold">STEP 1</p>
-                        <h1 className="text-3xl font-semibold mb-3">Milk Tank Info</h1>
+                        <h1 className="text-3xl font-semibold mb-3">General Info</h1>
                         <div className={`flex flex-wrap text-center w-fit items-center justify-center rounded-full p-1 px-2 mx-5 ${stepStatus.step1 === 'completed' ? 'bg-emerald-500 text-white' : 'bg-yellow-200 text-amber-500'}`}>
                             <p className="text-lg font-semibold">{stepStatus.step1 === 'completed' ? 'Completed' : 'In Progress'}</p>
                         </div>
@@ -315,7 +252,7 @@ const FarmCreateRM = () => {
                             <div className={`h-2 rounded-full ${stepStatus.step2 === 'in-progress' ? 'bg-yellow-400 w-1/5' : 'bg-gray-200 w-0'}`}></div>
                         </div>
                         <p className={`text-xl font-semibold ${stepStatus.step2 === 'in-progress' ? 'text-amber-500' : 'text-gray-500'}`}>STEP 2</p>
-                        <h1 className={`text-3xl font-semibold mb-3 ${stepStatus.step2 === 'in-progress' ? 'text-amber-500' : 'text-gray-500'}`}>Shipping Address</h1>
+                        <h1 className={`text-3xl font-semibold mb-3 ${stepStatus.step2 === 'in-progress' ? 'text-amber-500' : 'text-gray-500'}`}>Product Detail</h1>
                         <div className={`flex flex-wrap text-center w-fit items-center justify-center rounded-full mx-5 p-1 px-2 ${stepStatus.step2 === 'in-progress' ? 'bg-yellow-200 text-amber-500' : 'bg-gray-200 text-gray-500'}`}>
                             <p className="text-lg font-semibold">{stepStatus.step2 === 'in-progress' ? 'In Progress' : 'Not finished'}</p>
                         </div>
@@ -343,19 +280,22 @@ const FarmCreateRM = () => {
             <form className="flex flex-col w-5/6 h-full p-20 m-10" onSubmit={saveToLocalStorage}>
                 {/* Milk Tank Info Section */}
                 <div className="flex flex-col items-center w-full h-full text-xl gap-5">
-                    <h1 className="text-5xl font-bold">Milk Tank Info</h1>
-                    {/* Farm Name */}
+                    <h1 className="text-5xl font-bold">General Info</h1>
+                    {/* Recieve Status */}
                     <div className="flex flex-col w-full items-start gap-3">
-                        <label htmlFor="farmName" className="font-semibold">Farm Name</label>
-                        <input type="text" id="farmName"
-                            placeholder="Enter your farm name" className="border rounded-full p-3 w-full"
-                            name="milkTankInfo.farmName" value={formData.milkTankInfo.farmName} onChange={handleFormDataChange} />
+                        <label htmlFor="recieveStatus" className="font-semibold">Recieve Status</label>
+                        <select name="recieveStatus" id="recieveStatus" className="border rounded-full p-3 w-1/6 font-semibold">
+                            <option value="before">Before</option>
+                            <option value="during">During</option>
+                            <option value="after">After</option>
+                        </select>
                     </div>
-                    {/* Milk tank no. */}
+                    {/* Company Name */}
                     <div className="flex flex-col w-full items-start gap-3">
-                        <label htmlFor="milkTankNo" className="font-semibold">Milk Tank No.</label>
-                        <input type="text" id="milkTankNo" placeholder="Enter your milk tank number" className="border rounded-full p-3 w-full"
-                            name="milkTankInfo.milkTankNo" value={formData.milkTankInfo.milkTankNo} onChange={handleFormDataChange} />
+                        <label htmlFor="CompanyName" className="font-semibold">Company Name</label>
+                        <input type="text" id="CompanyName"
+                            placeholder="Enter your Company name" className="border rounded-full p-3 w-full"
+                            name="milkTankInfo.CompanyName" value={formData.milkTankInfo.CompanyName} onChange={handleFormDataChange} />
                     </div>
                     {/* Person in charge */}
                     <div className="flex flex-col w-full items-start gap-3">
@@ -364,169 +304,12 @@ const FarmCreateRM = () => {
                             placeholder="Enter name of person in charge" className="border rounded-full p-3 w-full"
                             value={formData.milkTankInfo.personInCharge} onChange={handleFormDataChange} />
                     </div>
-                    {/* Quantity + temperature */}
-                    <div className="flex w-full items-start gap-3">
-                        {/* Quantity */}
-                        <div className="flex flex-col w-1/2 items-start gap-3">
-                            <label htmlFor="quantity" className="font-semibold">Quantity</label>
-                            <div className="flex gap-3 w-full">
-                                <input type="number" name="milkTankInfo.quantity" id="quantity"
-                                    className="border rounded-full p-3 w-4/5" placeholder="0.00" step="0.01"
-                                    value={formData.milkTankInfo.quantity} onChange={handleFormDataChange} />
-                                <select name="milkTankInfo.quantityUnit" id="quantityUnit" className="border rounded-full p-3 w-1/5 font-semibold"
-                                    value={formData.milkTankInfo.quantityUnit} onChange={handleFormDataChange}>
-                                    <option value="Ton">Ton</option>
-                                    <option value="Liter">Liter</option>
-                                    <option value="Ml">Milliliter</option>
-                                    <option value="Oz">Ounce</option>
-                                    <option value="CC">cc</option>
-                                    <option value="Gallon">Gallon</option>
-                                </select>
-                            </div>
-                        </div>
-                        {/* Temperature */}
-                        <div className="flex flex-col w-1/2 items-start gap-3">
-                            <label htmlFor="temp" className="font-semibold">Temperature</label>
-                            <div className="flex w-full items-start gap-3">
-                                <input type="number" name="milkTankInfo.temp" id="temp" className="p-3 rounded-full borcder w-4/5" placeholder="0.00" step="0.01"
-                                    value={formData.milkTankInfo.temp} onChange={handleFormDataChange} />
-                                <select name="milkTankInfo.tempUnit" id="tempUnit" className="border rounded-full p-3 w-1/5 font-semibold"
-                                    value={formData.milkTankInfo.tempUnit} onChange={handleFormDataChange}>
-                                    <option value="Celcius">°C</option>
-                                    <option value="Farenheit">°F</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    {/* pH of Milk */}
+                    {/* Location */}
                     <div className="flex flex-col w-full items-start gap-3">
-                        <label htmlFor="pH" className="font-semibold">pH of Milk</label>
-                        <input type="number" name="milkTankInfo.pH" id="pH" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01"
-                            value={formData.milkTankInfo.pH} onChange={handleFormDataChange} />
-                    </div>
-                    {/* Fat + Protein */}
-                    <div className="flex w-full items-start gap-3">
-                        {/* Fat */}
-                        <div className="flex flex-col w-1/2 items-start gap-3">
-                            <label htmlFor="fat" className="font-semibold">Fat (%)</label>
-                            <input type="number" name="milkTankInfo.fat" id="fat" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01"
-                                value={formData.milkTankInfo.fat} onChange={handleFormDataChange} />
-                        </div>
-                        {/* Protein */}
-                        <div className="flex flex-col w-1/2 items-start gap-3">
-                            <label htmlFor="protein" className="font-semibold">Protein (%)</label>
-                            <input type="number" name="milkTankInfo.protein" id="protein" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01"
-                                value={formData.milkTankInfo.protein} onChange={handleFormDataChange} />
-                        </div>
-                    </div>
-                    {/* bacteria testing */}
-                    <div className="flex flex-col w-full justify-center gap-3">
-                        <div className="flex w-full items-center gap-3">
-                            <input
-                                type="checkbox"
-                                name="milkTankInfo.bacteria"
-                                id="bacteria"
-                                className="w-5 h-5 appearance-none border border-gray-400 rounded-full checked:bg-[#D3D596] checked:border-[#305066]"
-                                onChange={handleFormDataChange}
-                                checked={formData.milkTankInfo.bacteria}
-                            />
-                            <label htmlFor="bacteria" className="font-semibold">Bacteria Testing</label>
-                        </div>
-                        {formData.milkTankInfo.bacteria && (
-                            <input
-                                type="text"
-                                name="milkTankInfo.bacteriaInfo"
-                                id="bacteriaInfo"
-                                className="border rounded-full p-3"
-                                placeholder="Please fill additional information"
-                                value={formData.milkTankInfo.bacteriaInfo}
-                                onChange={handleFormDataChange}
-                            />
-                        )}
-                    </div>
-                    {/* Contaminants */}
-                    <div className="flex flex-col w-full justify-center gap-3">
-                        <div className="flex w-full items-center gap-3">
-                            <input
-                                type="checkbox"
-                                name="milkTankInfo.contaminants"
-                                id="milkTankInfo.contaminants"
-                                className="w-5 h-5 appearance-none border border-gray-400 rounded-full checked:bg-[#D3D596] checked:border-[#305066]"
-                                onChange={handleFormDataChange}
-                                checked={formData.milkTankInfo.contaminants}
-                            />
-                            <label htmlFor="contaminants" className="font-semibold">Contaminants</label>
-                        </div>
-                        {formData.milkTankInfo.contaminants && (
-                            <input
-                                type="text"
-                                name="milkTankInfo.contaminantInfo"
-                                id="milkTankInfo.contaminantInfo"
-                                className="border rounded-full p-3"
-                                placeholder="Please fill additional information"
-                                value={formData.milkTankInfo.contaminantInfo}
-                                onChange={handleFormDataChange}
-                            />
-                        )}
-                    </div>
-                    {/* Abnormal Characteristic */}
-                    <div className="flex flex-col w-full justify-center items-start gap-3">
-                        <div className="flex w-full items-center gap-3">
-                            <input
-                                type="checkbox"
-                                name="milkTankInfo.abnormalChar"
-                                id="abnormalChar"
-                                className="w-5 h-5 appearance-none border border-gray-400 rounded-full checked:bg-[#D3D596] checked:border-[#305066]"
-                                onChange={handleAbnormalChange}
-                                checked={formData.milkTankInfo.abnormalChar}
-                            />
-                            <label htmlFor="abnormalChar" className="font-semibold">Abnormal Characteristic</label>
-                        </div>
-                        {formData.milkTankInfo.abnormalChar && (
-                            <div className="flex flex-col w-full items-center gap-3 px-8">
-                                <div className="flex w-full items-center gap-3">
-                                    <input type="checkbox" name="milkTankInfo.abnormalType.smellBad" id="smellBad" className="border w-4 h-4"
-                                        checked={formData.milkTankInfo.abnormalType.smellBad} onChange={handleNestedCheckboxChange} />
-                                    <label htmlFor="smellBad" className="font-semibold">Smell Bad</label>
-                                </div>
-                                <div className="flex w-full items-center gap-3">
-                                    <input type="checkbox" name="milkTankInfo.abnormalType.smellNotFresh" id="smellNotFresh" className="border w-4 h-4"
-                                        checked={formData.milkTankInfo.abnormalType.smellNotFresh} onChange={handleNestedCheckboxChange} />
-                                    <label htmlFor="smellNotFresh" className="font-semibold">Smell not fresh</label>
-                                </div>
-                                <div className="flex w-full items-center gap-3">
-                                    <input type="checkbox" name="milkTankInfo.abnormalType.abnormalColor" id="abnormalColor" className="border w-4 h-4"
-                                        checked={formData.milkTankInfo.abnormalType.abnormalColor} onChange={handleNestedCheckboxChange} />
-                                    <label htmlFor="abnormalColor" className="font-semibold">Abnormal Color</label>
-                                    <p className="text-gray-500">ex. yellow or green</p>
-                                </div>
-                                <div className="flex w-full items-center gap-3">
-                                    <input type="checkbox" name="milkTankInfo.abnormalType.sour" id="sour" className="border w-4 h-4"
-                                        checked={formData.milkTankInfo.abnormalType.sour} onChange={handleNestedCheckboxChange} />
-                                    <label htmlFor="sour" className="font-semibold">Sour taste</label>
-                                </div>
-                                <div className="flex w-full items-center gap-3">
-                                    <input type="checkbox" name="milkTankInfo.abnormalType.bitter" id="bitter" className="border w-4 h-4"
-                                        checked={formData.milkTankInfo.abnormalType.bitter} onChange={handleNestedCheckboxChange} />
-                                    <label htmlFor="bitter" className="font-semibold">Bitter taste</label>
-                                </div>
-                                <div className="flex w-full items-center gap-3">
-                                    <input type="checkbox" name="milkTankInfo.abnormalType.cloudy" id="cloudy" className="border w-4 h-4"
-                                        checked={formData.milkTankInfo.abnormalType.cloudy} onChange={handleNestedCheckboxChange} />
-                                    <label htmlFor="cloudy" className="font-semibold">Cloudy Appearance</label>
-                                </div>
-                                <div className="flex w-full items-center gap-3">
-                                    <input type="checkbox" name="milkTankInfo.abnormalType.lumpy" id="lumpy" className="border w-4 h-4"
-                                        checked={formData.milkTankInfo.abnormalType.lumpy} onChange={handleNestedCheckboxChange} />
-                                    <label htmlFor="lumpy" className="font-semibold">Lumpy Appearance</label>
-                                </div>
-                                <div className="flex w-full items-center gap-3">
-                                    <input type="checkbox" name="milkTankInfo.abnormalType.separation" id="separation" className="border w-4 h-4"
-                                        checked={formData.milkTankInfo.abnormalType.separation} onChange={handleNestedCheckboxChange} />
-                                    <label htmlFor="separation" className="font-semibold">Separation between water and fat</label>
-                                </div>
-                            </div>
-                        )}
+                        <label htmlFor="location" className="font-semibold">Location</label>
+                        <input type="text" id="location"
+                            placeholder="Enter location" className="border rounded-full p-3 w-full"
+                            name="RecipientInfo.location" onChange={handleFormDataChange} />
                     </div>
 
                     <button
@@ -538,10 +321,130 @@ const FarmCreateRM = () => {
                     </button>
                 </div>
 
-                {/* Shipping Address section */}
+                {/* Product Detail section */}
                 {showShippingAddress && (
                     <div ref={shippingAddressRef} className="flex flex-col items-center w-full h-full text-xl gap-8 mt-20">
-                        <h1 className="text-5xl font-bold">Shipping Address</h1>
+                        <h1 className="text-5xl font-bold">Product Detail</h1>
+                        {/* Pick up Time */}
+                        <div className="flex w-full items-start gap-3">
+                            <div className="flex flex-col w-1/2 items-start gap-3">
+                                <label htmlFor="pickUpTime" className="font-semibold">Pick up time</label>
+                                <input type="datetime-local" id="pickUpTime"
+                                    className="border rounded-full p-3 w-full"
+                                    name="RecipientInfo.pickUpTime" onChange={handleFormDataChange} />
+                            </div>
+                            <div className="flex flex-col w-1/2 items-start gap-3">
+                                <label htmlFor="pickUpTime" className="font-semibold">Delivery time</label>
+                                <input type="datetime-local" id="pickUpTime"
+                                    className="border rounded-full p-3 w-full"
+                                    name="RecipientInfo.pickUpTime" onChange={handleFormDataChange} />
+                            </div>
+                        </div>
+                        {/* Quantity + temperature */}
+                        <div className="flex w-full items-start gap-3">
+                            {/* Quantity */}
+                            <div className="flex flex-col w-1/2 items-start gap-3">
+                                <label htmlFor="quantity" className="font-semibold">Quantity</label>
+                                <div className="flex gap-3 w-full">
+                                    <input type="number" name="milkTankInfo.quantity" id="quantity"
+                                        className="border rounded-full p-3 w-4/5" placeholder="0.00" step="0.01"
+                                        value={formData.milkTankInfo.quantity} onChange={handleFormDataChange} />
+                                    <select name="milkTankInfo.quantityUnit" id="quantityUnit" className="border rounded-full p-3 w-1/5 font-semibold"
+                                        value={formData.milkTankInfo.quantityUnit} onChange={handleFormDataChange}>
+                                        <option value="Ton">Ton</option>
+                                        <option value="Liter">Liter</option>
+                                        <option value="Ml">Milliliter</option>
+                                        <option value="Oz">Ounce</option>
+                                        <option value="CC">cc</option>
+                                        <option value="Gallon">Gallon</option>
+                                    </select>
+                                </div>
+                            </div>
+                            {/* Temperature */}
+                            <div className="flex flex-col w-1/2 items-start gap-3">
+                                <label htmlFor="temp" className="font-semibold">Temperature</label>
+                                <div className="flex w-full items-start gap-3">
+                                    <input type="number" name="milkTankInfo.temp" id="temp" className="p-3 rounded-full border w-4/5" placeholder="0.00" step="0.01"
+                                        value={formData.milkTankInfo.temp} onChange={handleFormDataChange} />
+                                    <select name="milkTankInfo.tempUnit" id="tempUnit" className="border rounded-full p-3 w-1/5 font-semibold"
+                                        value={formData.milkTankInfo.tempUnit} onChange={handleFormDataChange}>
+                                        <option value="Celcius">°C</option>
+                                        <option value="Farenheit">°F</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        {/* pH of Milk */}
+                        <div className="flex flex-col w-full items-start gap-3">
+                            <label htmlFor="pH" className="font-semibold">pH of Milk</label>
+                            <input type="number" name="milkTankInfo.pH" id="pH" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01"
+                                value={formData.milkTankInfo.pH} onChange={handleFormDataChange} />
+                        </div>
+                        {/* Fat + Protein */}
+                        <div className="flex w-full items-start gap-3">
+                            {/* Fat */}
+                            <div className="flex flex-col w-1/2 items-start gap-3">
+                                <label htmlFor="fat" className="font-semibold">Fat (%)</label>
+                                <input type="number" name="milkTankInfo.fat" id="fat" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01"
+                                    value={formData.milkTankInfo.fat} onChange={handleFormDataChange} />
+                            </div>
+                            {/* Protein */}
+                            <div className="flex flex-col w-1/2 items-start gap-3">
+                                <label htmlFor="protein" className="font-semibold">Protein (%)</label>
+                                <input type="number" name="milkTankInfo.protein" id="protein" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01"
+                                    value={formData.milkTankInfo.protein} onChange={handleFormDataChange} />
+                            </div>
+                        </div>
+                        {/* bacteria testing */}
+                        <div className="flex flex-col w-full justify-center gap-3">
+                            <div className="flex w-full items-center gap-3">
+                                <input
+                                    type="checkbox"
+                                    name="milkTankInfo.bacteria"
+                                    id="bacteria"
+                                    className="w-5 h-5 appearance-none border border-gray-400 rounded-full checked:bg-[#D3D596] checked:border-[#305066]"
+                                    onChange={handleFormDataChange}
+                                    checked={formData.milkTankInfo.bacteria}
+                                />
+                                <label htmlFor="bacteria" className="font-semibold">Bacteria Testing</label>
+                            </div>
+                            {formData.milkTankInfo.bacteria && (
+                                <input
+                                    type="text"
+                                    name="milkTankInfo.bacteriaInfo"
+                                    id="bacteriaInfo"
+                                    className="border rounded-full p-3"
+                                    placeholder="Please fill additional information"
+                                    value={formData.milkTankInfo.bacteriaInfo}
+                                    onChange={handleFormDataChange}
+                                />
+                            )}
+                        </div>
+                        {/* Contaminants */}
+                        <div className="flex flex-col w-full justify-center gap-3">
+                            <div className="flex w-full items-center gap-3">
+                                <input
+                                    type="checkbox"
+                                    name="milkTankInfo.contaminants"
+                                    id="milkTankInfo.contaminants"
+                                    className="w-5 h-5 appearance-none border border-gray-400 rounded-full checked:bg-[#D3D596] checked:border-[#305066]"
+                                    onChange={handleFormDataChange}
+                                    checked={formData.milkTankInfo.contaminants}
+                                />
+                                <label htmlFor="contaminants" className="font-semibold">Contaminants</label>
+                            </div>
+                            {formData.milkTankInfo.contaminants && (
+                                <input
+                                    type="text"
+                                    name="milkTankInfo.contaminantInfo"
+                                    id="milkTankInfo.contaminantInfo"
+                                    className="border rounded-full p-3"
+                                    placeholder="Please fill additional information"
+                                    value={formData.milkTankInfo.contaminantInfo}
+                                    onChange={handleFormDataChange}
+                                />
+                            )}
+                        </div>
                         {/* Company Name */}
                         <div className="flex flex-col w-full gap-5 mt-10">
                             <label htmlFor="companyName" className="font-semibold">Company Name</label>
@@ -668,19 +571,12 @@ const FarmCreateRM = () => {
                                 placeholder="Paste location url"
                                 value={formData.shippingAddress.location}
                                 onChange={handleFormDataChange} />
-
-                            {/* {location && (
-                                <div ref={mapRef} className="w-full h-96 mt-5" ></div>
-                            )}
-                            {location && geocodeError && (
-                                <p className="text-red-500">{geocodeError}</p>
-                            )} */}
                         </div>
 
                         <button
                             type="submit"
                             className="flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-2xl hover:bg-[#C0E0C8]"
-                            onClick={() => router.push('/Farmer/FarmCheck')}
+                            onClick={() => router.push('/Logistic/Recieving/CheckDetails')}
                         >
                             Next
                         </button>
@@ -690,5 +586,4 @@ const FarmCreateRM = () => {
         </div>
     );
 };
-
-export default FarmCreateRM;
+export default Recieving;
