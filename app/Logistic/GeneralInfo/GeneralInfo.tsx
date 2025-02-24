@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { MapProvider } from "@/providers/map-provider";
+import { MapComponent } from "@/components/map";
 
 interface GeoData {
     id: number;
@@ -16,15 +18,9 @@ interface GeoData {
     postalCode: number;
 }
 
-const FactoryGeneral = () => {
-
-    const [isEditable, setIsEditable] = useState<boolean>(true);
-
-    const handleSaveEditToggle = () => {
-        setIsEditable(!isEditable);
-    };
-
+const GeneralInfo = () => {
     const [fileNames, setFileNames] = useState<string[]>(["No file selected."]);
+    const [isEditable, setIsEditable] = useState<boolean>(true);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
@@ -43,6 +39,11 @@ const FactoryGeneral = () => {
     const [selectedProvince, setSelectedProvince] = useState<string>("");
     const [selectedDistrict, setSelectedDistrict] = useState<string>("");
     const [selectedSubDistrict, setSelectedSubDistrict] = useState<string>("");
+
+    const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number }>({
+        lat: 35.8799866,
+        lng: 76.5048004,
+    });
 
     useEffect(() => {
         fetch("/data/geography.json")
@@ -85,6 +86,28 @@ const FactoryGeneral = () => {
         }
     }, [selectedDistrict]);
 
+    useEffect(() => {
+        if (selectedProvince) {
+            localStorage.setItem("selectedProvince", selectedProvince);
+        }
+    }, [selectedProvince]);
+
+    useEffect(() => {
+        if (selectedDistrict) {
+            localStorage.setItem("selectedDistrict", selectedDistrict);
+        }
+    }, [selectedDistrict]);
+
+    useEffect(() => {
+        if (selectedSubDistrict) {
+            localStorage.setItem("selectedSubDistrict", selectedSubDistrict);
+        }
+    }, [selectedSubDistrict]);
+
+    const handleSaveEditToggle = () => {
+        setIsEditable(!isEditable);
+    };
+
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setIsEditable(false);
@@ -105,6 +128,24 @@ const FactoryGeneral = () => {
         //     // Handle error
         // });
     };
+
+    // const fetchCoordinates = async (address: string) => {
+    //     const response = await fetch(
+    //         `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_API}`
+    //     );
+    //     const data = await response.json();
+    //     if (data.results && data.results.length > 0) {
+    //         const location = data.results[0].geometry.location;
+    //         setMapCenter({ lat: location.lat, lng: location.lng });
+    //     } else {
+    //         console.error("Geocoding API error:", data);
+    //     }
+    // };
+
+    // const handleLocationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //     const address = event.target.value;
+    //     fetchCoordinates(address);
+    // };
 
     return (
         <div className="flex flex-col text-center w-full justify-center items-center text- h-full pt-20">
@@ -254,7 +295,7 @@ const FactoryGeneral = () => {
                     <div className="flex flex-col md:flex-row items-center justify-start gap-2 border p-2">
                         <label
                             htmlFor="file-upload"
-                            className="cursor-pointer px-4 py-2 bg-[#C98986] text-[#F7FCD4] rounded-lg hover:bg-[#6C0E23] transition"
+                            className={`cursor-pointer px-4 py-2 bg-[#C98986] text-white rounded-lg hover:bg-[#6C0E23] transition ${!isEditable && "opacity-50 cursor-not-allowed"}`}
                         >
                             Import file
                         </label>
@@ -275,13 +316,23 @@ const FactoryGeneral = () => {
                     {/* location */}
                     <div className="flex flex-col font-medium text-start">
                         <label htmlFor="location">Location</label>
-                        <input type="text" name="location" id="location" className="border border-gray-300 rounded-md p-2 flex-1 w-full"
-                            disabled={!isEditable} />
+                        <input
+                            type="text"
+                            name="location"
+                            id="location"
+                            className="border border-gray-300 rounded-md p-2 flex-1 w-full"
+                            placeholder="Enter a location"
+                            disabled={!isEditable}
+                        />
+
+                        {/* <MapProvider>
+                            <MapComponent center={mapCenter} />
+                        </MapProvider> */}
                     </div>
 
                     <button
                         type="button"
-                        className="flex items-center justify-center text- md:text-xl bg-[#C98986] hover: w-full md:w-1/6 rounded-full p-2 px-3 text-[#F7FCD4] self-center"
+                        className="flex items-center justify-center text- md:text-xl bg-[#C98986] hover:bg-[#6C0E23] w-full md:w-1/6 rounded-full p-2 px-3 text-white self-center"
                         onClick={isEditable ? handleSubmit : handleSaveEditToggle}
                     >
                         {isEditable ? "Save" : "Edit"}
@@ -296,9 +347,9 @@ const FactoryGeneral = () => {
                         )}
                     </button>
                 </form>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 
-export default FactoryGeneral;
+export default GeneralInfo;

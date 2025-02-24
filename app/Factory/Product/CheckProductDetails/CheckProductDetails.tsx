@@ -1,16 +1,16 @@
 "use client";
-
 import { useEffect, useState } from "react";
 
-const FactoryDetails = () => {
-    const [data, setData] = useState(null);
+const CheckProductDetails = () => {
 
-    useEffect(() => {
-        const storedData = localStorage.getItem("recievedForm");
-        if (storedData) {
-            setData(JSON.parse(storedData));
-        }
-    }, []);
+    const [data, setData] = useState(null);
+    
+        useEffect(() => {
+            const storedData = localStorage.getItem("recievedForm");
+            if (storedData) {
+                setData(JSON.parse(storedData));
+            }
+        }, []);
 
     return (
         <div className="flex flex-col w-full h-full min-h-screen items-center justify-center pt-24 bg-gray-100 text-gray-500">
@@ -18,7 +18,7 @@ const FactoryDetails = () => {
                 <div className="flex flex-col md:flex-row justify-between gap-10 w-full p-4 md:p-14">
                     {/* Recipient Info */}
                     <div className="flex flex-col gap-4 md:gap-10 w-full h-fit md:w-1/2 bg-white border p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
-                        <h1 className="text-xl md:text-3xl font-bold text-center text-black">Recipient Info</h1>
+                        <h1 className="text-xl md:text-3xl font-bold text-center text-black">General Information</h1>
                         <div className="flex flex-col space-y-2 gap-3">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Person in charge:</p>
@@ -37,7 +37,7 @@ const FactoryDetails = () => {
 
                     {/* Quantity Info */}
                     <div className="flex flex-col gap-4 md:gap-10 w-full md:w-1/2 border bg-white p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
-                        <h1 className="text-xl md:text-3xl font-bold text-center text-black">Quantity Info</h1>
+                        <h1 className="text-xl md:text-3xl font-bold text-center text-black">Nutrition</h1>
                         <div className="flex flex-col space-y-2 gap-3">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Quantity:</p>
@@ -110,6 +110,5 @@ const FactoryDetails = () => {
             </div>
         </div>
     );
-}
-
-export default FactoryDetails;
+};
+export default CheckProductDetails;
