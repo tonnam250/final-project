@@ -1,7 +1,7 @@
 [
     {
         "id": "1",
-        "status": "Received",
+        "status": "Pending",
         "milkTankInfo": {
             "tankId": "T1",
             "personInCharge": "John Doe",

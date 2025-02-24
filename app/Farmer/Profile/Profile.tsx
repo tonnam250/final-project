@@ -1,7 +1,9 @@
+
 "use client";
 import { useState, useEffect } from 'react';
 import { getFarmInfo } from "../../../services/farmService";
 import { getUserInfo, updateUserInfo } from "../../../services/authService";
+
 
 const Profile = () => {
     const [profileImage, setProfileImage] = useState("/images/profile2.jpg");
@@ -121,6 +123,7 @@ const Profile = () => {
                                 <p className="text-lg text-left w-32">{`${firstName} ${lastName}`}</p>
                             </div>
                         )}
+
                         <div className="flex justify-between gap-6 w-full">
                             <p className="text-lg font-bold">Password:</p>
                             <div className='flex gap-2 w-32'>
@@ -151,6 +154,10 @@ const Profile = () => {
                             </div>
                         </div>
                         {/* Email field จาก userInfo */}
+                        <div className="flex justify-between gap-6 w-full">
+                            <p className="text-lg font-bold">Role:</p>
+                            <p className="text-lg text-left w-32">{role}</p>
+                        </div>
                         <div className="flex justify-between gap-6 w-full">
                             <p className="text-lg font-bold">Email:</p>
                             {isEditing ? (
@@ -197,6 +204,7 @@ const Profile = () => {
             </div>
         </div>
     );
+
 };
 
 export default Profile;

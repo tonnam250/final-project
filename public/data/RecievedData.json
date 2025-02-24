@@ -26,7 +26,7 @@
     },
     {
         "id": "2",
-        "status": "Pending",
+        "status": "Received",
         "milkTankInfo": {
             "tankId": "T2",
             "personInCharge": "Jane Smith",
@@ -51,7 +51,7 @@
     },
     {
         "id": "3",
-        "status": "Pending",
+        "status": "Received",
         "milkTankInfo": {
             "tankId": "T3",
             "personInCharge": "Alice Johnson",
