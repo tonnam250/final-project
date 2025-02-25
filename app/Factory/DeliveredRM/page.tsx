@@ -11,9 +11,9 @@ const DeliveredRM = async () => {
                 <img src="/images/FarmLandscape2.webp" alt="Farm" className="w-full h-full relative object-cover" />
             </div>
             <div className="flex flex-col justify-center items-center w-full h-full mt-10 px-4 md:px-0">
-                <h1 className="text-4xl md:text-6xl font-semibold text-center">Delivered Order</h1>
+                <h1 className="text-4xl md:text-6xl font-bold text-center">Delivered Order</h1>
 
-                {/* Raw milk item */}
+                {/* Delivered item */}
                 <div className="flex flex-col justify-center items-center w-full h-full my-10 gap-8">
                     {data.map((item: { milkTankInfo: { tankId: string, personInCharge: string }, status: string }, index: number) => (
                         <div key={index} className="flex flex-col justify-center items-center w-full md:w-1/3 h-auto gap-5 bg-white text-slate-500 shadow-xl border rounded-2xl p-5">
@@ -44,7 +44,7 @@ const DeliveredRM = async () => {
                     ))}
                 </div>
             </div>
-            {/* end Raw Milk Item */}
+            {/* end Delivered Item */}
         </div>
     );
 };

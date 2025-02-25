@@ -95,14 +95,14 @@ const AddProduct = () => {
     // end step status update function
 
     // save form Data
-    const [recievedForm, setFormData] = useState({
-        RecipientInfo: {
-            productName: "",
+    const [addProdFacForm, setFormData] = useState({
+        GeneralInfo: {
+            prodName: "",
             category: "",
             description: "",
             quantity: ""
         },
-        Quantity: {
+        Nutrition: {
             quantity: 0,
             quantityUnit: "Ton",
             temp: 0,
@@ -154,14 +154,14 @@ const AddProduct = () => {
                 setFormData(JSON.parse(savedData));
             }
         }
-    }, []); 0
+    }, []); 
 
     // ✅ บันทึกข้อมูลลง localStorage ทุกครั้งที่ recieveForm เปลี่ยน
     useEffect(() => {
         if (typeof window !== "undefined") {
-            localStorage.setItem("recievedForm", JSON.stringify(recievedForm));
+            localStorage.setItem("addProdFacForm", JSON.stringify(addProdFacForm));
         }
-    }, [recievedForm]);
+    }, [addProdFacForm]);
 
     // ✅ ฟังก์ชัน handleFormDataChange รองรับ text, select และ checkbox
     const handleFormDataChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -170,7 +170,7 @@ const AddProduct = () => {
 
         setFormData((prevData) => {
             const updatedData = { ...prevData }; // Clone ข้อมูลเดิม
-            let temp = updatedData;
+            let temp: any = updatedData;
 
             for (let i = 0; i < keys.length - 1; i++) {
                 temp = temp[keys[i]];
@@ -180,11 +180,11 @@ const AddProduct = () => {
             temp[keys[keys.length - 1]] = type === "checkbox" ? checked : value;
 
             // อัปเดต province, district และ subdistrict
-            if (name === "RecipientInfo.province") {
+            if (name === "GeneralInfo.province") {
                 setSelectedProvince(value);
-            } else if (name === "RecipientInfo.district") {
+            } else if (name === "GeneralInfo.district") {
                 setSelectedDistrict(value);
-            } else if (name === "RecipientInfo.subDistrict") {
+            } else if (name === "GeneralInfo.subDistrict") {
                 setSelectedSubDistrict(value);
             }
 
@@ -215,9 +215,9 @@ const AddProduct = () => {
     // ✅ ฟังก์ชัน Submit → บันทึกข้อมูลลง localStorage
     const saveToLocalStorage = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        localStorage.setItem("recievedForm", JSON.stringify(recievedForm));
+        localStorage.setItem("recievedForm", JSON.stringify(addProdFacForm));
         alert("Form Save!");
-        console.log(recievedForm);
+        console.log(addProdFacForm);
     };
     // end save form Data
 
@@ -264,12 +264,12 @@ const AddProduct = () => {
                     <div className="flex flex-col w-1/3 h-full">
                         <div className="flex bg-gray-200 w-14 text-center text-gray-500 p-2 rounded-full mb-2">
                             <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="m23.5 17l-5 5l-3.5-3.5l1.5-1.5l2 2l3.5-3.5zM6 2a2 2 0 0 0-2 2v16c0 1.11.89 2 2 2h7.81c-.36-.62-.61-1.3-.73-2H6V4h7v5h5v3.08c.33-.05.67-.08 1-.08c.34 0 .67.03 1 .08V8l-6-6M8 12v2h8v-2m-8 4v2h5v-2Z" />
+                                <path fill="currentColor" d="m23.5 17l-5 5l-3.5-3.5l1.5-1.5l2 2l3.5-3.5zM6 2a2 2 0 0 0-2 2v16c0 1.11.89 2 2 2h7.81c-.36-.62-.61-1.3-.73-2H6V4h7v5h5v3.08c.33-.05.67-.08 1-.08c.34 0 .67.03 1 .08V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4zm-2-2h4.1l.9-.9V16H8zm12.2-5c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1l-2.1-2.1l1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z" />
                             </svg>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
                             <div className="bg-emerald-600 h-2 rounded-full w-0"></div>
-                        </div>
+                        </div> 
                         <p className="text-xl font-semibold text-gray-500">STEP 3</p>
                         <h1 className="text-3xl font-semibold mb-3 text-gray-500">Check Details</h1>
                         <div className="flex flex-wrap text-center w-fit items-center justify-center rounded-full p-1 px-2 mx-5 bg-gray-200 text-gray-500">
@@ -287,32 +287,32 @@ const AddProduct = () => {
                     <h1 className="text-5xl font-bold">General Information</h1>
                     {/* Product name */}
                     <div className="flex flex-col w-full items-start gap-3">
-                        <label htmlFor="productName" className="font-semibold">Product Name</label>
-                        <input type="text" name="RecipientInfo.productName" id="productName"
+                        <label htmlFor="prodName" className="font-semibold">Product Name</label>
+                        <input type="text" name="GeneralInfo.prodName" id="prodName"
                             placeholder="Enter product name" className="border rounded-full p-3 w-full"
-                            value={recievedForm.RecipientInfo.productName} onChange={handleFormDataChange} />
+                            value={addProdFacForm.GeneralInfo.prodName} onChange={handleFormDataChange} />
                     </div>
                     {/* Category */}
                     <div className="flex flex-col w-full items-start gap-3">
                         <label htmlFor="category" className="font-semibold">Category</label>
                         <input type="text" id="category"
                             placeholder="Enter category" className="border rounded-full p-3 w-full"
-                            name="RecipientInfo.category" value={recievedForm.RecipientInfo.category} onChange={handleFormDataChange} />
+                            name="GeneralInfo.category" value={addProdFacForm.GeneralInfo.category} onChange={handleFormDataChange} />
                     </div>
                     {/* Description */}
                     <div className="flex flex-col w-full items-start gap-3">
                         <label htmlFor="description" className="font-semibold">Description</label>
                         <input type="text" id="description" placeholder="Write description of product" className="border rounded-full p-3 w-full"
-                            name="RecipientInfo.description" value={recievedForm.RecipientInfo.description} onChange={handleFormDataChange} />
+                            name="GeneralInfo.description" value={addProdFacForm.GeneralInfo.description} onChange={handleFormDataChange} />
                     </div>
                     {/* Quauntity per unit */}
                     <div className="flex flex-col w-full items-start gap-3">
                         <label htmlFor="quantity" className="font-semibold">Quantity per unit</label>
                         <div className="flex gap-3 w-full items-center">
-                            <input type="number" name="RecipientInfo.quantity" className="border rounded-full w-5/6 p-3" placeholder="0.00" step={0.01}
-                                value={recievedForm.RecipientInfo.quantity} onChange={handleFormDataChange} />
-                            <select name="Quantity.quantityUnit" id="Unit" className="border rounded-full p-3 w-1/6 font-semibold text-center"
-                                value={recievedForm.Quantity.quantityUnit} onChange={handleFormDataChange}>
+                            <input type="number" name="GeneralInfo.quantity" className="border rounded-full w-5/6 p-3" placeholder="0.00" step={0.01}
+                                value={addProdFacForm.GeneralInfo.quantity} onChange={handleFormDataChange} />
+                            <select name="Nutrition.quantityUnit" id="Unit" className="border rounded-full p-3 w-1/6 font-semibold text-center"
+                                value={addProdFacForm.Nutrition.quantityUnit} onChange={handleFormDataChange}>
                                 <option value="liter">Liter</option>
                                 <option value="milliliter">Milliliter</option>
                                 <option value="gallon">Gallon</option>
@@ -325,7 +325,7 @@ const AddProduct = () => {
 
                     <button
                         type="button"
-                        className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-2xl hover:bg-[#C0E0C8] ${showShippingAddress ? 'hidden' : ''}`}
+                        className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8] ${showShippingAddress ? 'hidden' : ''}`}
                         onClick={handleNextClick}
                     >
                         Next
@@ -339,48 +339,48 @@ const AddProduct = () => {
                         {/* Calories */}
                         <div className="flex flex-col w-full items-start gap-3">
                             <label htmlFor="calories" className="font-semibold">Calories per 100 grams  </label>
-                            <input type="number" name="Quantity.calories" id="calories" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01"
-                                value={recievedForm.Quantity.calories} onChange={handleFormDataChange} />
+                            <input type="number" name="Nutrition.calories" id="calories" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01"
+                                value={addProdFacForm.Nutrition.calories} onChange={handleFormDataChange} />
                         </div>
                         {/* Total Fat */}
                         <div className="flex flex-col w-full items-start gap-3">
                             <label htmlFor="totalFat" className="font-semibold">Total Fat (g)</label>
-                            <input type="number" name="Quantity.totalFat" id="totalFat" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01"
-                                value={recievedForm.Quantity.totalFat} onChange={handleFormDataChange} />
+                            <input type="number" name="Nutrition.totalFat" id="totalFat" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01"
+                                value={addProdFacForm.Nutrition.totalFat} onChange={handleFormDataChange} />
                         </div>
                         {/* Colestoral */}
                         <div className="flex flex-col w-full items-start gap-3">
                             <label htmlFor="colestoral" className="font-semibold">Colestoral (mg)</label>
-                            <input type="number" name="Quantity.colestoral" id="colestoral" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01"
-                                value={recievedForm.Quantity.colestoral} onChange={handleFormDataChange} />
+                            <input type="number" name="Nutrition.colestoral" id="colestoral" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01"
+                                value={addProdFacForm.Nutrition.colestoral} onChange={handleFormDataChange} />
                         </div>
                         {/* Sodium */}
                         <div className="flex flex-col w-full items-start gap-3">
                             <label htmlFor="sodium" className="font-semibold">Sodium (mg)</label>
-                            <input type="number" name="Quantity.sodium" id="sodium" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01"
-                                value={recievedForm.Quantity.sodium} onChange={handleFormDataChange} />
+                            <input type="number" name="Nutrition.sodium" id="sodium" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01"
+                                value={addProdFacForm.Nutrition.sodium} onChange={handleFormDataChange} />
                         </div>
                         {/* Potassium */}
                         <div className="flex flex-col w-full items-start gap-3">
                             <label htmlFor="potassium" className="font-semibold">Potassium (mg)</label>
-                            <input type="number" name="Quantity.potassium" id="potassium" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01"
-                                value={recievedForm.Quantity.potassium} onChange={handleFormDataChange} />
+                            <input type="number" name="Nutrition.potassium" id="potassium" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01"
+                                value={addProdFacForm.Nutrition.potassium} onChange={handleFormDataChange} />
                         </div>
                         {/* Total Carbohydrates */}
                         <div className="flex flex-col w-full items-start gap-3">
                             <label htmlFor="totalCarbohydrates" className="font-semibold">Total Carbohydrates (g)</label>
-                            <input type="number" name="Quantity.totalCarbohydrates" id="totalCarbohydrates" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01"
-                                value={recievedForm.Quantity.totalCarbohydrates} onChange={handleFormDataChange} />
+                            <input type="number" name="Nutrition.totalCarbohydrates" id="totalCarbohydrates" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01"
+                                value={addProdFacForm.Nutrition.totalCarbohydrates} onChange={handleFormDataChange} />
                             <div className="flex w-full items-start gap-3">
                                 <div className="flex flex-col w-1/2 items-start gap-3">
                                     <label htmlFor="fiber" className="font-semibold" >Dietary Fiber (g)</label>
-                                    <input type="number" name="Quantity.fiber" id="fiber" className="border rounded-full w-full p-3" placeholder="0.00" step="0.01"
-                                        value={recievedForm.Quantity.fiber} onChange={handleFormDataChange} />
+                                    <input type="number" name="Nutrition.fiber" id="fiber" className="border rounded-full w-full p-3" placeholder="0.00" step="0.01"
+                                        value={addProdFacForm.Nutrition.fiber} onChange={handleFormDataChange} />
                                 </div>
                                 <div className="flex flex-col w-1/2 items-start gap-3">
                                     <label htmlFor="sugar" className="font-semibold">Sugar (g)</label>
-                                    <input type="number" name="Quantity.sugar" id="sugar" className="border rounded-full w-full p-3" placeholder="0.00" step="0.01"
-                                        value={recievedForm.Quantity.sugar} onChange={handleFormDataChange} />
+                                    <input type="number" name="Nutrition.sugar" id="sugar" className="border rounded-full w-full p-3" placeholder="0.00" step="0.01"
+                                        value={addProdFacForm.Nutrition.sugar} onChange={handleFormDataChange} />
                                 </div>
                             </div>
                         </div>
@@ -390,10 +390,10 @@ const AddProduct = () => {
                             <div className="flex flex-col w-full items-start gap-3">
                                 <label htmlFor="temp" className="font-semibold">Temperature</label>
                                 <div className="flex w-full items-start gap-3">
-                                    <input type="number" name="Quantity.temp" id="temp" className="p-3 rounded-full borcder w-11/12" placeholder="0.00" step="0.01"
-                                        value={recievedForm.Quantity.temp} onChange={handleFormDataChange} />
-                                    <select name="Quantity.tempUnit" id="tempUnit" className="border rounded-full p-3 w-1/12 font-semibold"
-                                        value={recievedForm.Quantity.tempUnit} onChange={handleFormDataChange}>
+                                    <input type="number" name="Nutrition.temp" id="temp" className="p-3 rounded-full borcder w-11/12" placeholder="0.00" step="0.01"
+                                        value={addProdFacForm.Nutrition.temp} onChange={handleFormDataChange} />
+                                    <select name="Nutrition.tempUnit" id="tempUnit" className="border rounded-full p-3 w-1/12 font-semibold"
+                                        value={addProdFacForm.Nutrition.tempUnit} onChange={handleFormDataChange}>
                                         <option value="Celcius">°C</option>
                                         <option value="Farenheit">°F</option>
                                     </select>
@@ -403,22 +403,22 @@ const AddProduct = () => {
                         {/* pH of Milk */}
                         <div className="flex flex-col w-full items-start gap-3">
                             <label htmlFor="pH" className="font-semibold">pH of Milk</label>
-                            <input type="number" name="Quantity.pH" id="pH" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01"
-                                value={recievedForm.Quantity.pH} onChange={handleFormDataChange} />
+                            <input type="number" name="Nutrition.pH" id="pH" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01"
+                                value={addProdFacForm.Nutrition.pH} onChange={handleFormDataChange} />
                         </div>
                         {/* Fat + Protein */}
                         <div className="flex w-full items-start gap-3">
                             {/* Fat */}
                             <div className="flex flex-col w-1/2 items-start gap-3">
                                 <label htmlFor="fat" className="font-semibold">Fat (%)</label>
-                                <input type="number" name="Quantity.fat" id="fat" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01"
-                                    value={recievedForm.Quantity.fat} onChange={handleFormDataChange} />
+                                <input type="number" name="Nutrition.fat" id="fat" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01"
+                                    value={addProdFacForm.Nutrition.fat} onChange={handleFormDataChange} />
                             </div>
                             {/* Protein */}
                             <div className="flex flex-col w-1/2 items-start gap-3">
                                 <label htmlFor="protein" className="font-semibold">Protein (%)</label>
-                                <input type="number" name="Quantity.protein" id="protein" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01"
-                                    value={recievedForm.Quantity.protein} onChange={handleFormDataChange} />
+                                <input type="number" name="Nutrition.protein" id="protein" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01"
+                                    value={addProdFacForm.Nutrition.protein} onChange={handleFormDataChange} />
                             </div>
                         </div>
                         {/* Vitamins and Minerals */}
@@ -426,49 +426,49 @@ const AddProduct = () => {
                             <div className="flex w-full items-start gap-3">
                                 <div className="flex flex-col w-1/2 items-start gap-3">
                                     <label htmlFor="vitaminC" className="font-semibold">Vitamin C (%)</label>
-                                    <input type="number" name="Quantity.vitaminC" id="vitaminC" className="border p-3 w-full rounded-full" placeholder="0.00" step="0.01"
-                                        value={recievedForm.Quantity.vitaminC} onChange={handleFormDataChange} />
+                                    <input type="number" name="Nutrition.vitaminC" id="vitaminC" className="border p-3 w-full rounded-full" placeholder="0.00" step="0.01"
+                                        value={addProdFacForm.Nutrition.vitaminC} onChange={handleFormDataChange} />
                                 </div>
                                 <div className="flex flex-col w-1/2 items-start gap-3">
                                     <label htmlFor="calcium" className="font-semibold">Calcium (%)</label>
-                                    <input type="number" name="Quantity.calcium" id="calcium" className="border p-3 w-full rounded-full" placeholder="0.00" step="0.01"
-                                        value={recievedForm.Quantity.calcium} onChange={handleFormDataChange} />
+                                    <input type="number" name="Nutrition.calcium" id="calcium" className="border p-3 w-full rounded-full" placeholder="0.00" step="0.01"
+                                        value={addProdFacForm.Nutrition.calcium} onChange={handleFormDataChange} />
                                 </div>
                             </div>
                             <div className="flex w-full items-start gap-3">
                                 <div className="flex flex-col w-1/2 items-start gap-3">
                                     <label htmlFor="iron" className="font-semibold">Iron (%)</label>
-                                    <input type="number" name="Quantity.iron" id="iron" className="border p-3 w-full rounded-full" placeholder="0.00" step="0.01"
-                                        value={recievedForm.Quantity.iron} onChange={handleFormDataChange} />
+                                    <input type="number" name="Nutrition.iron" id="iron" className="border p-3 w-full rounded-full" placeholder="0.00" step="0.01"
+                                        value={addProdFacForm.Nutrition.iron} onChange={handleFormDataChange} />
                                 </div>
                                 <div className="flex flex-col w-1/2 items-start gap-3">
                                     <label htmlFor="vitaminD" className="font-semibold">Vitamin D (%)</label>
-                                    <input type="number" name="Quantity.vitaminD" id="vitaminD" className="border p-3 w-full rounded-full" placeholder="0.00" step="0.01"
-                                        value={recievedForm.Quantity.vitaminD} onChange={handleFormDataChange} />
+                                    <input type="number" name="Nutrition.vitaminD" id="vitaminD" className="border p-3 w-full rounded-full" placeholder="0.00" step="0.01"
+                                        value={addProdFacForm.Nutrition.vitaminD} onChange={handleFormDataChange} />
                                 </div>
                             </div>
                             <div className="flex w-full items-start gap-3">
                                 <div className="flex flex-col w-1/2 items-start gap-3">
                                     <label htmlFor="vitaminB6" className="font-semibold">Vitamin B6 (%)</label>
-                                    <input type="number" name="Quantity.vitaminB6" id="vitaminB6" className="border p-3 w-full rounded-full" placeholder="0.00" step="0.01"
-                                        value={recievedForm.Quantity.vitaminB6} onChange={handleFormDataChange} />
+                                    <input type="number" name="Nutrition.vitaminB6" id="vitaminB6" className="border p-3 w-full rounded-full" placeholder="0.00" step="0.01"
+                                        value={addProdFacForm.Nutrition.vitaminB6} onChange={handleFormDataChange} />
                                 </div>
                                 <div className="flex flex-col w-1/2 items-start gap-3">
                                     <label htmlFor="vitaminB12" className="font-semibold">Vitamin B12 (%)</label>
-                                    <input type="number" name="Quantity.vitaminB12" id="vitaminB12" className="border p-3 w-full rounded-full" placeholder="0.00" step="0.01"
-                                        value={recievedForm.Quantity.vitaminB12} onChange={handleFormDataChange} />
+                                    <input type="number" name="Nutrition.vitaminB12" id="vitaminB12" className="border p-3 w-full rounded-full" placeholder="0.00" step="0.01"
+                                        value={addProdFacForm.Nutrition.vitaminB12} onChange={handleFormDataChange} />
                                 </div>
                             </div>
                             <div className="flex flex-col w-full items-start gap-3">
                                 <label htmlFor="magnesium" className="font-semibold">Magnesium (%)</label>
-                                <input type="number" name="Quantity.magnesium" id="magnesium" className="border rounded-full p-3 w-full" placeholder="0.00" step="0.01"
-                                    value={recievedForm.Quantity.magnesium} onChange={handleFormDataChange} />
+                                <input type="number" name="Nutrition.magnesium" id="magnesium" className="border rounded-full p-3 w-full" placeholder="0.00" step="0.01"
+                                    value={addProdFacForm.Nutrition.magnesium} onChange={handleFormDataChange} />
                             </div>
                         </div>
 
                         <button
                             type="submit"
-                            className="flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-2xl hover:bg-[#C0E0C8]"
+                            className="flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8]"
                             onClick={() => router.push("/Factory/Product/CheckProductDetails")}
                         >
                             Next

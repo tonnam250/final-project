@@ -1,9 +1,9 @@
-import SignUp from "./SignUp";
+import SelectRole from "./SelectRole";
 
 const Page = () => {
     return (
         <div>
-            <SignUp />
+            <SelectRole />
         </div>
     );
 };

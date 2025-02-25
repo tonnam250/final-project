@@ -105,15 +105,15 @@ const CheckDetails = () => {
                         <div className="flex flex-col space-y-2 gap-3">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Person in charge:</p>
-                                <p>{data.RecipientInfo.personInCharge}</p>
+                                <p>{data.GeneralInfo.personInCharge}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Location:</p>
-                                <p>{data.RecipientInfo.location}</p>
+                                <p>{data.productDetail.location}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Pick Up Time:</p>
-                                <p>{data.RecipientInfo.pickUpTime}</p>
+                                <p>{data.productDetail.pickUpTime}</p>
                             </div>
                         </div>
                     </div>
@@ -124,36 +124,36 @@ const CheckDetails = () => {
                         <div className="flex flex-col space-y-2 gap-3">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Quantity:</p>
-                                <p>{data.Quantity.quantity} {data.Quantity.quantityUnit}</p>
+                                <p>{data.GeneralInfo.quantity} {data.GeneralInfo.quantityUnit}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Temperature:</p>
-                                <p>{data.Quantity.temp} {data.Quantity.tempUnit}</p>
+                                <p>{data.GeneralInfo.temp} {data.GeneralInfo.tempUnit}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">pH:</p>
-                                <p>{data.Quantity.pH}</p>
+                                <p>{data.GeneralInfo.pH}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Fat:</p>
-                                <p>{data.Quantity.fat} %</p>
+                                <p>{data.GeneralInfo.fat} %</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Protein:</p>
-                                <p>{data.Quantity.protein} %</p>
+                                <p>{data.GeneralInfo.protein} %</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Bacteria:</p>
                                 <div className="flex flex-col gap-2">
-                                    <p>{data.Quantity.bacteria === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.bacteriaInfo}</p>
+                                    <p>{data.GeneralInfo.bacteria === true ? "True" : "False"}</p>
+                                    <p>{data.GeneralInfo.bacteriaInfo}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Contaminants:</p>
                                 <div className="flex flex-col gap-2">
-                                    <p>{data.Quantity.contaminants === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.contaminantInfo}</p>
+                                    <p>{data.GeneralInfo.contaminants === true ? "True" : "False"}</p>
+                                    <p>{data.GeneralInfo.contaminantInfo}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between">
@@ -171,15 +171,15 @@ const CheckDetails = () => {
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-3">
-                                    <p>{data.Quantity.abnormalChar === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.smellBad === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.smellNotFresh === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.abnormalColor === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.sour === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.bitter === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.cloudy === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.lumpy === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.separation === true ? "True" : "False"}</p>
+                                    <p>{data.GeneralInfo.abnormalChar === true ? "True" : "False"}</p>
+                                    <p>{data.GeneralInfo.abnormalType.smellBad === true ? "True" : "False"}</p>
+                                    <p>{data.GeneralInfo.abnormalType.smellNotFresh === true ? "True" : "False"}</p>
+                                    <p>{data.GeneralInfo.abnormalType.abnormalColor === true ? "True" : "False"}</p>
+                                    <p>{data.GeneralInfo.abnormalType.sour === true ? "True" : "False"}</p>
+                                    <p>{data.GeneralInfo.abnormalType.bitter === true ? "True" : "False"}</p>
+                                    <p>{data.GeneralInfo.abnormalType.cloudy === true ? "True" : "False"}</p>
+                                    <p>{data.GeneralInfo.abnormalType.lumpy === true ? "True" : "False"}</p>
+                                    <p>{data.GeneralInfo.abnormalType.separation === true ? "True" : "False"}</p>
                                 </div>
                             </div>
                         </div>

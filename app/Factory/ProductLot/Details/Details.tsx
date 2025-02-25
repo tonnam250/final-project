@@ -1,9 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 
-const CheckDetails = () => {
-    const router = useRouter();
+const Details = () => {
     const [data, setData] = useState(null);
 
     useEffect(() => {
@@ -13,14 +11,9 @@ const CheckDetails = () => {
         }
     }, []);
 
-    const handleSubmit = () => {
-        alert("Form saved successfully!");
-        router.push('/Factory/ProductLot/Details');
-    };
-
     return (
-        <div className="flex flex-col w-full h-full min-h-screen items-center justify-center pt-24 bg-gray-100 text-black">
-            <h1 className="text-5xl font-bold mt-10 text-black">Product Lot Check Detail</h1>
+        <div className="flex flex-col w-full h-full min-h-screen items-center justify-center pt-24 bg-gray-100 text-gray-500">
+            <h1 className="text-5xl font-bold mt-10 text-black">Product Lot Details</h1>
             {data && (
                 <div className="flex flex-col md:flex-row justify-between gap-10 w-full p-4 md:p-14">
                     {/* General Information */}
@@ -247,8 +240,10 @@ const CheckDetails = () => {
                     </div>
                 </div>
             )}
-            <button className="bg-emerald-500 text-white font-semibold text-xl rounded-full p-3 self-end mx-20 mb-10" onClick={handleSubmit}>Submit</button>
+            <div className="flex flex-col justify-center mt-10">
+                <h1 className="text-5xl font-bold">QR Code Section</h1>
+            </div>
         </div>
     );
 };
-export default CheckDetails;
+export default Details;

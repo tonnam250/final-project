@@ -19,9 +19,9 @@ const CheckProductDetails = () => {
     const [showShippingAddress, setShowShippingAddress] = useState<boolean>(false);
     const shippingAddressRef = useRef<HTMLDivElement>(null);
     const [stepStatus, setStepStatus] = useState({
-        step1: 'in-progress',
-        step2: 'not-started',
-        step3: 'not-started'
+        step1: 'completed',
+        step2: 'completed',
+        step3: 'in-progress'
     });
 
     const handleNextClick = () => {
@@ -37,6 +37,11 @@ const CheckProductDetails = () => {
         }, 100); // Delay to ensure the section is rendered
     };
     // end step status update function
+
+    const handleSubmit = () => {
+        alert("Form saved successfully!");
+        router.push('/Factory/Product/Details');
+    };
 
     return (
         <div className="flex flex-col w-full h-full min-h-screen items-center justify-center pt-24 bg-gray-100 text-gray-500">
@@ -61,34 +66,34 @@ const CheckProductDetails = () => {
                     </div>
                     {/* Second Step */}
                     <div className="flex flex-col w-1/3 h-full">
-                        <div className={`flex w-14 text-center p-2 rounded-full mb-2 ${stepStatus.step2 === 'in-progress' ? 'bg-yellow-200 text-amber-500' : 'bg-gray-200 text-gray-500'}`}>
+                        <div className={`flex w-14 text-center p-2 rounded-full mb-2 ${stepStatus.step2 === 'completed' ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
                             <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10" viewBox="0 0 32 32">
                                 <path fill="currentColor" d="M0 6v2h19v15h-6.156c-.446-1.719-1.992-3-3.844-3s-3.398 1.281-3.844 3H4v-5H2v7h3.156c.446 1.719 1.992 3 3.844 3s3.398-1.281 3.844-3h8.312c.446 1.719 1.992 3 3.844 3s3.398-1.281 3.844-3H32v-8.156l-.063-.157l-2-6L29.72 10H21V6zm1 4v2h9v-2zm20 2h7.281L30 17.125V23h-1.156c-.446-1.719-1.992-3-3.844-3s-3.398 1.281-3.844 3H21zM2 14v2h6v-2zm7 8c1.117 0 2 .883 2 2s-.883 2-2 2s-2-.883-2-2s.883-2 2-2m16 0c1.117 0 2 .883 2 2s-.883 2-2 2s-2-.883-2-2s.883-2 2-2" />
                             </svg>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div className={`h-2 rounded-full ${stepStatus.step2 === 'in-progress' ? 'bg-yellow-400 w-1/5' : 'bg-gray-200 w-0'}`}></div>
+                            <div className={`h-2 rounded-full ${stepStatus.step2 === 'completed' ? 'bg-emerald-500 w-full' : 'bg-gray-200 w-0'}`}></div>
                         </div>
-                        <p className={`text-xl font-semibold ${stepStatus.step2 === 'in-progress' ? 'text-amber-500' : 'text-gray-500'}`}>STEP 2</p>
-                        <h1 className={`text-3xl font-semibold mb-3 ${stepStatus.step2 === 'in-progress' ? 'text-amber-500' : 'text-gray-500'}`}>Nutrition</h1>
-                        <div className={`flex flex-wrap text-center w-fit items-center justify-center rounded-full mx-5 p-1 px-2 ${stepStatus.step2 === 'in-progress' ? 'bg-yellow-200 text-amber-500' : 'bg-gray-200 text-gray-500'}`}>
-                            <p className="text-lg font-semibold">{stepStatus.step2 === 'in-progress' ? 'In Progress' : 'Not finished'}</p>
+                        <p className={`text-xl font-semibold ${stepStatus.step2 === 'completed' ? 'text-emerald-500' : 'text-gray-500'}`}>STEP 2</p>
+                        <h1 className={`text-3xl font-semibold mb-3 ${stepStatus.step2 === 'completed' ? 'text-emerald-500' : 'text-gray-500'}`}>Nutrition</h1>
+                        <div className={`flex flex-wrap text-center w-fit items-center justify-center rounded-full mx-5 p-1 px-2 ${stepStatus.step2 === 'completed' ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                            <p className="text-lg font-semibold">{stepStatus.step2 === 'completed' ? 'Completed' : 'Not finished'}</p>
                         </div>
                     </div>
                     {/* Third Step */}
                     <div className="flex flex-col w-1/3 h-full">
-                        <div className="flex bg-gray-200 w-14 text-center text-gray-500 p-2 rounded-full mb-2">
+                        <div className={`flex w-14 text-center p-2 rounded-full mb-2 ${stepStatus.step3 === 'in-progress' ? 'bg-yellow-200 text-amber-500' : 'bg-gray-200 text-gray-500'}`}>
                             <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10" viewBox="0 0 24 24">
                                 <path fill="currentColor" d="m23.5 17l-5 5l-3.5-3.5l1.5-1.5l2 2l3.5-3.5zM6 2a2 2 0 0 0-2 2v16c0 1.11.89 2 2 2h7.81c-.36-.62-.61-1.3-.73-2H6V4h7v5h5v3.08c.33-.05.67-.08 1-.08c.34 0 .67.03 1 .08V8l-6-6M8 12v2h8v-2m-8 4v2h5v-2Z" />
                             </svg>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div className="bg-emerald-600 h-2 rounded-full w-0"></div>
+                            <div className={`h-2 rounded-full ${stepStatus.step3 === 'in-progress' ? 'bg-yellow-400 w-1/5' : 'bg-gray-200 w-0'}`}></div>
                         </div>
-                        <p className="text-xl font-semibold text-gray-500">STEP 3</p>
-                        <h1 className="text-3xl font-semibold mb-3 text-gray-500">Check Details</h1>
-                        <div className="flex flex-wrap text-center w-fit items-center justify-center rounded-full p-1 px-2 mx-5 bg-gray-200 text-gray-500">
-                            <p className="text-lg font-semibold">Not finished</p>
+                        <p className={`text-xl font-semibold ${stepStatus.step3 === 'in-progress' ? 'text-amber-500' : 'text-gray-500'}`}>STEP 3</p>
+                        <h1 className={`text-3xl font-semibold mb-3 ${stepStatus.step3 === 'in-progress' ? 'text-amber-500' : 'text-gray-500'}`}>Check Details</h1>
+                        <div className={`flex flex-wrap text-center w-fit items-center justify-center rounded-full mx-5 p-1 px-2 ${stepStatus.step3 === 'in-progress' ? 'bg-yellow-200 text-amber-500' : 'bg-gray-200 text-gray-500'}`}>
+                            <p className="text-lg font-semibold">{stepStatus.step3 === 'in-progress' ? 'In Progress' : 'Not finished'}</p>
                         </div>
                     </div>
                 </div>
@@ -97,61 +102,125 @@ const CheckProductDetails = () => {
 
             {data && (
                 <div className="flex flex-col md:flex-row justify-between gap-10 w-full p-4 md:p-14">
-                    {/* Recipient Info */}
+                    {/* General Info */}
                     <div className="flex flex-col gap-4 md:gap-10 w-full h-fit md:w-1/2 bg-white border p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
                         <h1 className="text-xl md:text-3xl font-bold text-center text-black">General Information</h1>
                         <div className="flex flex-col space-y-2 gap-3">
                             <div className="flex justify-between">
-                                <p className="font-semibold">Person in charge:</p>
-                                <p>{data.RecipientInfo.personInCharge}</p>
+                                <p className="font-semibold">Product Name:</p>
+                                <p>{data.GeneralInfo.productName}</p>
                             </div>
                             <div className="flex justify-between">
-                                <p className="font-semibold">Location:</p>
-                                <p>{data.RecipientInfo.location}</p>
+                                <p className="font-semibold">Category:</p>
+                                <p>{data.GeneralInfo.category}</p>
                             </div>
                             <div className="flex justify-between">
-                                <p className="font-semibold">Pick Up Time:</p>
-                                <p>{data.RecipientInfo.pickUpTime}</p>
+                                <p className="font-semibold">Description:</p>
+                                <p>{data.GeneralInfo.description}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Quantity:</p>
+                                <p>{data.GeneralInfo.quantity}</p>
                             </div>
                         </div>
                     </div>
 
-                    {/* Quantity Info */}
+                    {/* Nutrition Info */}
                     <div className="flex flex-col gap-4 md:gap-10 w-full md:w-1/2 border bg-white p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
                         <h1 className="text-xl md:text-3xl font-bold text-center text-black">Nutrition</h1>
                         <div className="flex flex-col space-y-2 gap-3">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Quantity:</p>
-                                <p>{data.Quantity.quantity} {data.Quantity.quantityUnit}</p>
+                                <p>{data.Nutrition.quantity} {data.Nutrition.quantityUnit}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Temperature:</p>
-                                <p>{data.Quantity.temp} {data.Quantity.tempUnit}</p>
+                                <p>{data.Nutrition.temp} {data.Nutrition.tempUnit}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">pH:</p>
-                                <p>{data.Quantity.pH}</p>
+                                <p>{data.Nutrition.pH}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Fat:</p>
-                                <p>{data.Quantity.fat} %</p>
+                                <p>{data.Nutrition.fat} %</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Protein:</p>
-                                <p>{data.Quantity.protein} %</p>
+                                <p>{data.Nutrition.protein} %</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Calories:</p>
+                                <p>{data.Nutrition.calories}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Total Fat:</p>
+                                <p>{data.Nutrition.totalFat}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Colestoral:</p>
+                                <p>{data.Nutrition.colestoral}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Sodium:</p>
+                                <p>{data.Nutrition.sodium}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Potassium:</p>
+                                <p>{data.Nutrition.potassium}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Total Carbohydrates:</p>
+                                <p>{data.Nutrition.totalCarbohydrates}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Fiber:</p>
+                                <p>{data.Nutrition.fiber}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Sugar:</p>
+                                <p>{data.Nutrition.sugar}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Vitamin C:</p>
+                                <p>{data.Nutrition.vitaminC}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Calcium:</p>
+                                <p>{data.Nutrition.calcium}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Iron:</p>
+                                <p>{data.Nutrition.iron}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Vitamin D:</p>
+                                <p>{data.Nutrition.vitaminD}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Vitamin B6:</p>
+                                <p>{data.Nutrition.vitaminB6}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Vitamin B12:</p>
+                                <p>{data.Nutrition.vitaminB12}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Magnesium:</p>
+                                <p>{data.Nutrition.magnesium}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Bacteria:</p>
                                 <div className="flex flex-col gap-2">
-                                    <p>{data.Quantity.bacteria === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.bacteriaInfo}</p>
+                                    <p>{data.Nutrition.bacteria === true ? "True" : "False"}</p>
+                                    <p>{data.Nutrition.bacteriaInfo}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Contaminants:</p>
                                 <div className="flex flex-col gap-2">
-                                    <p>{data.Quantity.contaminants === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.contaminantInfo}</p>
+                                    <p>{data.Nutrition.contaminants === true ? "True" : "False"}</p>
+                                    <p>{data.Nutrition.contaminantInfo}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between">
@@ -169,15 +238,15 @@ const CheckProductDetails = () => {
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-3">
-                                    <p>{data.Quantity.abnormalChar === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.smellBad === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.smellNotFresh === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.abnormalColor === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.sour === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.bitter === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.cloudy === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.lumpy === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.separation === true ? "True" : "False"}</p>
+                                    <p>{data.Nutrition.abnormalChar === true ? "True" : "False"}</p>
+                                    <p>{data.Nutrition.abnormalType.smellBad === true ? "True" : "False"}</p>
+                                    <p>{data.Nutrition.abnormalType.smellNotFresh === true ? "True" : "False"}</p>
+                                    <p>{data.Nutrition.abnormalType.abnormalColor === true ? "True" : "False"}</p>
+                                    <p>{data.Nutrition.abnormalType.sour === true ? "True" : "False"}</p>
+                                    <p>{data.Nutrition.abnormalType.bitter === true ? "True" : "False"}</p>
+                                    <p>{data.Nutrition.abnormalType.cloudy === true ? "True" : "False"}</p>
+                                    <p>{data.Nutrition.abnormalType.lumpy === true ? "True" : "False"}</p>
+                                    <p>{data.Nutrition.abnormalType.separation === true ? "True" : "False"}</p>
                                 </div>
                             </div>
                         </div>
@@ -185,7 +254,7 @@ const CheckProductDetails = () => {
                 </div>
             )}
             <button className="text-white font-semibold text-xl bg-emerald-500 rounded-full self-end mx-20 p-3 mb-10"
-            onClick={() => router.push('/Factory/Product/Details')}>Submit</button>
+            onClick={handleSubmit}>Submit</button>
         </div>
     );
 };

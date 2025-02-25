@@ -16,6 +16,7 @@ const CheckDetails = () => {
 
     const handleSubmit = () => {
         router.push("/Factory/Recieving/Details");
+        alert("Submitted Successfully!");
         // localStorage.clear(); // Clear the form data in localStorage after submission
     };
 

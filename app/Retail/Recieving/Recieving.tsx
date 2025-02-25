@@ -200,7 +200,6 @@ const Recieving = () => {
     const saveToLocalStorage = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         localStorage.setItem("recievedForm", JSON.stringify(recievedForm));
-        alert("Form Save!");
         console.log(recievedForm);
     };
     // end save form Data
@@ -292,7 +291,7 @@ const Recieving = () => {
 
                     <button
                         type="button"
-                        className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-2xl hover:bg-[#C0E0C8] ${showShippingAddress ? 'hidden' : ''}`}
+                        className={`flex text-center justify-center self-end bg-[#C2CC8D] text-[#52600A] p-3 w-1/12 rounded-full hover:bg-[#C0E0C8] ${showShippingAddress ? 'hidden' : ''}`}
                         onClick={handleNextClick}
                     >
                         Next
@@ -302,7 +301,7 @@ const Recieving = () => {
                 {/* Shipping Address section */}
                 {showShippingAddress && (
                     <div ref={shippingAddressRef} className="flex flex-col items-center w-full h-full text-xl gap-8 mt-20">
-                        <h1 className="text-5xl font-bold">Quality</h1>
+                        <h1 className="text-5xl font-bold mb-10">Quality</h1>
                         {/* Quantity + temperature */}
                         <div className="flex w-full items-start gap-3">
                             {/* Quantity */}
@@ -470,8 +469,8 @@ const Recieving = () => {
 
                         <button
                             type="submit"
-                            className="flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-2xl hover:bg-[#C0E0C8]"
-                            onClick={() => router.push("/Factory/Recieving/CheckDetails")}
+                            className="flex text-center self-end w-1/12 justify-center bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8]"
+                            onClick={() => router.push("/Retail/Recieving/CheckDetails")}
                         >
                             Next
                         </button>

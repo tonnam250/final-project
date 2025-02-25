@@ -1,11 +1,9 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-const CheckDetails = () => {
+const Details = () => {
     const [data, setData] = useState(null);
-    const router = useRouter();
 
     useEffect(() => {
         const storedData = localStorage.getItem("recievedForm");
@@ -14,19 +12,14 @@ const CheckDetails = () => {
         }
     }, []);
 
-    const handleSubmit = () => {
-        router.push("/Factory/FactoryDetails");
-        // localStorage.clear(); // Clear the form data in localStorage after submission
-    };
-
     return (
-        <div className="flex flex-col justify-center items-center w-full h-full min-h-screen pt-20">
-            <h1 className="text-5xl font-bold mt-10">Product Lot Detail</h1>
+        <div className="flex flex-col w-full h-full min-h-screen items-center justify-center pt-24 bg-gray-100 text-gray-500">
+            <h1 className="text-5xl font-bold text-black">Details</h1>
             {data && (
                 <div className="flex flex-col md:flex-row justify-between gap-10 w-full p-4 md:p-14">
                     {/* Recipient Info */}
                     <div className="flex flex-col gap-4 md:gap-10 w-full h-fit md:w-1/2 bg-white border p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
-                        <h1 className="text-xl md:text-3xl font-bold text-center">Recipient Info</h1>
+                        <h1 className="text-xl md:text-3xl font-bold text-center text-black">Recipient Info</h1>
                         <div className="flex flex-col space-y-2 gap-3">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Person in charge:</p>
@@ -45,7 +38,7 @@ const CheckDetails = () => {
 
                     {/* Quantity Info */}
                     <div className="flex flex-col gap-4 md:gap-10 w-full md:w-1/2 border bg-white p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
-                        <h1 className="text-xl md:text-3xl font-bold text-center">Quantity Info</h1>
+                        <h1 className="text-xl md:text-3xl font-bold text-center text-black">Quantity Info</h1>
                         <div className="flex flex-col space-y-2 gap-3">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Quantity:</p>
@@ -113,5 +106,6 @@ const CheckDetails = () => {
             )}
         </div>
     );
-};
-export default CheckDetails;
+}
+
+export default Details;

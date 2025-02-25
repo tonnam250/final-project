@@ -149,7 +149,7 @@ const FarmGeneralInfo = () => {
 
     return (
         <div className="flex flex-col text-center w-full justify-center items-center text- h-full pt-20">
-            <h1 className="text-3xl md:text-4xl font-bold my-4 md:my-8">General Information</h1>
+            <h1 className="text-5xl md:text-4xl font-bold my-4 md:my-8">General Information</h1>
             <div className="flex h-full w-11/12 md:w-8/12 h-11/12 p-4 md:p-5 shadow-xl justify-center items-center border rounded-2xl m-2 md:m-5">
                 <form action="" className="flex flex-col gap-4 w-full" onSubmit={handleSubmit}>
                     <div className="flex flex-col md:flex-row gap-4 md:gap-5 text-start w-full">
@@ -161,7 +161,7 @@ const FarmGeneralInfo = () => {
                                 type="text"
                                 id="fName"
                                 name="fName"
-                                className="border border-gray-300 rounded-md p-2 w-full"
+                                className="border border-gray-300 rounded-full p-2 w-full"
                                 required
                                 disabled={!isEditable}
                             />
@@ -175,7 +175,7 @@ const FarmGeneralInfo = () => {
                                 type="text"
                                 id="lName"
                                 name="lName"
-                                className="border border-gray-300 rounded-md p-2 w-full"
+                                className="border border-gray-300 rounded-full p-2 w-full"
                                 required
                                 disabled={!isEditable}
                             />
@@ -190,7 +190,7 @@ const FarmGeneralInfo = () => {
                             type="email"
                             id="email"
                             name="email"
-                            className="border border-gray-300 rounded-md p-2"
+                            className="border border-gray-300 rounded-full p-2"
                             placeholder="Example@gmail.com"
                             required
                             disabled={!isEditable}
@@ -209,13 +209,11 @@ const FarmGeneralInfo = () => {
                                 <select
                                     name="areaCode"
                                     id="areaCode"
-                                    className="border border-gray-300 rounded-md p-2 w-full md:w-20 text-center"
+                                    className="border border-gray-300 rounded-full p-2 w-full md:w-20 text-center"
                                     required
                                     disabled={!isEditable}
                                 >
                                     <option value="+66">+66</option>
-                                    <option value="+1">+1</option>
-                                    <option value="+44">+44</option>
                                 </select>
                             </div>
 
@@ -224,7 +222,7 @@ const FarmGeneralInfo = () => {
                                 type="tel"
                                 id="tel"
                                 name="tel"
-                                className="border border-gray-300 rounded-md p-2 flex-1 w-full"
+                                className="border border-gray-300 rounded-full p-2 flex-1 w-full"
                                 placeholder="Enter your phone number"
                                 required
                                 disabled={!isEditable}
@@ -236,14 +234,14 @@ const FarmGeneralInfo = () => {
                     {/* Address */}
                     <div className="flex flex-col text-start font-medium">
                         <label htmlFor="address">Address</label>
-                        <textarea name="address" id="address" className="border border-gray-300 rounded-md p-2 flex-1 w-full" disabled={!isEditable}></textarea>
+                        <textarea name="address" id="address" className="border border-gray-300 rounded-3xl p-2 flex-1 w-full" disabled={!isEditable}></textarea>
                     </div>
                     {/* end Address */}
 
                     {/* province */}
                     <div className="flex flex-col w-full text-start font-medium">
                         <label htmlFor="province">Province</label>
-                        <select name="province" id="province" className="border border-gray-300 rounded-md p-2 text-center"
+                        <select name="province" id="province" className="border border-gray-300 rounded-full p-2 text-center"
                             value={selectedProvince}
                             onChange={(e) => setSelectedProvince(e.target.value)}
                             disabled={!isEditable}>
@@ -261,7 +259,7 @@ const FarmGeneralInfo = () => {
                     <div className="flex flex-col md:flex-row w-full gap-4">
                         <div className="flex flex-col text-start font-medium w-full md:w-6/12">
                             <label htmlFor="district">District</label>
-                            <select name="district" id="district" className="border border-gray-300 rounded-md p-2 text-center"
+                            <select name="district" id="district" className="border border-gray-300 rounded-full p-2 text-center"
                                 value={selectedDistrict}
                                 onChange={(e) => setSelectedDistrict(e.target.value)}
                                 disabled={!selectedProvince || !isEditable}>
@@ -276,7 +274,7 @@ const FarmGeneralInfo = () => {
 
                         <div className="flex flex-col text-start font-medium w-full md:w-6/12">
                             <label htmlFor="subDistrict">Sub-District</label>
-                            <select name="subDistrict" id="subDistrict" className="border border-gray-300 rounded-md p-2 text-center"
+                            <select name="subDistrict" id="subDistrict" className="border border-gray-300 rounded-full p-2 text-center"
                                 value={selectedSubDistrict}
                                 onChange={(e) => setSelectedSubDistrict(e.target.value)}
                                 disabled={!selectedDistrict || !isEditable}>
@@ -293,10 +291,10 @@ const FarmGeneralInfo = () => {
 
                     {/* Upload Organic certification */}
                     <label htmlFor="" className="text-start font-semibold">Uplaod Organic Certification</label>
-                    <div className="flex flex-col md:flex-row items-center justify-start gap-2 border p-2">
+                    <div className="flex flex-col md:flex-row items-center justify-start gap-2 border p-2 rounded-full">
                         <label
                             htmlFor="file-upload"
-                            className={`cursor-pointer px-4 py-2 bg-[#abc32f] text-white rounded-lg hover:bg-[#607c3c] transition ${!isEditable && "opacity-50 cursor-not-allowed"}`}
+                            className={`cursor-pointer px-4 py-2 bg-[#abc32f] text-white rounded-full hover:bg-[#607c3c] transition ${!isEditable && "opacity-50 cursor-not-allowed"}`}
                         >
                             Import file
                         </label>
@@ -321,7 +319,7 @@ const FarmGeneralInfo = () => {
                             type="text"
                             name="location"
                             id="location"
-                            className="border border-gray-300 rounded-md p-2 flex-1 w-full"
+                            className="border border-gray-300 rounded-full p-2 flex-1 w-full"
                             placeholder="Enter a location"
                             disabled={!isEditable}
                         />

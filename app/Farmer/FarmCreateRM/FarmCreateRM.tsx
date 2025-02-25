@@ -388,7 +388,7 @@ const FarmCreateRM = () => {
                         <div className="flex flex-col w-1/2 items-start gap-3">
                             <label htmlFor="temp" className="font-semibold">Temperature</label>
                             <div className="flex w-full items-start gap-3">
-                                <input type="number" name="milkTankInfo.temp" id="temp" className="p-3 rounded-full borcder w-4/5" placeholder="0.00" step="0.01"
+                                <input type="number" name="milkTankInfo.temp" id="temp" className="p-3 rounded-full border w-4/5" placeholder="0.00" step="0.01"
                                     value={formData.milkTankInfo.temp} onChange={handleFormDataChange} />
                                 <select name="milkTankInfo.tempUnit" id="tempUnit" className="border rounded-full p-3 w-1/5 font-semibold"
                                     value={formData.milkTankInfo.tempUnit} onChange={handleFormDataChange}>
@@ -531,7 +531,7 @@ const FarmCreateRM = () => {
 
                     <button
                         type="button"
-                        className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-2xl hover:bg-[#C0E0C8] ${showShippingAddress ? 'hidden' : ''}`}
+                        className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8] ${showShippingAddress ? 'hidden' : ''}`}
                         onClick={handleNextClick}
                     >
                         Next
@@ -585,8 +585,6 @@ const FarmCreateRM = () => {
                                         onChange={handleFormDataChange}
                                     >
                                         <option value="+66">+66</option>
-                                        <option value="+1">+1</option>
-                                        <option value="+44">+44</option>
                                     </select>
                                 </div>
 
@@ -679,7 +677,7 @@ const FarmCreateRM = () => {
 
                         <button
                             type="submit"
-                            className="flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-2xl hover:bg-[#C0E0C8]"
+                            className="flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8]"
                             onClick={() => router.push('/Farmer/FarmCheck')}
                         >
                             Next

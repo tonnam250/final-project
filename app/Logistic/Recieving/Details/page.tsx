@@ -1,10 +1,10 @@
-import SignUp from "./SignUp";
+import Details from './Details';
 
 const Page = () => {
     return (
         <div>
-            <SignUp />
+            <Details />
         </div>
     );
-};
+}
 export default Page;

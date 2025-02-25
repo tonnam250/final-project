@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 const HomeNav = () => {
   const [hasScrolled, setHasScrolled] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,20 +36,24 @@ const HomeNav = () => {
     setShowLogin(false);
   };
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   return (
     <div className={`fixed w-full h-24 flex justify-between px-5 items-center text-white text-xl z-50 transition-all duration-300 ${hasScrolled ? "bg-[#3D405B] shadow-md" : "bg-transparent"
       }`} >
       <div className="flex justify-center items-center gap-4" >
         <a className="flex items-center gap-2">
-          <img src="./images/LogoNoBgNotxt.png" alt="Logo" className="w-24 pt-3" />
+          <img src="/images/LogoNoBgNotxt.png" alt="Logo" className="w-24 pt-3" />
           <div className="flex flex-col justify-center items-start">
             <p className="text-3xl font-bold">Purely</p>
             <small>TRACE</small>
           </div>
         </a>
       </div >
-      <div className="flex gap-10 justify-center items-center pr-10">
-        <a className="hover:text-[#f2cc8f] active:text-[#f2cc8f] cursor-pointer" onClick={() => scrollToSection('home')}>Home</a>
+      <div className="hidden md:flex gap-10 justify-center items-center pr-10">
+        <a href="/" className="hover:text-[#f2cc8f] active:text-[#f2cc8f] cursor-pointer" onClick={() => scrollToSection('home')}>Home</a>
         <a className="hover:text-[#f2cc8f] cursor-pointer" onClick={() => scrollToSection('about')}>About</a>
         <a className="hover:text-[#f2cc8f] cursor-pointer" onClick={() => scrollToSection('story')}>Story</a>
         <a className="hover:text-[#f2cc8f] cursor-pointer" onClick={() => scrollToSection('details')}>Details</a>
@@ -59,11 +64,38 @@ const HomeNav = () => {
           </a>
         </div>
       </div>
-
+      <div className="md:hidden flex items-center">
+        <button onClick={toggleMobileMenu} className="text-white focus:outline-none">
+          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+          </svg>
+        </button>
+      </div>
+      {isMobileMenuOpen && (
+        <div className="md:hidden fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50">
+          <div className="fixed top-0 right-0 w-3/4 h-full bg-[#3D405B] shadow-lg flex flex-col p-5">
+            <button onClick={toggleMobileMenu} className="self-end text-white focus:outline-none">
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+            <a className="hover:text-[#f2cc8f] cursor-pointer mt-5" onClick={() => { scrollToSection('home'); toggleMobileMenu(); }}>Home</a>
+            <a className="hover:text-[#f2cc8f] cursor-pointer mt-5" onClick={() => { scrollToSection('about'); toggleMobileMenu(); }}>About</a>
+            <a className="hover:text-[#f2cc8f] cursor-pointer mt-5" onClick={() => { scrollToSection('story'); toggleMobileMenu(); }}>Story</a>
+            <a className="hover:text-[#f2cc8f] cursor-pointer mt-5" onClick={() => { scrollToSection('details'); toggleMobileMenu(); }}>Details</a>
+            <a className="hover:text-[#f2cc8f] cursor-pointer mt-5" onClick={() => { scrollToSection('contact'); toggleMobileMenu(); }}>Contact Us</a>
+            <div className="flex flex-wrap m-2 items-center border-2 border-[#f2cc8f] rounded-full p-2 justify-center shadow-md mt-5">
+              <a className="font-semibold px-3 text-[#f2cc8f] cursor-pointer" onClick={() => { showLoginSidebar(); toggleMobileMenu(); }}>
+                Sign In
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Login SideBar */}
       {showLogin && (
         <div className="flex bg-black bg-opacity-50 fixed top-0 left-0 w-full h-full justify-center items-center z-50" id="login">
-          <div className="flex flex-col justify-between fixed top-0 right-0 w-1/4 h-full bg-[#83b39b] shadow-lg">
+          <div className="flex flex-col justify-between fixed top-0 right-0 w-full md:w-1/4 h-full bg-[#83b39b] shadow-lg">
             <div className="flex flex-col justify-center p-8">
               <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-semibold text-[#3D405B]">Sign In</h1>

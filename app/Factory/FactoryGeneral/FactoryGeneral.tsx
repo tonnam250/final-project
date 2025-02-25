@@ -120,7 +120,7 @@ const FactoryGeneral = () => {
                                 type="text"
                                 id="fName"
                                 name="fName"
-                                className="border border-gray-300 rounded-md p-2 w-full"
+                                className="border border-gray-300 rounded-full p-2 w-full"
                                 required
                                 disabled={!isEditable}
                             />
@@ -134,7 +134,7 @@ const FactoryGeneral = () => {
                                 type="text"
                                 id="lName"
                                 name="lName"
-                                className="border border-gray-300 rounded-md p-2 w-full"
+                                className="border border-gray-300 rounded-full p-2 w-full"
                                 required
                                 disabled={!isEditable}
                             />
@@ -149,7 +149,7 @@ const FactoryGeneral = () => {
                             type="email"
                             id="email"
                             name="email"
-                            className="border border-gray-300 rounded-md p-2"
+                            className="border border-gray-300 rounded-full p-2"
                             placeholder="Example@gmail.com"
                             required
                             disabled={!isEditable}
@@ -168,13 +168,11 @@ const FactoryGeneral = () => {
                                 <select
                                     name="areaCode"
                                     id="areaCode"
-                                    className="border border-gray-300 rounded-md p-2 w-full md:w-20 text-center"
+                                    className="border border-gray-300 rounded-full p-2 w-full md:w-20 text-center"
                                     required
                                     disabled={!isEditable}
                                 >
                                     <option value="+66">+66</option>
-                                    <option value="+1">+1</option>
-                                    <option value="+44">+44</option>
                                 </select>
                             </div>
 
@@ -183,7 +181,7 @@ const FactoryGeneral = () => {
                                 type="tel"
                                 id="tel"
                                 name="tel"
-                                className="border border-gray-300 rounded-md p-2 flex-1 w-full"
+                                className="border border-gray-300 rounded-full p-2 flex-1 w-full"
                                 placeholder="Enter your phone number"
                                 required
                                 disabled={!isEditable}
@@ -195,14 +193,14 @@ const FactoryGeneral = () => {
                     {/* Address */}
                     <div className="flex flex-col text-start font-medium">
                         <label htmlFor="address">Address</label>
-                        <textarea name="address" id="address" className="border border-gray-300 rounded-md p-2 flex-1 w-full" disabled={!isEditable}></textarea>
+                        <textarea name="address" id="address" className="border border-gray-300 rounded-full p-2 flex-1 w-full" disabled={!isEditable}></textarea>
                     </div>
                     {/* end Address */}
 
                     {/* province */}
                     <div className="flex flex-col w-full text-start font-medium">
                         <label htmlFor="province">Province</label>
-                        <select name="province" id="province" className="border border-gray-300 rounded-md p-2 text-center"
+                        <select name="province" id="province" className="border border-gray-300 rounded-full p-2 text-center"
                             value={selectedProvince}
                             onChange={(e) => setSelectedProvince(e.target.value)}
                             disabled={!isEditable}>
@@ -220,7 +218,7 @@ const FactoryGeneral = () => {
                     <div className="flex flex-col md:flex-row w-full gap-4">
                         <div className="flex flex-col text-start font-medium w-full md:w-6/12">
                             <label htmlFor="district">District</label>
-                            <select name="district" id="district" className="border border-gray-300 rounded-md p-2 text-center"
+                            <select name="district" id="district" className="border border-gray-300 rounded-full p-2 text-center"
                                 value={selectedDistrict}
                                 onChange={(e) => setSelectedDistrict(e.target.value)}
                                 disabled={!selectedProvince || !isEditable}>
@@ -235,7 +233,7 @@ const FactoryGeneral = () => {
 
                         <div className="flex flex-col text-start font-medium w-full md:w-6/12">
                             <label htmlFor="subDistrict">Sub-District</label>
-                            <select name="subDistrict" id="subDistrict" className="border border-gray-300 rounded-md p-2 text-center"
+                            <select name="subDistrict" id="subDistrict" className="border border-gray-300 rounded-full p-2 text-center"
                                 value={selectedSubDistrict}
                                 onChange={(e) => setSelectedSubDistrict(e.target.value)}
                                 disabled={!selectedDistrict || !isEditable}>
@@ -276,7 +274,7 @@ const FactoryGeneral = () => {
                     {/* location */}
                     <div className="flex flex-col font-medium text-start">
                         <label htmlFor="location">Location</label>
-                        <input type="text" name="location" id="location" className="border border-gray-300 rounded-md p-2 flex-1 w-full"
+                        <input type="text" name="location" id="location" className="border border-gray-300 rounded-full p-2 flex-1 w-full"
                             disabled={!isEditable} />
                     </div>
 

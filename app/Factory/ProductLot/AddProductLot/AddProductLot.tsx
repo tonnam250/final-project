@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import GeneralInfo from "@/app/Logistic/GeneralInfo/GeneralInfo";
 
 interface GeoData {
     id: number;
@@ -100,16 +101,15 @@ const AddProductLot = () => {
     // end step status update function
 
     // save form Data
-    const [recievedForm, setFormData] = useState({
-        RecipientInfo: {
+    const [productLotForm, setFormData] = useState({
+        GeneralInfo: {
             productName: "",
             category: "",
             description: "",
-            quality: ""
-        },
-        Quantity: {
             quantity: 0,
-            quantityUnit: "Ton",
+            quantityUnit: "Ton"
+        },
+        selectMilkTank: {
             temp: 0,
             tempUnit: "Celcius",
             pH: 0,
@@ -130,28 +130,67 @@ const AddProductLot = () => {
                 lumpy: false,
                 separation: false
             }
+        },
+        Quality: {
+            calories: 0,
+            totalFat: 0,
+            colestoral: 0,
+            sodium: 0,
+            potassium: 0,
+            totalCarbohydrates: 0,
+            fiber: 0,
+            sugar: 0,
+            vitaminC: 0,
+            calcium: 0,
+            iron: 0,
+            vitaminD: 0,
+            vitaminB6: 0,
+            vitaminB12: 0,
+            magnesium: 0
+        },
+        nutrition: {
+            calories: 0,
+            totalFat: 0,
+            colestoral: 0,
+            sodium: 0,
+            potassium: 0,
+            totalCarbohydrates: 0,
+            fiber: 0,
+            sugar: 0,
+            vitaminC: 0,
+            calcium: 0,
+            iron: 0,
+            vitaminD: 0,
+            vitaminB6: 0,
+            vitaminB12: 0,
+            magnesium: 0
+        },
+        shippingAddress: {
+            companyName: "",
+            firstName: "",
+            lastName: "",
+            email: "",
+            areaCode: "+66",
+            phoneNumber: "",
+            address: "",
+            province: "",
+            district: "",
+            subDistrict: "",
+            postalCode: "",
+            location: ""
         }
     });
 
     // ✅ \u04E04\u04E27\u04E1A\u04E04\u04E38\u04E23\u04E07\u04E01\u04E23\u04E32\u04E07\u04E2B\u04E27\u04E31\u04E14\u04E17\u04E35\u04E48 abnormalType
     const [showAbnormalInfo, setShowAbnormalInfo] = useState(false);
+    const [showBacteriaInfo, setShowBacteriaInfo] = useState(false);
+    const [showContaminantInfo, setShowContaminantInfo] = useState(false);
 
     // ✅ \u04E42\u04E2D\u04E14\u04E02\u04E49\u04E21\u04E39\u04E25\u04E08\u04E32\u04E01 localStorage \u04E40\u04E21\u04E37\u04E48\u04E2D\u04E2B\u04E19\u04E49\u04E32\u04E40\u04E2B\u04E25\u04E14
-    useEffect(() => {
-        if (typeof window !== "undefined") {
-            const savedData = localStorage.getItem("recievedForm");
-            if (savedData) {
-                setFormData(JSON.parse(savedData));
-            }
-        }
-    }, []);
+    // Removed localStorage retrieval
 
     // ✅ \u04E42\u04E1A\u04E17\u04E36\u04E01\u04E02\u04E49\u04E21\u04E39\u04E25\u04E07 localStorage \u04E17\u04E38\u04E01\u04E04\u04E23\u04E32\u04E07\u04E17\u04E35\u04E48 recieveForm \u04E40\u04E1B\u04E25\u04E35\u04E48\u04E19
-    useEffect(() => {
-        if (typeof window !== "undefined") {
-            localStorage.setItem("recievedForm", JSON.stringify(recievedForm));
-        }
-    }, [recievedForm]);
+    // Removed localStorage saving
 
     // ✅ \u04E1F\u04E31\u04E07\u04E01\u04E4C\u04E32\u04E19 handleFormDataChange \u04E23\u04E2D\u04E07\u04E23\u04E31\u04E1A text, select \u04E41\u04E25\u04E30 checkbox
     const handleFormDataChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -170,11 +209,11 @@ const AddProductLot = () => {
             temp[keys[keys.length - 1]] = type === "checkbox" ? checked : value;
 
             // อัปเดต province, district และ subdistrict
-            if (name === "RecipientInfo.province") {
+            if (name === "shippingAddress.province") {
                 setSelectedProvince(value);
-            } else if (name === "RecipientInfo.district") {
+            } else if (name === "shippingAddress.district") {
                 setSelectedDistrict(value);
-            } else if (name === "RecipientInfo.subDistrict") {
+            } else if (name === "shippingAddress.subDistrict") {
                 setSelectedSubDistrict(value);
             }
 
@@ -184,8 +223,18 @@ const AddProductLot = () => {
 
     // ✅ \u04E1F\u04E31\u04E07\u04E01\u04E4C\u04E32\u04E19 handleAbnormalChange \u04E21\u04E49\u04E48 \u04E40\u04E0A\u04E47 abnormalChar \u04E41\u04E25\u04E30\u04E42\u04E0A abnormalType
     const handleAbnormalChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        handleFormDataChange(event);
+        // handleFormDataChange(event);
         setShowAbnormalInfo(event.target.checked);
+    };
+
+    const handleBacteriaChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        // handleFormDataChange(event);
+        setShowBacteriaInfo(event.target.checked);
+    };
+
+    const handleContaminantChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        // handleFormDataChange(event);
+        setShowContaminantInfo(event.target.checked);
     };
 
     // ✅ \u04E1F\u04E31\u04E07\u04E01\u04E4C\u04E32\u04E19 handleNestedCheckboxChange \u04E2A\u04E33\u04E2B\u04E23\u04E31\u04E1A abnormalType
@@ -202,12 +251,13 @@ const AddProductLot = () => {
         });
     };
 
+
     // ✅ \u04E1F\u04E31\u04E07\u04E01\u04E4C\u04E32\u04E19 Submit \u04E21\u04E49\u04E48 \u04E1A\u04E17\u04E36\u04E01\u04E02\u04E49\u04E21\u04E39\u04E25\u04E07 localStorage
     const saveToLocalStorage = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        localStorage.setItem("recievedForm", JSON.stringify(recievedForm));
+        // Removed localStorage saving
         alert("Form Save!");
-        console.log(recievedForm);
+        console.log(productLotForm);
     };
     // end save form Data
 
@@ -216,108 +266,109 @@ const AddProductLot = () => {
     return (
         <div className="flex flex-col w-full h-full min-h-screen items-center justify-center pt-20">
             {/* Detail Status */}
-            <div className="flex items-center w-full h-full p-10">
-                <div className="flex border shadow-xl w-full h-full p-5 rounded-3xl gap-8">
-                    {/* First Step */}
-                    <div className="flex flex-col w-1/3 h-full">
-                        <div className={`flex w-14 text-center p-2 rounded-full mb-2 ${stepStatus.step1 === 'completed' ? 'bg-emerald-500 text-white' : 'bg-yellow-200 text-amber-500'}`}>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="w-full" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="M8 12h8v2H8zm2 8H6V4h7v5h5v3.1l2-2V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4zm-2-2h4.1l.9-.9V16H8zm12.2-5c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1l-2.1-2.1l1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z" />
-                            </svg>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div className={`h-2 rounded-full ${stepStatus.step1 === 'completed' ? 'bg-emerald-500 w-full' : 'bg-yellow-400 w-1/5'}`}></div>
-                        </div>
-                        <p className="text-xl font-semibold">STEP 1</p>
-                        <h1 className="text-3xl font-semibold mb-3">General Info</h1>
-                        <div className={`flex flex-wrap text-center w-fit items-center justify-center rounded-full p-1 px-2 mx-5 ${stepStatus.step1 === 'completed' ? 'bg-emerald-500 text-white' : 'bg-yellow-200 text-amber-500'}`}>
-                            <p className="text-lg font-semibold">{stepStatus.step1 === 'completed' ? 'Completed' : 'In Progress'}</p>
-                        </div>
-                    </div>
-                    {/* Second Step */}
-                    <div className="flex flex-col w-1/3 h-full">
-                        <div className={`flex w-14 text-center p-2 rounded-full mb-2 ${stepStatus.step2 === 'completed' ? 'bg-emerald-500 text-white' : stepStatus.step2 === 'in-progress' ? 'bg-yellow-200 text-amber-500' : 'bg-gray-200 text-gray-500'}`}>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10" viewBox="0 0 32 32">
-                                <path fill="currentColor" d="M0 6v2h19v15h-6.156c-.446-1.719-1.992-3-3.844-3s-3.398 1.281-3.844 3H4v-5H2v7h3.156c.446 1.719 1.992 3 3.844 3s3.398-1.281 3.844-3h8.312c.446 1.719 1.992 3 3.844 3s3.398-1.281 3.844-3H32v-8.156l-.063-.157l-2-6L29.72 10H21V6zm1 4v2h9v-2zm20 2h7.281L30 17.125V23h-1.156c-.446-1.719-1.992-3-3.844-3s-3.398 1.281-3.844 3H21zM2 14v2h6v-2zm7 8c1.117 0 2 .883 2 2s-.883 2-2 2s-2-.883-2-2s.883-2 2-2m16 0c1.117 0 2 .883 2 2s-.883 2-2 2s-2-.883-2-2s.883-2 2-2" />
-                            </svg>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div className={`h-2 rounded-full ${stepStatus.step2 === 'completed' ? 'bg-emerald-500 w-full' : stepStatus.step2 === 'in-progress' ? 'bg-yellow-400 w-1/5' : 'bg-gray-200 text-gray-500'}`}></div>
-                        </div>
-                        <p className={`text-xl font-semibold ${stepStatus.step2 === 'completed' ? 'text-black' : stepStatus.step2 === 'in-progress' ? 'text-black' : 'text-gray-500'}`}>STEP 2</p>
-                        <h1 className={`text-3xl font-semibold mb-3 ${stepStatus.step2 === 'completed' ? 'text-black' : stepStatus.step2 === 'in-progress' ? 'text-black' : 'text-gray-500'}`}>Select Milk Tank</h1>
-                        <div className={`flex flex-wrap text-center w-fit items-center justify-center rounded-full mx-5 p-1 px-2 ${stepStatus.step2 === 'completed' ? 'bg-emerald-500 text-white' : stepStatus.step2 === 'in-progress' ? 'bg-yellow-200 text-amber-500' : 'bg-gray-200 text-gray-500'}`}>
-                            <p className="text-lg font-semibold">{stepStatus.step2 === 'completed' ? 'Completed' : stepStatus.step2 === 'in-progress' ? 'In Progress' : 'Not finish'}</p>
-                        </div>
-                    </div>
-                    {/* Third Step */}
-                    <div className="flex flex-col w-1/3 h-full">
-                        <div className={`flex w-14 text-center p-2 rounded-full mb-2 ${stepStatus.step3 === 'completed' ? 'bg-emerald-500 text-white' : stepStatus.step3 === 'in-progress' ? 'bg-yellow-200 text-amber-500' : 'bg-gray-200 text-gray-500'}`}>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="m23.5 17l-5 5l-3.5-3.5l1.5-1.5l2 2l3.5-3.5zM6 2a2 2 0 0 0-2 2v16c0 1.11.89 2 2 2h7.81c-.36-.62-.61-1.3-.73-2H6V4h7v5h5v3.08c.33-.05.67-.08 1-.08c.34 0 .67.03 1 .08V8l-6-6M8 12v2h8v-2m-8 4v2h5v-2Z" />
-                            </svg>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div className={`h-2 rounded-full w-0 ${stepStatus.step3 === 'completed' ? 'bg-emerald-500 w-full' : stepStatus.step3 === 'in-progress' ? 'bg-yellow-400 w-1/5' : 'bg-gray-200'}`}></div>
-                        </div>
-                        <p className={`text-xl font-semibold ${stepStatus.step3 === 'completed' ? 'text-black' : stepStatus.step3 === 'in-progress' ? 'text-black' : 'text-gray-500' }`}>STEP 3</p>
-                        <h1 className={`text-3xl font-semibold mb-3 ${stepStatus.step3 === 'completed' ? 'text-black' : stepStatus.step3 === 'in-progress' ? 'text-black' : 'text-gray-500' }`}>Quality</h1>
-                        <div className={`flex flex-wrap text-center w-fit items-center justify-center rounded-full mx-5 p-1 px-2 ${stepStatus.step3 === 'completed' ? 'bg-emerald-500 text-white' : stepStatus.step3 === 'in-progress' ? 'bg-yellow-200 text-amber-500' : 'bg-gray-200 text-gray-500'}`}>
-                            <p className="text-lg font-semibold">{stepStatus.step3 === 'completed' ? 'Completed' : stepStatus.step3 === 'in-progress' ? 'In Progress' : 'Not finish'}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div className="flex flex-col items-center w-full h-full p-10 mt-10">
 
-            {/* Step 4-6 */}
-            <div className="flex items-center w-full h-full p-10">
-                <div className="flex border shadow-xl w-full h-full p-5 rounded-3xl gap-8">
-                    {/* Fourth Step */}
-                    <div className="flex flex-col w-1/3 h-full">
-                        <div className={`flex w-14 text-center p-2 rounded-full mb-2 ${stepStatus.step4 === 'completed' ? 'bg-emerald-500 text-white' : stepStatus.step4 === 'in-progress' ? 'bg-yellow-200 text-amber-500' : 'bg-gray-200 text-gray-500'}`}>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="w-full" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="M8 12h8v2H8zm2 8H6V4h7v5h5v3.1l2-2V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4zm-2-2h4.1l.9-.9V16H8zm12.2-5c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1l-2.1-2.1l1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z" />
-                            </svg>
+                <div className="flex flex-col items-center w-full h-full border shadow-xl rounded-3xl p-10">
+                    <div className="flex w-full h-full p-5 gap-8">
+                        {/* First Step */}
+                        <div className="flex flex-col w-1/3 h-full">
+                            <div className={`flex w-14 text-center p-2 rounded-full mb-2 ${stepStatus.step1 === 'completed' ? 'bg-emerald-500 text-white' : 'bg-yellow-200 text-amber-500'}`}>
+                                <svg xmlns="http://www.w3.org/2000/svg" className="w-full" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M8 12h8v2H8zm2 8H6V4h7v5h5v3.1l2-2V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4zm-2-2h4.1l.9-.9V16H8zm12.2-5c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1l-2.1-2.1l1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z" />
+                                </svg>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div className={`h-2 rounded-full ${stepStatus.step1 === 'completed' ? 'bg-emerald-500 w-full' : 'bg-yellow-400 w-1/5'}`}></div>
+                            </div>
+                            <p className="text-xl font-semibold">STEP 1</p>
+                            <h1 className="text-3xl font-semibold mb-3">General Info</h1>
+                            <div className={`flex flex-wrap text-center w-fit items-center justify-center rounded-full p-1 px-2 mx-5 ${stepStatus.step1 === 'completed' ? 'bg-emerald-500 text-white' : 'bg-yellow-200 text-amber-500'}`}>
+                                <p className="text-lg font-semibold">{stepStatus.step1 === 'completed' ? 'Completed' : 'In Progress'}</p>
+                            </div>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div className={`h-2 rounded-full ${stepStatus.step4 === 'completed' ? 'bg-emerald-500 w-full' : stepStatus.step4 === 'in-progress' ? 'bg-yellow-400 w-1/5' : 'bg-gray-200'}`}></div>
+                        {/* Second Step */}
+                        <div className="flex flex-col w-1/3 h-full">
+                            <div className={`flex w-14 text-center p-2 rounded-full mb-2 ${stepStatus.step2 === 'completed' ? 'bg-emerald-500 text-white' : stepStatus.step2 === 'in-progress' ? 'bg-yellow-200 text-amber-500' : 'bg-gray-200 text-gray-500'}`}>
+                                <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10" viewBox="0 0 32 32">
+                                    <path fill="currentColor" d="M0 6v2h19v15h-6.156c-.446-1.719-1.992-3-3.844-3s-3.398 1.281-3.844 3H4v-5H2v7h3.156c.446 1.719 1.992 3 3.844 3s3.398-1.281 3.844-3h8.312c.446 1.719 1.992 3 3.844 3s3.398-1.281 3.844-3H32v-8.156l-.063-.157l-2-6L29.72 10H21V6zm1 4v2h9v-2zm20 2h7.281L30 17.125V23h-1.156c-.446-1.719-1.992-3-3.844-3s-3.398 1.281-3.844 3H21zM2 14v2h6v-2zm7 8c1.117 0 2 .883 2 2s-.883 2-2 2s-2-.883-2-2s.883-2 2-2m16 0c1.117 0 2 .883 2 2s-.883 2-2 2s-2-.883-2-2s.883-2 2-2" />
+                                </svg>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div className={`h-2 rounded-full ${stepStatus.step2 === 'completed' ? 'bg-emerald-500 w-full' : stepStatus.step2 === 'in-progress' ? 'bg-yellow-400 w-1/5' : 'bg-gray-200 text-gray-500'}`}></div>
+                            </div>
+                            <p className={`text-xl font-semibold ${stepStatus.step2 === 'completed' ? 'text-black' : stepStatus.step2 === 'in-progress' ? 'text-black' : 'text-gray-500'}`}>STEP 2</p>
+                            <h1 className={`text-3xl font-semibold mb-3 ${stepStatus.step2 === 'completed' ? 'text-black' : stepStatus.step2 === 'in-progress' ? 'text-black' : 'text-gray-500'}`}>Select Milk Tank</h1>
+                            <div className={`flex flex-wrap text-center w-fit items-center justify-center rounded-full mx-5 p-1 px-2 ${stepStatus.step2 === 'completed' ? 'bg-emerald-500 text-white' : stepStatus.step2 === 'in-progress' ? 'bg-yellow-200 text-amber-500' : 'bg-gray-200 text-gray-500'}`}>
+                                <p className="text-lg font-semibold">{stepStatus.step2 === 'completed' ? 'Completed' : stepStatus.step2 === 'in-progress' ? 'In Progress' : 'Not finish'}</p>
+                            </div>
                         </div>
-                        <p className="text-xl font-semibold">STEP 4</p>
-                        <h1 className="text-3xl font-semibold mb-3">Nutrition</h1>
-                        <div className={`flex flex-wrap text-center w-fit items-center justify-center rounded-full p-1 px-2 mx-5 ${stepStatus.step4 === 'completed' ? 'bg-emerald-500 text-white' : stepStatus.step4 === 'in-progress' ? 'bg-yellow-200 text-amber-500' : 'bg-gray-200 text-gray-500'}`}>
-                            <p className="text-lg font-semibold">{stepStatus.step4 === 'completed' ? 'Completed' : stepStatus.step4 === 'in-progress' ? 'In Progress' : 'Not finished'}</p>
+                        {/* Third Step */}
+                        <div className="flex flex-col w-1/3 h-full">
+                            <div className={`flex w-14 text-center p-2 rounded-full mb-2 ${stepStatus.step3 === 'completed' ? 'bg-emerald-500 text-white' : stepStatus.step3 === 'in-progress' ? 'bg-yellow-200 text-amber-500' : 'bg-gray-200 text-gray-500'}`}>
+                                <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="m23.5 17l-5 5l-3.5-3.5l1.5-1.5l2 2l3.5-3.5zM6 2a2 2 0 0 0-2 2v16c0 1.11.89 2 2 2h7.81c-.36-.62-.61-1.3-.73-2H6V4h7v5h5v3.08c.33-.05.67-.08 1-.08c.34 0 .67.03 1 .08V8l-6-6M8 12v2h8v-2m-8 4v2h5v-2Z" />
+                                </svg>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div className={`h-2 rounded-full w-0 ${stepStatus.step3 === 'completed' ? 'bg-emerald-500 w-full' : stepStatus.step3 === 'in-progress' ? 'bg-yellow-400 w-1/5' : 'bg-gray-200'}`}></div>
+                            </div>
+                            <p className={`text-xl font-semibold ${stepStatus.step3 === 'completed' ? 'text-black' : stepStatus.step3 === 'in-progress' ? 'text-black' : 'text-gray-500'}`}>STEP 3</p>
+                            <h1 className={`text-3xl font-semibold mb-3 ${stepStatus.step3 === 'completed' ? 'text-black' : stepStatus.step3 === 'in-progress' ? 'text-black' : 'text-gray-500'}`}>Quality</h1>
+                            <div className={`flex flex-wrap text-center w-fit items-center justify-center rounded-full mx-5 p-1 px-2 ${stepStatus.step3 === 'completed' ? 'bg-emerald-500 text-white' : stepStatus.step3 === 'in-progress' ? 'bg-yellow-200 text-amber-500' : 'bg-gray-200 text-gray-500'}`}>
+                                <p className="text-lg font-semibold">{stepStatus.step3 === 'completed' ? 'Completed' : stepStatus.step3 === 'in-progress' ? 'In Progress' : 'Not finish'}</p>
+                            </div>
                         </div>
                     </div>
-                    {/* Fifth Step */}
-                    <div className="flex flex-col w-1/3 h-full">
-                        <div className={`flex w-14 text-center p-2 rounded-full mb-2 ${stepStatus.step5 === 'in-progress' ? 'bg-yellow-200 text-amber-500' : 'bg-gray-200 text-gray-500'}`}>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10" viewBox="0 0 32 32">
-                                <path fill="currentColor" d="M0 6v2h19v15h-6.156c-.446-1.719-1.992-3-3.844-3s-3.398 1.281-3.844 3H4v-5H2v7h3.156c.446 1.719 1.992 3 3.844 3s3.398-1.281 3.844-3h8.312c.446 1.719 1.992 3 3.844 3s3.398-1.281 3.844-3H32v-8.156l-.063-.157l-2-6L29.72 10H21V6zm1 4v2h9v-2zm20 2h7.281L30 17.125V23h-1.156c-.446-1.719-1.992-3-3.844-3s-3.398 1.281-3.844 3H21zM2 14v2h6v-2zm7 8c1.117 0 2 .883 2 2s-.883 2-2 2s-2-.883-2-2s.883-2 2-2m16 0c1.117 0 2 .883 2 2s-.883 2-2 2s-2-.883-2-2s.883-2 2-2" />
-                            </svg>
+
+                    {/* Second row */}
+                    <div className="flex w-full h-full p-5 gap-8 mt-5">
+                        {/* Sixth Step */}
+                        <div className="flex flex-col w-1/3 h-full">
+                            <div className="flex bg-gray-200 w-14 text-center text-gray-500 p-2 rounded-full mb-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="m23.5 17l-5 5l-3.5-3.5l1.5-1.5l2 2l3.5-3.5zM6 2a2 2 0 0 0-2 2v16c0 1.11.89 2 2 2h7.81c-.36-.62-.61-1.3-.73-2H6V4h7v5h5v3.08c.33-.05.67-.08 1-.08c.34 0 .67.03 1 .08V8l-6-6M8 12v2h8v-2m-8 4v2h5v-2Z" />
+                                </svg>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div className="bg-emerald-600 h-2 rounded-full w-0"></div>
+                            </div>
+                            <p className="text-xl font-semibold text-gray-500">STEP 6</p>
+                            <h1 className="text-3xl font-semibold mb-3 text-gray-500">Check Details</h1>
+                            <div className="flex flex-wrap text-center w-fit items-center justify-center rounded-full p-1 px-2 mx-5 bg-gray-200 text-gray-500">
+                                <p className="text-lg font-semibold">Not finished</p>
+                            </div>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div className={`h-2 rounded-full ${stepStatus.step5 === 'in-progress' ? 'bg-yellow-400 w-1/5' : 'bg-gray-200 w-0'}`}></div>
+                        {/* Fifth Step */}
+                        <div className="flex flex-col w-1/3 h-full">
+                            <div className={`flex w-14 text-center p-2 rounded-full mb-2 ${stepStatus.step5 === 'in-progress' ? 'bg-yellow-200 text-amber-500' : 'bg-gray-200 text-gray-500'}`}>
+                                <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10" viewBox="0 0 32 32">
+                                    <path fill="currentColor" d="M0 6v2h19v15h-6.156c-.446-1.719-1.992-3-3.844-3s-3.398 1.281-3.844 3H4v-5H2v7h3.156c.446 1.719 1.992 3 3.844 3s3.398-1.281 3.844-3h8.312c.446 1.719 1.992 3 3.844 3s3.398-1.281 3.844-3H32v-8.156l-.063-.157l-2-6L29.72 10H21V6zm1 4v2h9v-2zm20 2h7.281L30 17.125V23h-1.156c-.446-1.719-1.992-3-3.844-3s-3.398 1.281-3.844 3H21zM2 14v2h6v-2zm7 8c1.117 0 2 .883 2 2s-.883 2-2 2s-2-.883-2-2s.883-2 2-2m16 0c1.117 0 2 .883 2 2s-.883 2-2 2s-2-.883-2-2s.883-2 2-2" />
+                                </svg>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div className={`h-2 rounded-full ${stepStatus.step5 === 'in-progress' ? 'bg-yellow-400 w-1/5' : 'bg-gray-200 w-0'}`}></div>
+                            </div>
+                            <p className={`text-xl font-semibold ${stepStatus.step5 === 'in-progress' ? 'text-amber-500' : 'text-gray-500'}`}>STEP 5</p>
+                            <h1 className={`text-3xl font-semibold mb-3 ${stepStatus.step5 === 'in-progress' ? 'text-amber-500' : 'text-gray-500'}`}>Shipping</h1>
+                            <div className={`flex flex-wrap text-center w-fit items-center justify-center rounded-full mx-5 p-1 px-2 ${stepStatus.step5 === 'in-progress' ? 'bg-yellow-200 text-amber-500' : 'bg-gray-200 text-gray-500'}`}>
+                                <p className="text-lg font-semibold">{stepStatus.step5 === 'in-progress' ? 'In Progress' : 'Not finished'}</p>
+                            </div>
                         </div>
-                        <p className={`text-xl font-semibold ${stepStatus.step5 === 'in-progress' ? 'text-amber-500' : 'text-gray-500'}`}>STEP 5</p>
-                        <h1 className={`text-3xl font-semibold mb-3 ${stepStatus.step5 === 'in-progress' ? 'text-amber-500' : 'text-gray-500'}`}>Shipping</h1>
-                        <div className={`flex flex-wrap text-center w-fit items-center justify-center rounded-full mx-5 p-1 px-2 ${stepStatus.step5 === 'in-progress' ? 'bg-yellow-200 text-amber-500' : 'bg-gray-200 text-gray-500'}`}>
-                            <p className="text-lg font-semibold">{stepStatus.step5 === 'in-progress' ? 'In Progress' : 'Not finished'}</p>
-                        </div>
-                    </div>
-                    {/* Sixth Step */}
-                    <div className="flex flex-col w-1/3 h-full">
-                        <div className="flex bg-gray-200 w-14 text-center text-gray-500 p-2 rounded-full mb-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="m23.5 17l-5 5l-3.5-3.5l1.5-1.5l2 2l3.5-3.5zM6 2a2 2 0 0 0-2 2v16c0 1.11.89 2 2 2h7.81c-.36-.62-.61-1.3-.73-2H6V4h7v5h5v3.08c.33-.05.67-.08 1-.08c.34 0 .67.03 1 .08V8l-6-6M8 12v2h8v-2m-8 4v2h5v-2Z" />
-                            </svg>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div className="bg-emerald-600 h-2 rounded-full w-0"></div>
-                        </div>
-                        <p className="text-xl font-semibold text-gray-500">STEP 6</p>
-                        <h1 className="text-3xl font-semibold mb-3 text-gray-500">Check Details</h1>
-                        <div className="flex flex-wrap text-center w-fit items-center justify-center rounded-full p-1 px-2 mx-5 bg-gray-200 text-gray-500">
-                            <p className="text-lg font-semibold">Not finished</p>
+                        {/* Fourth Step */}
+                        <div className="flex flex-col w-1/3 h-full">
+                            <div className={`flex w-14 text-center p-2 rounded-full mb-2 ${stepStatus.step4 === 'completed' ? 'bg-emerald-500 text-white' : stepStatus.step4 === 'in-progress' ? 'bg-yellow-200 text-amber-500' : 'bg-gray-200 text-gray-500'}`}>
+                                <svg xmlns="http://www.w3.org/2000/svg" className="w-full" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M8 12h8v2H8zm2 8H6V4h7v5h5v3.1l2-2V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4zm-2-2h4.1l.9-.9V16H8zm12.2-5c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1l-2.1-2.1l1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z" />
+                                </svg>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div className={`h-2 rounded-full ${stepStatus.step4 === 'completed' ? 'bg-emerald-500 w-full' : stepStatus.step4 === 'in-progress' ? 'bg-yellow-400 w-1/5' : 'bg-gray-200'}`}></div>
+                            </div>
+                            <p className={`text-xl font-semibold ${stepStatus.step4 === 'completed' ? 'text-black' : stepStatus.step4 === 'in-progress' ? 'text-black' : 'text-gray-500'}`}>STEP 4</p>
+                            <h1 className={`text-3xl font-semibold mb-3 ${stepStatus.step4 === 'completed' ? 'text-black' : stepStatus.step4 === 'in-progress' ? 'text-black' : 'text-gray-500'}`}>Nutrition</h1>
+                            <div className={`flex flex-wrap text-center w-fit items-center justify-center rounded-full p-1 px-2 mx-5 ${stepStatus.step4 === 'completed' ? 'bg-emerald-500 text-white' : stepStatus.step4 === 'in-progress' ? 'bg-yellow-200 text-amber-500' : 'bg-gray-200 text-gray-500'}`}>
+                                <p className="text-lg font-semibold">{stepStatus.step4 === 'completed' ? 'Completed' : stepStatus.step4 === 'in-progress' ? 'In Progress' : 'Not finished'}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -369,7 +420,7 @@ const AddProductLot = () => {
 
                     <button
                         type="button"
-                        className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-2xl hover:bg-[#C0E0C8] ${stepStatus.step1 === 'completed' ? 'hidden' : ''}`}
+                        className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8] ${stepStatus.step1 === 'completed' ? 'hidden' : ''}`}
                         onClick={() => handleNextClick(1)}
                     >
                         Next
@@ -423,7 +474,7 @@ const AddProductLot = () => {
 
                     <button
                         type="button"
-                        className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-2xl hover:bg-[#C0E0C8] ${stepStatus.step2 === 'completed' ? 'hidden' : ''}`}
+                        className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8] ${stepStatus.step2 === 'completed' ? 'hidden' : ''}`}
                         onClick={() => handleNextClick(2)}
                     >
                         Next
@@ -475,18 +526,19 @@ const AddProductLot = () => {
                                 name="milkTankInfo.bacteria"
                                 id="bacteria"
                                 className="w-5 h-5 appearance-none border border-gray-400 rounded-full checked:bg-[#D3D596] checked:border-[#305066]"
-
+                                onChange={handleBacteriaChange}
                             />
                             <label htmlFor="bacteria" className="font-semibold">Bacteria Testing</label>
                         </div>
-                        <input
-                            type="text"
-                            name="milkTankInfo.bacteriaInfo"
-                            id="bacteriaInfo"
-                            className="border rounded-full p-3"
-                            placeholder="Please fill additional information"
-
-                        />
+                        {showBacteriaInfo && (
+                            <input
+                                type="text"
+                                name="milkTankInfo.bacteriaInfo"
+                                id="bacteriaInfo"
+                                className="border rounded-full p-3"
+                                placeholder="Please fill additional information"
+                            />
+                        )}
                     </div>
                     {/* Contaminants */}
                     <div className="flex flex-col w-full justify-center gap-3">
@@ -496,17 +548,19 @@ const AddProductLot = () => {
                                 name="milkTankInfo.contaminants"
                                 id="milkTankInfo.contaminants"
                                 className="w-5 h-5 appearance-none border border-gray-400 rounded-full checked:bg-[#D3D596] checked:border-[#305066]"
-
+                                onChange={handleContaminantChange}
                             />
                             <label htmlFor="contaminants" className="font-semibold">Contaminants</label>
                         </div>
-                        <input
-                            type="text"
-                            name="milkTankInfo.contaminantInfo"
-                            id="milkTankInfo.contaminantInfo"
-                            className="border rounded-full p-3"
-                            placeholder="Please fill additional information"
-                        />
+                        {showContaminantInfo && (
+                            <input
+                                type="text"
+                                name="milkTankInfo.contaminantInfo"
+                                id="milkTankInfo.contaminantInfo"
+                                className="border rounded-full p-3"
+                                placeholder="Please fill additional information"
+                            />
+                        )}
                     </div>
                     {/* Abnormal Characteristic */}
                     <div className="flex flex-col w-full justify-center items-start gap-3">
@@ -520,54 +574,56 @@ const AddProductLot = () => {
                             />
                             <label htmlFor="abnormalChar" className="font-semibold">Abnormal Characteristic</label>
                         </div>
-                        <div className="flex flex-col w-full items-center gap-3 px-8">
-                            <div className="flex w-full items-center gap-3">
-                                <input type="checkbox" name="milkTankInfo.abnormalType.smellBad" id="smellBad" className="border w-4 h-4"
-                                    onChange={handleNestedCheckboxChange} />
-                                <label htmlFor="smellBad" className="font-semibold">Smell Bad</label>
+                        {showAbnormalInfo && (
+                            <div className="flex flex-col w-full items-center gap-3 px-8">
+                                <div className="flex w-full items-center gap-3">
+                                    <input type="checkbox" name="milkTankInfo.abnormalType.smellBad" id="smellBad" className="border w-4 h-4"
+                                         />
+                                    <label htmlFor="smellBad" className="font-semibold">Smell Bad</label>
+                                </div>
+                                <div className="flex w-full items-center gap-3">
+                                    <input type="checkbox" name="milkTankInfo.abnormalType.smellNotFresh" id="smellNotFresh" className="border w-4 h-4"
+                                         />
+                                    <label htmlFor="smellNotFresh" className="font-semibold">Smell not fresh</label>
+                                </div>
+                                <div className="flex w-full items-center gap-3">
+                                    <input type="checkbox" name="milkTankInfo.abnormalType.abnormalColor" id="abnormalColor" className="border w-4 h-4"
+                                         />
+                                    <label htmlFor="abnormalColor" className="font-semibold">Abnormal Color</label>
+                                    <p className="text-gray-500">ex. yellow or green</p>
+                                </div>
+                                <div className="flex w-full items-center gap-3">
+                                    <input type="checkbox" name="milkTankInfo.abnormalType.sour" id="sour" className="border w-4 h-4"
+                                         />
+                                    <label htmlFor="sour" className="font-semibold">Sour taste</label>
+                                </div>
+                                <div className="flex w-full items-center gap-3">
+                                    <input type="checkbox" name="milkTankInfo.abnormalType.bitter" id="bitter" className="border w-4 h-4"
+                                         />
+                                    <label htmlFor="bitter" className="font-semibold">Bitter taste</label>
+                                </div>
+                                <div className="flex w-full items-center gap-3">
+                                    <input type="checkbox" name="milkTankInfo.abnormalType.cloudy" id="cloudy" className="border w-4 h-4"
+                                         />
+                                    <label htmlFor="cloudy" className="font-semibold">Cloudy Appearance</label>
+                                </div>
+                                <div className="flex w-full items-center gap-3">
+                                    <input type="checkbox" name="milkTankInfo.abnormalType.lumpy" id="lumpy" className="border w-4 h-4"
+                                         />
+                                    <label htmlFor="lumpy" className="font-semibold">Lumpy Appearance</label>
+                                </div>
+                                <div className="flex w-full items-center gap-3">
+                                    <input type="checkbox" name="milkTankInfo.abnormalType.separation" id="separation" className="border w-4 h-4"
+                                         />
+                                    <label htmlFor="separation" className="font-semibold">Separation between water and fat</label>
+                                </div>
                             </div>
-                            <div className="flex w-full items-center gap-3">
-                                <input type="checkbox" name="milkTankInfo.abnormalType.smellNotFresh" id="smellNotFresh" className="border w-4 h-4"
-                                    onChange={handleNestedCheckboxChange} />
-                                <label htmlFor="smellNotFresh" className="font-semibold">Smell not fresh</label>
-                            </div>
-                            <div className="flex w-full items-center gap-3">
-                                <input type="checkbox" name="milkTankInfo.abnormalType.abnormalColor" id="abnormalColor" className="border w-4 h-4"
-                                    onChange={handleNestedCheckboxChange} />
-                                <label htmlFor="abnormalColor" className="font-semibold">Abnormal Color</label>
-                                <p className="text-gray-500">ex. yellow or green</p>
-                            </div>
-                            <div className="flex w-full items-center gap-3">
-                                <input type="checkbox" name="milkTankInfo.abnormalType.sour" id="sour" className="border w-4 h-4"
-                                    onChange={handleNestedCheckboxChange} />
-                                <label htmlFor="sour" className="font-semibold">Sour taste</label>
-                            </div>
-                            <div className="flex w-full items-center gap-3">
-                                <input type="checkbox" name="milkTankInfo.abnormalType.bitter" id="bitter" className="border w-4 h-4"
-                                    onChange={handleNestedCheckboxChange} />
-                                <label htmlFor="bitter" className="font-semibold">Bitter taste</label>
-                            </div>
-                            <div className="flex w-full items-center gap-3">
-                                <input type="checkbox" name="milkTankInfo.abnormalType.cloudy" id="cloudy" className="border w-4 h-4"
-                                    onChange={handleNestedCheckboxChange} />
-                                <label htmlFor="cloudy" className="font-semibold">Cloudy Appearance</label>
-                            </div>
-                            <div className="flex w-full items-center gap-3">
-                                <input type="checkbox" name="milkTankInfo.abnormalType.lumpy" id="lumpy" className="border w-4 h-4"
-                                    onChange={handleNestedCheckboxChange} />
-                                <label htmlFor="lumpy" className="font-semibold">Lumpy Appearance</label>
-                            </div>
-                            <div className="flex w-full items-center gap-3">
-                                <input type="checkbox" name="milkTankInfo.abnormalType.separation" id="separation" className="border w-4 h-4"
-                                    onChange={handleNestedCheckboxChange} />
-                                <label htmlFor="separation" className="font-semibold">Separation between water and fat</label>
-                            </div>
-                        </div>
+                        )}
                     </div>
 
                     <button
                         type="button"
-                        className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-2xl hover:bg-[#C0E0C8] ${stepStatus.step3 === 'completed' ? 'hidden' : ''}`}
+                        className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8] ${stepStatus.step3 === 'completed' ? 'hidden' : ''}`}
                         onClick={() => handleNextClick(3)}
                     >
                         Next
@@ -706,7 +762,7 @@ const AddProductLot = () => {
 
                     <button
                         type="button"
-                        className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-2xl hover:bg-[#C0E0C8] ${stepStatus.step4 === 'completed' ? 'hidden' : ''}`}
+                        className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8] ${stepStatus.step4 === 'completed' ? 'hidden' : ''}`}
                         onClick={() => handleNextClick(4)}
                     >
                         Next
@@ -757,8 +813,6 @@ const AddProductLot = () => {
                                     required
                                 >
                                     <option value="+66">+66</option>
-                                    <option value="+1">+1</option>
-                                    <option value="+44">+44</option>
                                 </select>
                             </div>
 
@@ -841,14 +895,14 @@ const AddProductLot = () => {
 
                     <button
                         type="button"
-                        className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-2xl hover:bg-[#C0E0C8]`}
+                        className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8]`}
                         onClick={() => router.push('/Factory/ProductLot/CheckDetails')}
                     >
                         Next
                     </button>
                 </div>
             </form>
-        </div>
+        </div >
     );
 };
 export default AddProductLot;

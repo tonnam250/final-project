@@ -97,7 +97,7 @@ const Recieving = () => {
 
     // save form Data
     const [formData, setFormData] = useState({
-        milkTankInfo: {
+        GeneralInfo: {
             farmName: "",
             milkTankNo: "",
             personInCharge: "",
@@ -124,7 +124,7 @@ const Recieving = () => {
                 separation: false
             }
         },
-        shippingAddress: {
+        productDetail: {
             companyName: "",
             firstName: "",
             lastName: "",
@@ -177,11 +177,11 @@ const Recieving = () => {
             temp[keys[keys.length - 1]] = type === "checkbox" ? checked : value;
 
             // อัปเดต province, district และ subdistrict
-            if (name === "shippingAddress.province") {
+            if (name === "productDetail.province") {
                 setSelectedProvince(value);
-            } else if (name === "shippingAddress.district") {
+            } else if (name === "productDetail.district") {
                 setSelectedDistrict(value);
-            } else if (name === "shippingAddress.subDistrict") {
+            } else if (name === "productDetail.subDistrict") {
                 setSelectedSubDistrict(value);
             }
 
@@ -214,7 +214,7 @@ const Recieving = () => {
     // ✅ ฟังก์ชัน Submit → บันทึกข้อมูลลง localStorage
     const saveToLocalStorage = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        localStorage.setItem("formData", JSON.stringify(formData));
+        localStorage.setItem("recievedForm", JSON.stringify(formData));
         alert("Information Save!");
         console.log(formData);
     };
@@ -295,26 +295,26 @@ const Recieving = () => {
                         <label htmlFor="CompanyName" className="font-semibold">Company Name</label>
                         <input type="text" id="CompanyName"
                             placeholder="Enter your Company name" className="border rounded-full p-3 w-full"
-                            name="milkTankInfo.CompanyName" value={formData.milkTankInfo.CompanyName} onChange={handleFormDataChange} />
+                            name="GeneralInfo.companyName" value={formData.GeneralInfo.companyName} onChange={handleFormDataChange} />
                     </div>
                     {/* Person in charge */}
                     <div className="flex flex-col w-full items-start gap-3">
                         <label htmlFor="personInCharge" className="font-semibold">Person In Charge</label>
-                        <input type="text" name="milkTankInfo.personInCharge" id="personInCharge"
+                        <input type="text" name="GeneralInfo.personInCharge" id="personInCharge"
                             placeholder="Enter name of person in charge" className="border rounded-full p-3 w-full"
-                            value={formData.milkTankInfo.personInCharge} onChange={handleFormDataChange} />
+                            value={formData.GeneralInfo.personInCharge} onChange={handleFormDataChange} />
                     </div>
                     {/* Location */}
                     <div className="flex flex-col w-full items-start gap-3">
                         <label htmlFor="location" className="font-semibold">Location</label>
                         <input type="text" id="location"
                             placeholder="Enter location" className="border rounded-full p-3 w-full"
-                            name="RecipientInfo.location" onChange={handleFormDataChange} />
+                            name="GeneralInfo.location" value={formData.GeneralInfo.location} onChange={handleFormDataChange} />
                     </div>
 
                     <button
                         type="button"
-                        className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-2xl hover:bg-[#C0E0C8] ${showShippingAddress ? 'hidden' : ''}`}
+                        className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8] ${showShippingAddress ? 'hidden' : ''}`}
                         onClick={handleNextClick}
                     >
                         Next
@@ -331,13 +331,13 @@ const Recieving = () => {
                                 <label htmlFor="pickUpTime" className="font-semibold">Pick up time</label>
                                 <input type="datetime-local" id="pickUpTime"
                                     className="border rounded-full p-3 w-full"
-                                    name="RecipientInfo.pickUpTime" onChange={handleFormDataChange} />
+                                    name="productDetail.pickUpTime" value={formData.productDetail.pickUpTime} onChange={handleFormDataChange} />
                             </div>
                             <div className="flex flex-col w-1/2 items-start gap-3">
                                 <label htmlFor="pickUpTime" className="font-semibold">Delivery time</label>
-                                <input type="datetime-local" id="pickUpTime"
+                                <input type="datetime-local" id="deliveryTime"
                                     className="border rounded-full p-3 w-full"
-                                    name="RecipientInfo.pickUpTime" onChange={handleFormDataChange} />
+                                    name="productDetail.deliveryTime" value={formData.productDetail.deliveryTime} onChange={handleFormDataChange} />
                             </div>
                         </div>
                         {/* Quantity + temperature */}
@@ -346,11 +346,11 @@ const Recieving = () => {
                             <div className="flex flex-col w-1/2 items-start gap-3">
                                 <label htmlFor="quantity" className="font-semibold">Quantity</label>
                                 <div className="flex gap-3 w-full">
-                                    <input type="number" name="milkTankInfo.quantity" id="quantity"
+                                    <input type="number" name="GeneralInfo.quantity" id="quantity"
                                         className="border rounded-full p-3 w-4/5" placeholder="0.00" step="0.01"
-                                        value={formData.milkTankInfo.quantity} onChange={handleFormDataChange} />
-                                    <select name="milkTankInfo.quantityUnit" id="quantityUnit" className="border rounded-full p-3 w-1/5 font-semibold"
-                                        value={formData.milkTankInfo.quantityUnit} onChange={handleFormDataChange}>
+                                        value={formData.GeneralInfo.quantity} onChange={handleFormDataChange} />
+                                    <select name="GeneralInfo.quantityUnit" id="quantityUnit" className="border rounded-full p-3 w-1/5 font-semibold"
+                                        value={formData.GeneralInfo.quantityUnit} onChange={handleFormDataChange}>
                                         <option value="Ton">Ton</option>
                                         <option value="Liter">Liter</option>
                                         <option value="Ml">Milliliter</option>
@@ -364,10 +364,10 @@ const Recieving = () => {
                             <div className="flex flex-col w-1/2 items-start gap-3">
                                 <label htmlFor="temp" className="font-semibold">Temperature</label>
                                 <div className="flex w-full items-start gap-3">
-                                    <input type="number" name="milkTankInfo.temp" id="temp" className="p-3 rounded-full border w-4/5" placeholder="0.00" step="0.01"
-                                        value={formData.milkTankInfo.temp} onChange={handleFormDataChange} />
-                                    <select name="milkTankInfo.tempUnit" id="tempUnit" className="border rounded-full p-3 w-1/5 font-semibold"
-                                        value={formData.milkTankInfo.tempUnit} onChange={handleFormDataChange}>
+                                    <input type="number" name="GeneralInfo.temp" id="temp" className="p-3 rounded-full border w-4/5" placeholder="0.00" step="0.01"
+                                        value={formData.GeneralInfo.temp} onChange={handleFormDataChange} />
+                                    <select name="GeneralInfo.tempUnit" id="tempUnit" className="border rounded-full p-3 w-1/5 font-semibold"
+                                        value={formData.GeneralInfo.tempUnit} onChange={handleFormDataChange}>
                                         <option value="Celcius">°C</option>
                                         <option value="Farenheit">°F</option>
                                     </select>
@@ -377,22 +377,22 @@ const Recieving = () => {
                         {/* pH of Milk */}
                         <div className="flex flex-col w-full items-start gap-3">
                             <label htmlFor="pH" className="font-semibold">pH of Milk</label>
-                            <input type="number" name="milkTankInfo.pH" id="pH" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01"
-                                value={formData.milkTankInfo.pH} onChange={handleFormDataChange} />
+                            <input type="number" name="GeneralInfo.pH" id="pH" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01"
+                                value={formData.GeneralInfo.pH} onChange={handleFormDataChange} />
                         </div>
                         {/* Fat + Protein */}
                         <div className="flex w-full items-start gap-3">
                             {/* Fat */}
                             <div className="flex flex-col w-1/2 items-start gap-3">
                                 <label htmlFor="fat" className="font-semibold">Fat (%)</label>
-                                <input type="number" name="milkTankInfo.fat" id="fat" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01"
-                                    value={formData.milkTankInfo.fat} onChange={handleFormDataChange} />
+                                <input type="number" name="GeneralInfo.fat" id="fat" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01"
+                                    value={formData.GeneralInfo.fat} onChange={handleFormDataChange} />
                             </div>
                             {/* Protein */}
                             <div className="flex flex-col w-1/2 items-start gap-3">
                                 <label htmlFor="protein" className="font-semibold">Protein (%)</label>
-                                <input type="number" name="milkTankInfo.protein" id="protein" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01"
-                                    value={formData.milkTankInfo.protein} onChange={handleFormDataChange} />
+                                <input type="number" name="GeneralInfo.protein" id="protein" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01"
+                                    value={formData.GeneralInfo.protein} onChange={handleFormDataChange} />
                             </div>
                         </div>
                         {/* bacteria testing */}
@@ -400,22 +400,22 @@ const Recieving = () => {
                             <div className="flex w-full items-center gap-3">
                                 <input
                                     type="checkbox"
-                                    name="milkTankInfo.bacteria"
+                                    name="GeneralInfo.bacteria"
                                     id="bacteria"
                                     className="w-5 h-5 appearance-none border border-gray-400 rounded-full checked:bg-[#D3D596] checked:border-[#305066]"
                                     onChange={handleFormDataChange}
-                                    checked={formData.milkTankInfo.bacteria}
+                                    checked={formData.GeneralInfo.bacteria}
                                 />
                                 <label htmlFor="bacteria" className="font-semibold">Bacteria Testing</label>
                             </div>
-                            {formData.milkTankInfo.bacteria && (
+                            {formData.GeneralInfo.bacteria && (
                                 <input
                                     type="text"
-                                    name="milkTankInfo.bacteriaInfo"
+                                    name="GeneralInfo.bacteriaInfo"
                                     id="bacteriaInfo"
                                     className="border rounded-full p-3"
                                     placeholder="Please fill additional information"
-                                    value={formData.milkTankInfo.bacteriaInfo}
+                                    value={formData.GeneralInfo.bacteriaInfo}
                                     onChange={handleFormDataChange}
                                 />
                             )}
@@ -425,22 +425,22 @@ const Recieving = () => {
                             <div className="flex w-full items-center gap-3">
                                 <input
                                     type="checkbox"
-                                    name="milkTankInfo.contaminants"
+                                    name="GeneralInfo.contaminants"
                                     id="milkTankInfo.contaminants"
                                     className="w-5 h-5 appearance-none border border-gray-400 rounded-full checked:bg-[#D3D596] checked:border-[#305066]"
                                     onChange={handleFormDataChange}
-                                    checked={formData.milkTankInfo.contaminants}
+                                    checked={formData.GeneralInfo.contaminants}
                                 />
                                 <label htmlFor="contaminants" className="font-semibold">Contaminants</label>
                             </div>
-                            {formData.milkTankInfo.contaminants && (
+                            {formData.GeneralInfo.contaminants && (
                                 <input
                                     type="text"
-                                    name="milkTankInfo.contaminantInfo"
+                                    name="GeneralInfo.contaminantInfo"
                                     id="milkTankInfo.contaminantInfo"
                                     className="border rounded-full p-3"
                                     placeholder="Please fill additional information"
-                                    value={formData.milkTankInfo.contaminantInfo}
+                                    value={formData.GeneralInfo.contaminantInfo}
                                     onChange={handleFormDataChange}
                                 />
                             )}
@@ -448,27 +448,27 @@ const Recieving = () => {
                         {/* Company Name */}
                         <div className="flex flex-col w-full gap-5 mt-10">
                             <label htmlFor="companyName" className="font-semibold">Company Name</label>
-                            <input type="text" name="shippingAddress.companyName" id="companyName" className="border p-3 rounded-full" placeholder="Enter your company name"
-                                value={formData.shippingAddress.companyName} onChange={handleFormDataChange} />
+                            <input type="text" name="productDetail.companyName" id="companyName" className="border p-3 rounded-full" placeholder="Enter your company name"
+                                value={formData.productDetail.companyName} onChange={handleFormDataChange} />
                         </div>
                         {/* First name + Last name */}
                         <div className="flex items-center w-full gap-5">
                             <div className="flex flex-col w-1/2 gap-3">
                                 <label htmlFor="fName" className="font-semibold">First Name</label>
-                                <input type="text" name="shippingAddress.firstName" id="fName" className="border p-3 rounded-full" placeholder="Enter your first name"
-                                    value={formData.shippingAddress.firstName} onChange={handleFormDataChange} />
+                                <input type="text" name="productDetail.firstName" id="fName" className="border p-3 rounded-full" placeholder="Enter your first name"
+                                    value={formData.productDetail.firstName} onChange={handleFormDataChange} />
                             </div>
                             <div className="flex flex-col w-1/2 gap-3">
                                 <label htmlFor="lName" className="font-semibold">Last Name</label>
-                                <input type="text" name="shippingAddress.lastName" id="lName" className="border p-3 rounded-full" placeholder="Enter your last name"
-                                    value={formData.shippingAddress.lastName} onChange={handleFormDataChange} />
+                                <input type="text" name="productDetail.lastName" id="lName" className="border p-3 rounded-full" placeholder="Enter your last name"
+                                    value={formData.productDetail.lastName} onChange={handleFormDataChange} />
                             </div>
                         </div>
 
                         <div className="flex flex-col w-full gap-3">
                             <label htmlFor="email" className="font-semibold">Email</label>
-                            <input type="text" name="shippingAddress.email" id="email" className="border p-3 rounded-full" placeholder="Enter your Email"
-                                value={formData.shippingAddress.email} onChange={handleFormDataChange} />
+                            <input type="text" name="productDetail.email" id="email" className="border p-3 rounded-full" placeholder="Enter your Email"
+                                value={formData.productDetail.email} onChange={handleFormDataChange} />
                         </div>
 
                         {/* Phone Number */}
@@ -480,16 +480,14 @@ const Recieving = () => {
                                 <div className="flex flex-col">
                                     <label htmlFor="areaCode" className="sr-only">Area Code</label>
                                     <select
-                                        name="shippingAddress.areaCode"
+                                        name="productDetail.areaCode"
                                         id="areaCode"
                                         className="border border-gray-300 rounded-full p-3 w-auto text-center"
                                         required
-                                        value={formData.shippingAddress.areaCode}
+                                        value={formData.productDetail.areaCode}
                                         onChange={handleFormDataChange}
                                     >
                                         <option value="+66">+66</option>
-                                        <option value="+1">+1</option>
-                                        <option value="+44">+44</option>
                                     </select>
                                 </div>
 
@@ -497,11 +495,11 @@ const Recieving = () => {
                                 <input
                                     type="tel"
                                     id="tel"
-                                    name="shippingAddress.phoneNumber"
+                                    name="productDetail.phoneNumber"
                                     className="border border-gray-300 rounded-full p-3 flex-1 w-10/12"
                                     placeholder="Enter your phone number"
                                     required
-                                    value={formData.shippingAddress.phoneNumber}
+                                    value={formData.productDetail.phoneNumber}
                                     onChange={handleFormDataChange}
                                 />
                             </div>
@@ -510,14 +508,14 @@ const Recieving = () => {
                         {/* Address */}
                         <div className="flex flex-col text-start font-medium w-full h-40 gap-3">
                             <label htmlFor="address">Address</label>
-                            <textarea name="shippingAddress.address" id="address" className="border border-gray-300 rounded-3xl p-3 flex-1 w-full"
-                                value={formData.shippingAddress.address} onChange={handleFormDataChange}></textarea>
+                            <textarea name="productDetail.address" id="address" className="border border-gray-300 rounded-3xl p-3 flex-1 w-full"
+                                value={formData.productDetail.address} onChange={handleFormDataChange}></textarea>
                         </div>
 
                         {/* province */}
                         <div className="flex flex-col w-full text-start gap-3">
                             <label htmlFor="province" className="font-semibold" >Province</label>
-                            <select name="shippingAddress.province" id="province" className="border border-gray-300 rounded-full p-3 text-center"
+                            <select name="productDetail.province" id="province" className="border border-gray-300 rounded-full p-3 text-center"
                                 value={selectedProvince} onChange={handleFormDataChange}>
                                 <option value="">Select province</option>
                                 {provinceList.map((prov, index) => (
@@ -532,7 +530,7 @@ const Recieving = () => {
                         <div className="flex flex-row w-full gap-4">
                             <div className="flex flex-col text-start w-6/12 gap-3">
                                 <label htmlFor="district" className="font-semibold">District</label>
-                                <select name="shippingAddress.district" id="district" className="border border-gray-300 rounded-full p-3 text-center"
+                                <select name="productDetail.district" id="district" className="border border-gray-300 rounded-full p-3 text-center"
                                     value={selectedDistrict} onChange={handleFormDataChange} disabled={!selectedProvince}>
                                     <option value="">Select district</option>
                                     {districtList.map((dist, index) => (
@@ -545,7 +543,7 @@ const Recieving = () => {
 
                             <div className="flex flex-col text-start w-6/12 gap-3">
                                 <label htmlFor="subDistrict" className="font-semibold">Sub-District</label>
-                                <select name="shippingAddress.subDistrict" id="subDistrict" className="border border-gray-300 rounded-full p-3 text-center"
+                                <select name="productDetail.subDistrict" id="subDistrict" className="border border-gray-300 rounded-full p-3 text-center"
                                     value={selectedSubDistrict} onChange={handleFormDataChange} disabled={!selectedDistrict}>
                                     <option value="">Select sub-district</option>
                                     {subDistrictList.map((subDist, index) => (
@@ -560,23 +558,22 @@ const Recieving = () => {
                         {/* Zip/Postal Code */}
                         <div className="flex flex-col text-start w-full gap-3">
                             <label htmlFor="postalCode" className="font-semibold">Zip/Postal Code</label>
-                            <input type="text" name="shippingAddress.postalCode" id="postalCode" className="border border-gray-300 rounded-full p-3 w-full" placeholder="Enter postal code"
-                                value={formData.shippingAddress.postalCode} onChange={handleFormDataChange} />
+                            <input type="text" name="productDetail.postalCode" id="postalCode" className="border border-gray-300 rounded-full p-3 w-full" placeholder="Enter postal code"
+                                value={formData.productDetail.postalCode} onChange={handleFormDataChange} />
                         </div>
 
                         {/* location */}
                         <div className="flex flex-col text-start w-full gap-3">
                             <label htmlFor="location" className="font-semibold">Location</label>
-                            <input type="text" name="shippingAddress.location" id="location" className="border border-gray-300 rounded-full p-3 flex-1 w-full"
+                            <input type="text" name="productDetail.location" id="location" className="border border-gray-300 rounded-full p-3 flex-1 w-full"
                                 placeholder="Paste location url"
-                                value={formData.shippingAddress.location}
+                                value={formData.productDetail.location}
                                 onChange={handleFormDataChange} />
                         </div>
 
                         <button
                             type="submit"
-                            className="flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-2xl hover:bg-[#C0E0C8]"
-                            onClick={() => router.push('/Logistic/Recieving/CheckDetails')}
+                            className="flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8]"
                         >
                             Next
                         </button>

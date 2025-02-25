@@ -98,6 +98,7 @@ const FarmCheck = () => {
             </div>
             {/* End Detail Status */}
 
+            <h1 className="font-bold text-5xl">Check Details</h1>
             {data && (
                 <div className="flex flex-col md:flex-row justify-between gap-10 w-full p-4 md:p-14">
                     {/* Milk tank info */}
