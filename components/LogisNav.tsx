@@ -33,8 +33,8 @@ const LogisNav = () => {
 
             <div className={`flex-col md:flex-row md:flex gap-4 md:gap-24 justify-end items-center w-full md:w-1/2 ${isMenuOpen ? 'flex' : 'hidden'} md:flex`}>
                 <Link href={'/Logistic/GeneralInfo'} className={`hover:text-[#C98986] whitespace-nowrap ${pathname === "/Logistic/GeneralInfo" ? "text-[#C98986]" : ""}`}>General Information</Link>
-                <Link href={'/Logistic/Recieved'} className={`hover:text-[#C98986] ${pathname === "/Logistic/Recieve" ? "text-[#C98986]" : ""}`}>Recieved</Link>
                 <Link href={'/Logistic/Delivered'} className={`hover:text-[#C98986]  ${pathname === "/Logistic/Delivered" ? "text-[#C98986]" : ""}`}>Delivered</Link>
+                <Link href={'/Logistic/Recieved'} className={`hover:text-[#C98986] ${pathname === "/Logistic/Recieve" ? "text-[#C98986]" : ""}`}>Recieved</Link>
                 <Link href={'/Logistic/Profile'} className={`flex items-center border-2 border-[#EFE4DC] rounded-full px-2 md:px-3 py-1 md:py-2 shadow-md gap-2 md:gap-3 cursor-pointer hover:text-[#F7FCD4] hover:bg-[#C98986]`}>
                     <div className="flex w-8 md:w-10 h-8 md:h-10 bg-slate-200 rounded-full">
                         <svg xmlns="http://www.w3.org/2000/svg" className="w-8 md:w-10 h-8 md:h-10" viewBox="0 0 24 24">
