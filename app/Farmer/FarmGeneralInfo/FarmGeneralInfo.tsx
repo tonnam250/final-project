@@ -3,6 +3,10 @@
 import { useState, useEffect } from "react";
 import { MapProvider } from "@/providers/map-provider";
 import { MapComponent } from "@/components/map";
+import { getFarmInfo, updateFarmInfo, submitFarmData } from "@/services/farmService";
+import { getCertificateInfo, uploadAndSetCertificate, deleteCertificate, handleDeleteCertificate } from "@/services/certificateService";
+import { handleFileChange } from "@/services/fileService";
+import { getGeoData, getProvinceList, getDistrictList, getSubDistrictList } from "@/services/geoService";
 
 interface GeoData {
     id: number;
@@ -19,169 +23,149 @@ interface GeoData {
 }
 
 const FarmGeneralInfo = () => {
+    const [farmData, setFarmData] = useState<any>(null);
+    const [isEditable, setIsEditable] = useState<boolean>(false);
     const [fileNames, setFileNames] = useState<string[]>(["No file selected."]);
-    const [isEditable, setIsEditable] = useState<boolean>(true);
-
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files) {
-            const files = Array.from(event.target.files).map((file) => file.name);
-            setFileNames(files.length ? files : ["ยังไม่ได้เลือกไฟล์"]);
-        } else {
-            setFileNames(["ยังไม่ได้เลือกไฟล์"]);
-        }
-    };
-
+    const [certificateFile, setCertificateFile] = useState<File | null>(null);
+    const [certificateData, setCertificateData] = useState<any | null>(null);
     const [geoData, setGeoData] = useState<GeoData[]>([]);
     const [provinceList, setProvinceList] = useState<string[]>([]);
     const [districtList, setDistrictList] = useState<string[]>([]);
     const [subDistrictList, setSubDistrictList] = useState<string[]>([]);
-
     const [selectedProvince, setSelectedProvince] = useState<string>("");
     const [selectedDistrict, setSelectedDistrict] = useState<string>("");
     const [selectedSubDistrict, setSelectedSubDistrict] = useState<string>("");
 
-    const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number }>({
-        lat: 35.8799866,
-        lng: 76.5048004,
-    });
-
+    // ✅ ดึงข้อมูลภูมิศาสตร์
     useEffect(() => {
-        fetch("/data/geography.json")
-            .then((res) => res.json())
-            .then((data: GeoData[]) => {
-                setGeoData(data);
-
-                // ดึงจังหวัดที่ไม่ซ้ำ (ใช้ภาษาไทยให้ตรงกับ selectedProvince)
-                const provinces = Array.from(new Set(data.map((item) => item.provinceNameEn)));
-                setProvinceList(provinces);
-            })
-            .catch((err) => console.error("Fetch error:", err));
+        const fetchGeoData = async () => {
+            const data = await getGeoData();
+            setGeoData(data);
+            setProvinceList(getProvinceList(data)); // ✅ ใช้ geoService
+        };
+        fetchGeoData();
     }, []);
 
+    // ✅ ดึงข้อมูลฟาร์ม
     useEffect(() => {
-        if (selectedProvince) {
-            const filteredDistricts = Array.from(
-                new Set(
-                    geoData.filter((item) => item.provinceNameEn === selectedProvince).map((item) => item.districtNameEn)
-                )
-            );
+        const fetchFarmData = async () => {
+            try {
+                const data = await getFarmInfo();
+                if (data) {
+                    setFarmData(data);
+                    setSelectedProvince(data.province || "");
+                    setSelectedDistrict(data.district || "");
+                    setSelectedSubDistrict(data.subdistrict || "");
+                }
+            } catch (error) {
+                console.error("Error fetching farm data:", error);
+            }
+        };
+        fetchFarmData();
+    }, []);
 
+    // ✅ ดึงข้อมูลใบเซอร์ของฟาร์ม
+    useEffect(() => {
+        if (!farmData) return;
+        const fetchCertificate = async () => {
+            try {
+                const cert = await getCertificateInfo(farmData.farmerID);
+                setCertificateData(cert || null);
+            } catch (error) {
+                console.error("Error fetching certificate:", error);
+                setCertificateData(null);
+            }
+        };
+        fetchCertificate();
+    }, [farmData]);
+
+    // ✅ ดึง Districts เมื่อ Province เปลี่ยน
+    useEffect(() => {
+        if (selectedProvince && geoData.length > 0) {
+            const filteredDistricts = [...new Set(
+                geoData.filter((item) => item.provinceNameEn === selectedProvince).map((item) => item.districtNameEn)
+            )];
             setDistrictList(filteredDistricts);
-            setSelectedDistrict("");
-            setSubDistrictList([]);
-            setSelectedSubDistrict("");
+            if (!filteredDistricts.includes(selectedDistrict)) {
+                setSelectedDistrict(farmData?.district || "");
+            }
         }
-    }, [selectedProvince]);
+    }, [selectedProvince, geoData]);
 
+    // ✅ ดึง Sub-Districts เมื่อ District เปลี่ยน
     useEffect(() => {
-        if (selectedDistrict) {
-            const filteredSubDistricts = Array.from(
-                new Set(
-                    geoData.filter((item) => item.districtNameEn === selectedDistrict).map((item) => item.subdistrictNameEn)
-                )
-            );
-
+        if (selectedDistrict && geoData.length > 0) {
+            const filteredSubDistricts = [...new Set(
+                geoData.filter((item) => item.districtNameEn === selectedDistrict).map((item) => item.subdistrictNameEn)
+            )];
             setSubDistrictList(filteredSubDistricts);
-            setSelectedSubDistrict("");
+            if (!filteredSubDistricts.includes(selectedSubDistrict)) {
+                setSelectedSubDistrict(farmData?.subdistrict || "");
+            }
         }
-    }, [selectedDistrict]);
+    }, [selectedDistrict, geoData]);
 
-    useEffect(() => {
-        if (selectedProvince) {
-            localStorage.setItem("selectedProvince", selectedProvince);
-        }
-    }, [selectedProvince]);
+    // ✅ อัปเดตค่า input
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFarmData((prevData: any) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
 
-    useEffect(() => {
-        if (selectedDistrict) {
-            localStorage.setItem("selectedDistrict", selectedDistrict);
-        }
-    }, [selectedDistrict]);
-
-    useEffect(() => {
-        if (selectedSubDistrict) {
-            localStorage.setItem("selectedSubDistrict", selectedSubDistrict);
-        }
-    }, [selectedSubDistrict]);
+    // ✅ อัปเดตค่า select
+    const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setFarmData((prevData: any) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
 
     const handleSaveEditToggle = () => {
         setIsEditable(!isEditable);
     };
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        setIsEditable(false);
-
-        const formData = new FormData(event.currentTarget);
-        formData.append("province", selectedProvince);
-        formData.append("district", selectedDistrict);
-        formData.append("subDistrict", selectedSubDistrict);
-
-        // Handle form submission logic here
-        // For example, you can send formData to an API endpoint
-        // fetch('/api/submit', {
-        //     method: 'POST',
-        //     body: formData,
-        // }).then(response => {
-        //     // Handle response
-        // }).catch(error => {
-        //     // Handle error
-        // });
+    // ✅ อัปโหลดไฟล์ใบเซอร์
+    const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        await handleFileChange(event, setFileNames, setCertificateFile);
     };
 
-    // const fetchCoordinates = async (address: string) => {
-    //     const response = await fetch(
-    //         `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_API}`
-    //     );
-    //     const data = await response.json();
-    //     if (data.results && data.results.length > 0) {
-    //         const location = data.results[0].geometry.location;
-    //         setMapCenter({ lat: location.lat, lng: location.lng });
-    //     } else {
-    //         console.error("Geocoding API error:", data);
-    //     }
-    // };
-
-    // const handleLocationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    //     const address = event.target.value;
-    //     fetchCoordinates(address);
-    // };
-
     return (
-        <div className="flex flex-col text-center w-full justify-center items-center text- h-full pt-20">
+        <div className="flex flex-col text-center w-full justify-center items-center h-full pt-20">
             <h1 className="text-3xl md:text-4xl font-bold my-4 md:my-8">General Information</h1>
-            <div className="flex h-full w-11/12 md:w-8/12 h-11/12 p-4 md:p-5 shadow-xl justify-center items-center border rounded-2xl m-2 md:m-5">
-                <form action="" className="flex flex-col gap-4 w-full" onSubmit={handleSubmit}>
+            <div className="flex h-full w-11/12 md:w-8/12 p-4 md:p-5 shadow-xl justify-center items-center border rounded-2xl m-2 md:m-5">
+                <form action="" className="flex flex-col gap-4 w-full" onSubmit={submitFarmData}>
                     <div className="flex flex-col md:flex-row gap-4 md:gap-5 text-start w-full">
-
-                        {/* first name */}
-                        <div className="flex flex-col text-start w-full md:w-6/12">
-                            <label htmlFor="fName" className="font-medium">First Name</label>
-                            <input
-                                type="text"
-                                id="fName"
-                                name="fName"
-                                className="border border-gray-300 rounded-md p-2 w-full"
-                                required
-                                disabled={!isEditable}
-                            />
-                        </div>
-                        {/* end first name */}
-
-                        {/* lastName */}
-                        <div className="flex flex-col text-start w-full md:w-6/12">
-                            <label htmlFor="lName" className="font-medium">Last Name</label>
-                            <input
-                                type="text"
-                                id="lName"
-                                name="lName"
-                                className="border border-gray-300 rounded-md p-2 w-full"
-                                required
-                                disabled={!isEditable}
-                            />
-                        </div>
-                        {/* end lastName */}
-                    </div>
+                        {/* First Name & Last Name */}
+    <div className="flex flex-col text-start w-full md:w-6/12">
+        <label htmlFor="fName" className="font-medium">First Name</label>
+        <input
+            type="text"
+            id="fName"
+            name="firstName"
+            className="border border-gray-300 rounded-md p-2 w-full"
+            required
+            disabled={!isEditable}
+            value={farmData?.firstName || ""}
+            onChange={handleInputChange} // ✅ ใช้ value + onChange
+        />
+    </div>
+    <div className="flex flex-col text-start w-full md:w-6/12">
+        <label htmlFor="lName" className="font-medium">Last Name</label>
+        <input
+            type="text"
+            id="lName"
+            name="lastName"
+            className="border border-gray-300 rounded-md p-2 w-full"
+            required
+            disabled={!isEditable}
+            value={farmData?.lastName || ""}
+            onChange={handleInputChange} // ✅ ใช้ value + onChange
+        />
+    </div>
+</div>
 
                     {/* email */}
                     <div className="flex flex-col text-start w-full">
@@ -194,59 +178,70 @@ const FarmGeneralInfo = () => {
                             placeholder="Example@gmail.com"
                             required
                             disabled={!isEditable}
+                            value={farmData?.email || ""}
+                            onChange={handleInputChange} // ✅ เพิ่ม onChange เพื่ออัปเดตค่า
                         />
                     </div>
-                    {/* end email */}
 
                     {/* Phone Number */}
-                    <div className="flex flex-col text-start">
-                        <label htmlFor="tel" className="font-medium">Phone Number</label>
-                        <div className="flex flex-col md:flex-row gap-2">
-
-                            {/* Area Code */}
-                            <div className="flex flex-col">
-                                <label htmlFor="areaCode" className="sr-only">Area Code</label>
-                                <select
-                                    name="areaCode"
-                                    id="areaCode"
-                                    className="border border-gray-300 rounded-md p-2 w-full md:w-20 text-center"
-                                    required
-                                    disabled={!isEditable}
-                                >
-                                    <option value="+66">+66</option>
-                                    <option value="+1">+1</option>
-                                    <option value="+44">+44</option>
-                                </select>
-                            </div>
-
-                            {/* Phone Input */}
-                            <input
-                                type="tel"
-                                id="tel"
-                                name="tel"
-                                className="border border-gray-300 rounded-md p-2 flex-1 w-full"
-                                placeholder="Enter your phone number"
-                                required
-                                disabled={!isEditable}
-                            />
-                        </div>
-                    </div>
-                    {/* end Phone number */}
-
+<div className="flex flex-col text-start">
+    <label htmlFor="tel" className="font-medium">Phone Number</label>
+    <div className="flex flex-col md:flex-row gap-2">
+        {/* Area Code */}
+        <div className="flex flex-col">
+            <label htmlFor="areaCode" className="sr-only">Area Code</label>
+            <select
+                name="areaCode"
+                id="areaCode"
+                className="border border-gray-300 rounded-md p-2 w-full md:w-20 text-center"
+                required
+                disabled={!isEditable}
+                value={farmData?.areaCode || "+66"}
+                onChange={handleSelectChange} // ✅ ใช้ฟังก์ชันเดิมที่รองรับ input และ select
+            >
+                <option value="+66">+66</option>
+                <option value="+1">+1</option>
+                <option value="+44">+44</option>
+            </select>
+        </div>
+        {/* Phone Input */}
+        <input
+            type="tel"
+            id="tel"
+            name="telephone"
+            className="border border-gray-300 rounded-md p-2 flex-1 w-full"
+            placeholder="Enter your phone number"
+            required
+            disabled={!isEditable}
+            value={farmData?.telephone || ""}
+            onChange={handleInputChange}
+        />
+    </div>
+</div>
                     {/* Address */}
                     <div className="flex flex-col text-start font-medium">
                         <label htmlFor="address">Address</label>
-                        <textarea name="address" id="address" className="border border-gray-300 rounded-md p-2 flex-1 w-full" disabled={!isEditable}></textarea>
+                        <textarea
+                            name="address"
+                            id="address"
+                            className="border border-gray-300 rounded-md p-2 flex-1 w-full"
+                            disabled={!isEditable}
+                            value={farmData?.address || ""}
+                            onChange={handleInputChange} // ✅ เพิ่ม onChange เพื่ออัปเดตค่า
+                        ></textarea>
                     </div>
-                    {/* end Address */}
 
                     {/* province */}
                     <div className="flex flex-col w-full text-start font-medium">
                         <label htmlFor="province">Province</label>
-                        <select name="province" id="province" className="border border-gray-300 rounded-md p-2 text-center"
+                        <select
+                            name="province"
+                            id="province"
+                            className="border border-gray-300 rounded-md p-2 text-center"
                             value={selectedProvince}
                             onChange={(e) => setSelectedProvince(e.target.value)}
-                            disabled={!isEditable}>
+                            disabled={!isEditable}
+                        >
                             <option value="">Select province</option>
                             {provinceList.map((prov, index) => (
                                 <option key={index} value={prov}>
@@ -255,16 +250,19 @@ const FarmGeneralInfo = () => {
                             ))}
                         </select>
                     </div>
-                    {/* end province */}
 
-                    {/* district + Sub-District */}
+                    {/* district + sub-district */}
                     <div className="flex flex-col md:flex-row w-full gap-4">
                         <div className="flex flex-col text-start font-medium w-full md:w-6/12">
                             <label htmlFor="district">District</label>
-                            <select name="district" id="district" className="border border-gray-300 rounded-md p-2 text-center"
+                            <select
+                                name="district"
+                                id="district"
+                                className="border border-gray-300 rounded-md p-2 text-center"
                                 value={selectedDistrict}
                                 onChange={(e) => setSelectedDistrict(e.target.value)}
-                                disabled={!selectedProvince || !isEditable}>
+                                disabled={!selectedProvince || !isEditable}
+                            >
                                 <option value="">Select district</option>
                                 {districtList.map((dist, index) => (
                                     <option key={index} value={dist}>
@@ -273,13 +271,16 @@ const FarmGeneralInfo = () => {
                                 ))}
                             </select>
                         </div>
-
                         <div className="flex flex-col text-start font-medium w-full md:w-6/12">
                             <label htmlFor="subDistrict">Sub-District</label>
-                            <select name="subDistrict" id="subDistrict" className="border border-gray-300 rounded-md p-2 text-center"
+                            <select
+                                name="subDistrict"
+                                id="subDistrict"
+                                className="border border-gray-300 rounded-md p-2 text-center"
                                 value={selectedSubDistrict}
                                 onChange={(e) => setSelectedSubDistrict(e.target.value)}
-                                disabled={!selectedDistrict || !isEditable}>
+                                disabled={!selectedDistrict || !isEditable}
+                            >
                                 <option value="">Select sub-district</option>
                                 {subDistrictList.map((subDist, index) => (
                                     <option key={index} value={subDist}>
@@ -289,9 +290,8 @@ const FarmGeneralInfo = () => {
                             </select>
                         </div>
                     </div>
-                    {/* end district + sub-district */}
 
-                    {/* Upload Organic certification */}
+                    {/* Upload Organic certification (ใช้สำหรับเลือกไฟล์ใบเซอร์) */}
                     <div className="flex flex-col md:flex-row items-center justify-start gap-2 border p-2">
                         <label
                             htmlFor="file-upload"
@@ -306,12 +306,42 @@ const FarmGeneralInfo = () => {
                             id="file-upload"
                             type="file"
                             className="hidden"
-                            multiple
-                            onChange={handleFileChange}
+                            onChange={handleFileUpload}
                             disabled={!isEditable}
                         />
                     </div>
-                    {/* end upload organic certification */}
+{/* ✅ แสดงข้อมูลใบเซอร์ (Certificate) ✅ */}
+<div className="flex flex-col border p-2">
+    <h3 className="font-medium">Certificates</h3>
+    {certificateData && certificateData.length > 0 ? (
+        certificateData.map((cert: any, index: number) => (
+            <div key={index} className="flex justify-between items-center border p-2 my-2 rounded-md">
+                <a
+                    href={`https://ipfs.io/ipfs/${cert.CertificationCID}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline"
+                >
+                    View Certificate {index + 1}
+                </a>
+
+                {/* ✅ แสดงปุ่มลบเฉพาะ Edit Mode */}
+                {isEditable && (
+                    <button
+                        type="button"
+                        onClick={() => handleDeleteCertificate(farmData?.farmerID, setCertificateData)}
+                        className="ml-4 bg-red-500 text-white px-2 py-1 rounded"
+                    >
+                        Delete
+                    </button>
+                )}
+            </div>
+        ))
+    ) : (
+        <div className="text-red-500">❌ No certificates available.</div>
+    )}
+</div>
+
 
                     {/* location */}
                     <div className="flex flex-col font-medium text-start">
@@ -323,32 +353,50 @@ const FarmGeneralInfo = () => {
                             className="border border-gray-300 rounded-md p-2 flex-1 w-full"
                             placeholder="Enter a location"
                             disabled={!isEditable}
+                            value={farmData?.location || ""}
+                            onChange={handleInputChange} // ✅ เพิ่ม onChange เพื่ออัปเดตค่า
                         />
-
-                        {/* <MapProvider>
-                            <MapComponent center={mapCenter} />
-                        </MapProvider> */}
                     </div>
 
                     <button
-                        type="button"
-                        className="flex items-center justify-center text- md:text-xl bg-[#abc32f] hover: w-full md:w-1/6 rounded-full p-2 px-3 text-white self-center"
-                        onClick={isEditable ? handleSubmit : handleSaveEditToggle}
-                    >
-                        {isEditable ? "Save" : "Edit"}
-                        {isEditable ? (
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="ml-2 w-6 h-6">
-                                <path fill="currentColor" d="M15 9H5V5h10m-3 14a3 3 0 0 1-3-3a3 3 0 0 1 3-3a3 3 0 0 1-3 3a3 3 0 0 1-3-3m5-16H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7z" />
-                            </svg>
-                        ) : (
-                            <svg xmlns="http://www.w3.org/2000/svg" className="ml-2 w-6 h-6" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="m14.06 9l.94.94L5.92 19H5v-.92zm3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83l3.75 3.75l1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94z" />
-                            </svg>
-                        )}
-                    </button>
+    type="button"
+    className="flex items-center justify-center text-md md:text-xl bg-[#abc32f] w-full md:w-1/6 rounded-full p-2 px-3 text-white self-center"
+    onClick={async (event) => {
+        event.preventDefault(); // ✅ ป้องกันการ reload หน้าเว็บ
+        if (isEditable)  {
+            await submitFarmData(
+                farmData,
+                certificateFile,
+                certificateData,
+                selectedDistrict,
+                selectedSubDistrict,
+                selectedProvince,
+                setFarmData,
+                setCertificateData,
+                setCertificateFile,
+                setFileNames
+            );
+            setIsEditable(false); // ปิด Edit Mode
+        } else {
+            handleSaveEditToggle();
+        }
+    }}
+>
+    {isEditable ? "Save" : "Edit"}
+    {isEditable ? (
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="ml-2 w-6 h-6">
+            <path fill="currentColor" d="M15 9H5V5h10m-3 14a3 3 0 0 1-3-3a3 3 0 0 1 3-3a3 3 0 0 1-3 3a3 3 0 0 1-3-3m5-16H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7z" />
+        </svg>
+    ) : (
+        <svg xmlns="http://www.w3.org/2000/svg" className="ml-2 w-6 h-6" viewBox="0 0 24 24">
+            <path fill="currentColor" d="m14.06 9l.94.94L5.92 19H5v-.92zm3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83l3.75 3.75l1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94z" />
+        </svg>
+    )}
+</button>
+
                 </form>
-            </div >
-        </div >
+            </div>
+        </div>
     );
 };
 
