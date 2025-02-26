@@ -123,3 +123,33 @@ export const updateUserInfo = async (email: string, password: string): Promise<b
     return true;
 };
 
+// ✅ ตรวจสอบว่าอีเมลซ้ำหรือไม่
+export const checkEmailAvailability = async (email: string): Promise<boolean> => {
+    try {
+        const response = await fetch(`${API_URL}/check-email?email=${email}`);
+        const data = await response.json();
+        return data.available;
+    } catch (err) {
+        console.error("❌ [Check Email] Error:", err);
+        return false;
+    }
+};
+
+// ✅ ฟังก์ชันสมัครสมาชิก
+export const registerUser = async (username: string, email: string, password: string) => {
+    try {
+        const response = await fetch(`${API_URL}/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, email, password }),
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Registration failed");
+
+        return data;
+    } catch (err) {
+        console.error("❌ [SignUp] Error:", err);
+        throw new Error(err instanceof Error ? err.message : "Registration failed");
+    }
+};

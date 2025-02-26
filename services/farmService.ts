@@ -1,6 +1,6 @@
 const API_URL = "http://127.0.0.1:8080/api/v1/farmers";
 
-import { uploadCertificate, createOrUpdateCertificate } from "./certificateService";
+import { uploadCertificate, createOrUpdateCertificate, checkUserCertification } from "./certificateService";
 
 // ✅ ดึงข้อมูลฟาร์ม
 export const getFarmInfo = async (): Promise<any | null> => {
@@ -63,15 +63,15 @@ export const submitFarmData = async (
 ) => {
     let certCID = certificateData?.cid || "";
 
-    // ✅ อัปโหลดไฟล์ใบเซอร์ถ้ามีการเลือกไฟล์ใหม่
+    // ✅ อัปโหลดใบเซอร์ใหม่ถ้ามีไฟล์ใหม่
     if (certificateFile) {
         try {
             console.log("📌 Uploading certificate file:", certificateFile.name);
             const uploadResult = await uploadCertificate(certificateFile);
 
-            if (uploadResult) {  // ✅ แก้ไขตรงนี้ เพราะ uploadCertificate() คืนค่าเป็น string (CID)
+            if (uploadResult) {
                 certCID = uploadResult;
-                console.log("📌 Received CID from IPFS:", certCID); // ✅ Debug CID ที่ได้จาก IPFS
+                console.log("📌 Received CID from IPFS:", certCID);
                 setCertificateData({ cid: certCID });
                 setCertificateFile(null);
                 setFileNames(["No file selected."]);
@@ -86,7 +86,17 @@ export const submitFarmData = async (
         }
     }
 
-    // ✅ สร้าง payload สำหรับอัปเดตฟาร์ม
+    // ✅ ตรวจสอบว่า CID นี้ซ้ำใน Blockchain หรือไม่
+    if (certCID) {
+        console.log("📌 Checking if certification CID exists on Blockchain...");
+        const isDuplicate = await checkUserCertification(certCID);
+        if (isDuplicate) {
+            alert("⚠️ CID ของใบเซอร์นี้มีอยู่แล้วในระบบ Blockchain!");
+            return;
+        }
+    }
+
+    // ✅ สร้าง payload สำหรับอัปเดตข้อมูลฟาร์ม
     const payload = {
         firstname: farmData?.firstName,
         lastname: farmData?.lastName,
@@ -98,15 +108,16 @@ export const submitFarmData = async (
         phone: farmData?.telephone,
         areaCode: farmData?.areaCode,
         location_link: farmData?.location,
-        cert_file: certCID, // ✅ ใช้ certCID ที่อัปโหลดแล้ว
+        cert_file: certCID, // ✅ เพิ่ม certCID เข้าไปใน payload
     };
 
     try {
+        // ✅ อัปเดตข้อมูลฟาร์ม
         const result = await updateFarmInfo(payload);
         if (result) {
             console.log("✅ Farm information updated successfully");
 
-            // ✅ อัปเดตข้อมูลใบเซอร์บน Blockchain
+            // ✅ อัปเดตใบเซอร์ลง Blockchain ถ้ามี certCID
             if (certCID) {
                 const certPayload = {
                     entityType: "Farmer",
@@ -116,10 +127,10 @@ export const submitFarmData = async (
                     expiryDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
                 };
 
-                console.log("📌 Sending certification data to Blockchain:", certPayload); // ✅ Debug
+                console.log("📌 Sending certification data to Blockchain:", certPayload);
                 try {
                     const certUpdate = await createOrUpdateCertificate(certPayload);
-                    console.log("📌 API Response:", certUpdate); // ✅ Debug Response
+                    console.log("📌 API Response:", certUpdate);
 
                     if (certUpdate) {
                         console.log("✅ Certification updated on Blockchain");
@@ -143,3 +154,71 @@ export const submitFarmData = async (
     }
 };
 
+
+// ✅ ฟังก์ชันสร้างฟาร์มใหม่
+export const createFarm = async (farmData: any, certificateFile: File | null): Promise<any | null> => {
+    try {
+        let certCID = "";
+
+        // ✅ ถ้ามีไฟล์ใบเซอร์ → อัปโหลดไปยัง IPFS ก่อน
+        if (certificateFile) {
+            console.log("📌 Uploading certificate file:", certificateFile.name);
+            const uploadResult = await uploadCertificate(certificateFile);
+
+            if (uploadResult) {
+                certCID = uploadResult;
+                console.log("📌 Received CID from IPFS:", certCID);
+            } else {
+                throw new Error("❌ อัปโหลดใบเซอร์ไม่สำเร็จ");
+            }
+        }
+
+        // ✅ ตรวจสอบว่า CID นี้มีอยู่บน Blockchain หรือไม่
+        if (certCID) {
+            console.log("📌 Checking if certification CID exists on Blockchain...");
+            const isDuplicate = await checkUserCertification(certCID);
+            if (isDuplicate) {
+                alert("⚠️ CID ของใบเซอร์นี้มีอยู่แล้วในระบบ Blockchain!");
+                return null;
+            }
+        }
+
+        // ✅ สร้าง Payload สำหรับ API `/create-farm`
+        const payload = {
+            firstname: farmData?.firstName,
+            lastname: farmData?.lastName,
+            email: farmData?.email,
+            address: farmData?.address,
+            district: farmData?.district,
+            subdistrict: farmData?.subdistrict,
+            province: farmData?.province,
+            phone: farmData?.telephone,
+            areaCode: farmData?.areaCode,
+            location_link: farmData?.location,
+            cert_file: certCID, // ✅ เพิ่ม CID ของใบเซอร์ลงใน payload
+        };
+
+        console.log("📌 Sending farm creation data to Backend:", payload);
+
+        // ✅ ส่งข้อมูลไปยัง API `/create-farm`
+        const response = await fetch(`${API_URL}/create`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+            throw new Error(`❌ Failed to create farm: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log("✅ Farm created successfully:", result);
+
+        return result;
+    } catch (error) {
+        console.error("❌ [ERROR] Creating farm failed:", error);
+        alert("เกิดข้อผิดพลาดขณะสร้างฟาร์ม");
+        return null;
+    }
+};

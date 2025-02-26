@@ -1,10 +1,43 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { checkEmailAvailability, registerUser } from "@/services/authService";
 
 const SignUp = () => {
-
     const router = useRouter();
+
+    // ✅ สร้าง State เก็บค่าฟอร์ม
+    const [fullName, setFullName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [error, setError] = useState<string | null>(null);
+
+    // ✅ ฟังก์ชันสมัครสมาชิก
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError(null);
+
+        if (password !== confirmPassword) {
+            setError("Passwords do not match");
+            return;
+        }
+
+        const emailAvailable = await checkEmailAvailability(email);
+        if (!emailAvailable) {
+            setError("Email is already taken");
+            return;
+        }
+
+        try {
+            const data = await registerUser(fullName, email, password);
+            console.log("✅ [SignUp] Success:", data);
+            router.push("/SignUp/SelectRole");
+        } catch (err) {
+            setError(err.message);
+        }
+    };
 
     return (
         <div className="flex flex-col w-full h-full bg-[url('/images/CowBg.jpg')] min-h-screen bg-cover bg-center bg-[#3D405B] bg-blend-overlay bg-opacity-80 overflow-hidden justify-center items-center pt-20">
@@ -16,25 +49,27 @@ const SignUp = () => {
             {/* Form */}
             <div className="flex flex-col w-full h-full justify-center items-center gap-10 z-30">
                 <h1 className="text-5xl font-bold text-white">Sign Up</h1>
-                <form className="flex flex-col gap-5 w-full justify-center items-center">
+                <form className="flex flex-col gap-5 w-full justify-center items-center" onSubmit={handleSubmit}>
                     <div className="flex flex-col gap-2 w-1/3 justify-center items-center text-lg">
                         <label htmlFor="fullName" className="text-white self-start font-semibold">Full Name</label>
-                        <input type="text" placeholder="Full Name" name="fullName" id="fullName" className="p-2 rounded-full w-full border-2" />
+                        <input type="text" placeholder="Full Name" name="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)}  id="fullName" className="p-2 rounded-full w-full border-2" />
                     </div>
                     <div className="flex flex-col gap-2 w-1/3 justify-center items-center text-lg">
                         <label htmlFor="email" className="text-white self-start font-semibold">Email</label>
-                        <input type="email" placeholder="Email" name="email" id="email" className="p-2 rounded-full w-full border-2" />
+                        <input type="email" placeholder="Email" name="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} className="p-2 rounded-full w-full border-2" />
                     </div>
                     <div className="flex flex-col gap-2 w-1/3 justify-center items-center text-lg">
                         <label htmlFor="password" className="text-white self-start font-semibold">Password</label>
-                        <input type="password" placeholder="Password" className="p-2 rounded-full w-full border-2" />
+                        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="p-2 rounded-full w-full border-2" />
                     </div>
                     <div className="flex flex-col gap-2 w-1/3 justify-center items-center text-lg">
                         <label htmlFor="confirmPassword" className="text-[#3D405B] self-start font-semibold">Confirm Password</label>
-                        <input type="password" placeholder="Confirm Password" className="p-2 rounded-full w-full border-2" />
+                        <input type="password" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="p-2 rounded-full w-full border-2" />
                     </div>
-                    <button type="button" className="p-2 text-xl font-semibold bg-[#f2cc8f] hover:bg-[#ffa850] text-[#EFE4DC] rounded-full"
-                        onClick={() => router.push('/SignUp/SelectRole')}>
+
+                    {error && <p className="text-red-500">{error}</p>}
+
+                    <button type="submit" className="p-2 text-xl font-semibold bg-[#f2cc8f] hover:bg-[#ffa850] text-[#EFE4DC] rounded-full">
                         Sign Up
                     </button>
                 </form>
