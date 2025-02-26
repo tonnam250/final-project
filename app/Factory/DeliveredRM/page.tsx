@@ -11,9 +11,9 @@ const DeliveredRM = async () => {
                 <img src="/images/FarmLandscape2.webp" alt="Farm" className="w-full h-full relative object-cover" />
             </div>
             <div className="flex flex-col justify-center items-center w-full h-full mt-10 px-4 md:px-0">
-                <h1 className="text-4xl md:text-6xl font-semibold text-center">Delivered Order</h1>
+                <h1 className="text-4xl md:text-6xl font-bold text-center">Delivered Order</h1>
 
-                {/* Raw milk item */}
+                {/* Delivered item */}
                 <div className="flex flex-col justify-center items-center w-full h-full my-10 gap-8">
                     {data.map((item: { milkTankInfo: { tankId: string, personInCharge: string }, status: string }, index: number) => (
                         <div key={index} className="flex flex-col justify-center items-center w-full md:w-1/3 h-auto gap-5 bg-white text-slate-500 shadow-xl border rounded-2xl p-5">
@@ -37,14 +37,14 @@ const DeliveredRM = async () => {
                             </div>
                             <div className="flex flex-col md:flex-row justify-between items-center w-full">
                                 <span className="text-xl md:text-2xl font-semibold">Person In Charge: <p className="inline font-normal">{item.milkTankInfo.personInCharge}</p></span>
-                                <Link href={`/Factory/FactoryDetails?id=${item.id}`} className="text-lg md:text-xl underline italic cursor-pointer mt-2 md:mt-0">More info</Link>
+                                <Link href={`/Factory/DeliveredRM/Details`} className="text-lg md:text-xl underline italic cursor-pointer mt-2 md:mt-0">More info</Link>
                             </div>
-                            <button className="bg-[#198754] text-white p-2 w-full rounded-xl hover:bg-[#3eb055]">Recieved</button>
+                            <Link href={'/Factory/Recieving'} className="bg-[#198754] text-white p-2 w-full rounded-xl hover:bg-[#3eb055] text-center">Recieved</Link>
                         </div>  
                     ))}
                 </div>
             </div>
-            {/* end Raw Milk Item */}
+            {/* end Delivered Item */}
         </div>
     );
 };

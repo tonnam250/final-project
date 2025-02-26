@@ -4,10 +4,10 @@ import { useState, useEffect } from 'react';
 import { getFarmInfo } from "../../../services/farmService";
 import { getUserInfo, updateUserInfo } from "../../../services/authService";
 
-
 const Profile = () => {
     const [profileImage, setProfileImage] = useState("/images/profile2.jpg");
     const [isEditing, setIsEditing] = useState(false);
+
     
     // ข้อมูลผู้ใช้จากตาราง user (email, password)
     const [email, setEmail] = useState("jdoe@gmail.com");
@@ -79,10 +79,10 @@ const Profile = () => {
         <div className="flex flex-col items-center min-h-screen pt-24 px-10 p-10 bg-slate-100">
             <div className="flex flex-col items-center gap-4 bg-white w-3/4 border rounded-3xl p-10 shadow-xl">
                 <h1 className="text-5xl font-semibold">Your Profile</h1>
-                <div className="flex flex-col items-center gap-4 mt-10">
-                    <div className="flex flex-col items-center gap-5">
-                        <div className="overflow-hidden w-24 h-24 rounded-full">
-                            <img src={profileImage} alt="Profile Picture" className="flex justify-center items-center" />
+                <div className="flex justify-center w-full items-center gap-10 mt-10">
+                    <div className="flex flex-col items-center gap-5 w-1/2">
+                        <div className="flex justify-center items-center overflow-hidden w-1/2 rounded-full">
+                            <img src={profileImage} alt="Profile Picture" className="flex justify-center items-center rounded-full" />
                         </div>
                         <label className="cursor-pointer bg-emerald-400 text-white py-2 px-4 rounded-full hover:bg-green-700">
                             <input type="file" className="hidden" onChange={handleImageChange} />
@@ -123,7 +123,6 @@ const Profile = () => {
                                 <p className="text-lg text-left w-32">{`${firstName} ${lastName}`}</p>
                             </div>
                         )}
-
                         <div className="flex justify-between gap-6 w-full">
                             <p className="text-lg font-bold">Password:</p>
                             <div className='flex gap-2 w-32'>
@@ -147,7 +146,7 @@ const Profile = () => {
                                         </svg>
                                     ) : (
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                            <path fill="currentColor" fillRule="evenodd" d="M1.606 6.08a1 1 0 0 1 1.313.526L2 7l.92-.394v-.001l.003.009l.021.045l.094.194c.086.172.219.424.4.729a13.4 13.4 0 0 0 1.67 2.237a12 12 0 0 0 .59.592C7.18 11.8 9.251 13 12 13a8.7 8.7 0 0 0 3.22-.602c1.227-.483 2.254-1.21 3.096-1.998a13 13 0 0 0 2.733-3.725l.027-.058l.005-.011a1 1 0 0 1 1.838.788L22 7l.92.394l-.003.005l-.004.008l-.011.026l-.04.087a14 14 0 0 1-.741 1.348a15.4 15.4 0 0 1-1.711 2.256l.797.797a1 1 0 0 1-1.414 1.415l-.84-.84a12 12 0 0 1-1.897 1.256l.782 1.202a1 1 0 1 1-1.676 1.091l-.986-1.514c-.679.208-1.404.355-2.176.424V16.5a1 1 0 0 1-2 0v-1.544c-.775-.07-1.5-.217-2.177-.425l-.985 1.514a1 1 0 0 1-1.676-1.09l.782-1.203c-.7-.37-1.332-.8-1.897-1.257l-.84.84a1 1 0 0 1-1.414-1.414l.797-.797a15.4 15.4 0 0 1-1.87-2.519a14 14 0 0 1-.591-1.107l-.033-.072l-.01-.021l-.002-.007l-.001-.002v-.001C1.08 7.395 1.08 7.394 2 7l-.919.395a1 1 0 0 1 .525-1.314" clipRule="evenodd"/>
+                                            <path fill="currentColor" fillRule="evenodd" d="M1.606 6.08a1 1 0 0 1 1.313.526L2 7l.92-.394v-.001l.003.009l.021.045l.094.194c.086.172.219.424.4.729a13.4 13.4 0 0 0 1.67 2.237a12 12 0 0 0 .59.592C7.18 11.8 9.251 13 12 13a8.7 8.7 0 0 0 3.22-.602c1.227-.483 2.254-1.21 3.096-1.998a13 13 0 0 0 2.733-3.725l.027-.058l.005-.011a1 1 0 0 1 1.838.788L22 7l.92.394l-.003.005l-.004.008l-.011.026l-.04.087a14 14 0 0 1-.741 1.348a15.4 15.4 0 0 1-1.711 2.256l.797.797a1 1 0 0 1-1.414 1.415l-.84-.84a12 12 0 0 1-1.897 1.256l.782 1.202a1 1 0 1 1-1.676 1.091l-.986-1.514c-.679.208-1.404.355-2.176.424V16.5a1 1 0 0 1-2 0v-1.544c-.775-.07-1.5-.217-2.177-.425l-.985 1.514a1 1 0 0 1-1.676-1.09l.782-1.203c-.7-.37-1.332-.8-1.897-1.257l-.84.84a1 1 0 0 1-1.414-1.414l.797-.797a15.4 15.4 0 0 1-1.87-2.519a14 14 0 0 1-.591-1.107l-.033-.072l-.01-.021l-.002-.007l-.001-.002v-.001C1.08 7.395 1.08 7.394 2 7l-.919.395a1 1 0 0 1 .525-1.314" clipRule="evenodd" />
                                         </svg>
                                     )}
                                 </button>
@@ -195,7 +194,7 @@ const Profile = () => {
                     {isEditing ? "Save" : (
                         <>
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="m14.06 9l.94.94L5.92 19H5v-.92zm3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83l3.75 3.75l1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94z"/>
+                                <path fill="currentColor" d="m14.06 9l.94.94L5.92 19H5v-.92zm3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83l3.75 3.75l1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94z" />
                             </svg>
                             Edit
                         </>

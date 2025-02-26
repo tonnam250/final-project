@@ -174,7 +174,7 @@ const FarmGeneralInfo = () => {
                             type="email"
                             id="email"
                             name="email"
-                            className="border border-gray-300 rounded-md p-2"
+                            className="border border-gray-300 rounded-full p-2"
                             placeholder="Example@gmail.com"
                             required
                             disabled={!isEditable}
@@ -184,6 +184,7 @@ const FarmGeneralInfo = () => {
                     </div>
 
                     {/* Phone Number */}
+
 <div className="flex flex-col text-start">
     <label htmlFor="tel" className="font-medium">Phone Number</label>
     <div className="flex flex-col md:flex-row gap-2">
@@ -238,6 +239,7 @@ const FarmGeneralInfo = () => {
                             name="province"
                             id="province"
                             className="border border-gray-300 rounded-md p-2 text-center"
+
                             value={selectedProvince}
                             onChange={(e) => setSelectedProvince(e.target.value)}
                             disabled={!isEditable}
@@ -290,12 +292,11 @@ const FarmGeneralInfo = () => {
                             </select>
                         </div>
                     </div>
-
                     {/* Upload Organic certification (ใช้สำหรับเลือกไฟล์ใบเซอร์) */}
                     <div className="flex flex-col md:flex-row items-center justify-start gap-2 border p-2">
                         <label
                             htmlFor="file-upload"
-                            className={`cursor-pointer px-4 py-2 bg-[#abc32f] text-white rounded-lg hover:bg-[#607c3c] transition ${!isEditable && "opacity-50 cursor-not-allowed"}`}
+                            className={`cursor-pointer px-4 py-2 bg-[#abc32f] text-white rounded-full hover:bg-[#607c3c] transition ${!isEditable && "opacity-50 cursor-not-allowed"}`}
                         >
                             Import file
                         </label>
@@ -350,7 +351,7 @@ const FarmGeneralInfo = () => {
                             type="text"
                             name="location"
                             id="location"
-                            className="border border-gray-300 rounded-md p-2 flex-1 w-full"
+                            className="border border-gray-300 rounded-full p-2 flex-1 w-full"
                             placeholder="Enter a location"
                             disabled={!isEditable}
                             value={farmData?.location || ""}

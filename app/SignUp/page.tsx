@@ -1,8 +1,10 @@
-const SignUp = () => {
+import SignUp from "./SignUp";
+
+const Page = () => {
     return (
-        <div className="w-full h-full flex">
-        <h1>Sign Up</h1>
+        <div>
+            <SignUp />
         </div>
     );
-}
-export default SignUp;
+};
+export default Page;

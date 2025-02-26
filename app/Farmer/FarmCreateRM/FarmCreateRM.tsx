@@ -159,7 +159,7 @@ const FarmCreateRM = () => {
                 setFormData(JSON.parse(savedData));
             }
         }
-    }, []);0
+    }, []); 0
 
     // ✅ บันทึกข้อมูลลง localStorage ทุกครั้งที่ formData เปลี่ยน
     useEffect(() => {
@@ -172,18 +172,18 @@ const FarmCreateRM = () => {
     const handleFormDataChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, type, value, checked } = event.target;
         const keys = name.split(".");
-    
+
         setFormData((prevData) => {
             const updatedData = { ...prevData }; // Clone ข้อมูลเดิม
             let temp = updatedData;
-    
+
             for (let i = 0; i < keys.length - 1; i++) {
                 temp = temp[keys[i]];
             }
-    
+
             // ถ้าเป็น checkbox ให้ใช้ checked ถ้าไม่ใช่ให้ใช้ value
             temp[keys[keys.length - 1]] = type === "checkbox" ? checked : value;
-    
+
             // อัปเดต province, district และ subdistrict
             if (name === "shippingAddress.province") {
                 setSelectedProvince(value);
@@ -192,7 +192,7 @@ const FarmCreateRM = () => {
             } else if (name === "shippingAddress.subDistrict") {
                 setSelectedSubDistrict(value);
             }
-    
+
             return updatedData;
         });
     };
@@ -371,8 +371,8 @@ const FarmCreateRM = () => {
                             <label htmlFor="quantity" className="font-semibold">Quantity</label>
                             <div className="flex gap-3 w-full">
                                 <input type="number" name="milkTankInfo.quantity" id="quantity"
-                                    className="border rounded-full p-3 w-4/5" placeholder="0.00" step="0.01" 
-                                    value={formData.milkTankInfo.quantity} onChange={handleFormDataChange}/>
+                                    className="border rounded-full p-3 w-4/5" placeholder="0.00" step="0.01"
+                                    value={formData.milkTankInfo.quantity} onChange={handleFormDataChange} />
                                 <select name="milkTankInfo.quantityUnit" id="quantityUnit" className="border rounded-full p-3 w-1/5 font-semibold"
                                     value={formData.milkTankInfo.quantityUnit} onChange={handleFormDataChange}>
                                     <option value="Ton">Ton</option>
@@ -388,7 +388,7 @@ const FarmCreateRM = () => {
                         <div className="flex flex-col w-1/2 items-start gap-3">
                             <label htmlFor="temp" className="font-semibold">Temperature</label>
                             <div className="flex w-full items-start gap-3">
-                                <input type="number" name="milkTankInfo.temp" id="temp" className="p-3 rounded-full borcder w-4/5" placeholder="0.00" step="0.01"
+                                <input type="number" name="milkTankInfo.temp" id="temp" className="p-3 rounded-full border w-4/5" placeholder="0.00" step="0.01"
                                     value={formData.milkTankInfo.temp} onChange={handleFormDataChange} />
                                 <select name="milkTankInfo.tempUnit" id="tempUnit" className="border rounded-full p-3 w-1/5 font-semibold"
                                     value={formData.milkTankInfo.tempUnit} onChange={handleFormDataChange}>
@@ -531,7 +531,7 @@ const FarmCreateRM = () => {
 
                     <button
                         type="button"
-                        className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-2xl hover:bg-[#C0E0C8] ${showShippingAddress ? 'hidden' : ''}`}
+                        className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8] ${showShippingAddress ? 'hidden' : ''}`}
                         onClick={handleNextClick}
                     >
                         Next
@@ -585,8 +585,6 @@ const FarmCreateRM = () => {
                                         onChange={handleFormDataChange}
                                     >
                                         <option value="+66">+66</option>
-                                        <option value="+1">+1</option>
-                                        <option value="+44">+44</option>
                                     </select>
                                 </div>
 
@@ -658,7 +656,7 @@ const FarmCreateRM = () => {
                         <div className="flex flex-col text-start w-full gap-3">
                             <label htmlFor="postalCode" className="font-semibold">Zip/Postal Code</label>
                             <input type="text" name="shippingAddress.postalCode" id="postalCode" className="border border-gray-300 rounded-full p-3 w-full" placeholder="Enter postal code"
-                            value={formData.shippingAddress.postalCode} onChange={handleFormDataChange} />
+                                value={formData.shippingAddress.postalCode} onChange={handleFormDataChange} />
                         </div>
 
                         {/* location */}
@@ -679,7 +677,7 @@ const FarmCreateRM = () => {
 
                         <button
                             type="submit"
-                            className="flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-2xl hover:bg-[#C0E0C8]"
+                            className="flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8]"
                             onClick={() => router.push('/Farmer/FarmCheck')}
                         >
                             Next

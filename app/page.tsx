@@ -49,16 +49,16 @@ export default function HomePage() {
         </svg>
 
         {/* Welcome text */}
-        <div className="flex w-full min-h-screen" id="home">
-          <div className="w-1/2 flex flex-col justify-center items-start p-10 text-white pl-20">
+        <div className="flex flex-col md:flex-row w-full min-h-screen" id="home">
+          <div className="w-full md:w-1/2 flex flex-col justify-center items-start p-10 text-white md:pl-20">
             <div className="flex flex-col gap-3">
               <h1 className="text-4xl font-bold">Welcome to our Final Project</h1>
               <h1 className="text-5xl font-bold">Purely Trace is</h1>
-              <p className="text-5xl font-bold">Organic</p>
+              <span className="text-5xl font-bold">Organic <p className="inline text-5xl font-bold text-[#ffc260]">Blockchain</p></span>
             </div>
             <a href="#" className="text-xl mt-8 bg-[#f2cc8f] p-2 px-3 rounded-full font-semibold">Our Story</a>
             <div className="flex flex-wrap align-middle items-center gap-3 mt-5">
-              <input type="search" className="w-96 rounded-full h-13 p-3 items-center" placeholder="Search..." />
+              <input type="search" className="w-full md:w-96 rounded-full h-13 p-3 items-center" placeholder="Search..." />
               <button className="bg-blue-500 flex rounded-full w-12 h-12 text-center justify-center items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M9.5 16q-2.725 0-4.612-1.888T3 9.5t1.888-4.612T9.5 3t4.613 1.888T16 9.5q0 1.1-.35 2.075T14.7 13.3l5.6 5.6q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-5.6-5.6q-.75.6-1.725.95T9.5 16m0-2q1.875 0 3.188-1.312T14 9.5t-1.312-3.187T9.5 5T6.313 6.313T5 9.5t1.313 3.188T9.5 14" />
@@ -79,9 +79,9 @@ export default function HomePage() {
           </div>
           {/* end Welcome text */}
 
-          {/* Video Seciton */}
-          <div className="flex flex-col w-1/2 justify-center items-center z-40">
-            <iframe src="https://www.youtube.com/embed/gUHn6o1og_0" className="w-3/4 h-1/2 rounded-3xl"></iframe>
+          {/* Video Section */}
+          <div className="flex flex-col w-full md:w-1/2 justify-center items-center z-40">
+            <iframe src="https://www.youtube.com/embed/gUHn6o1og_0" className="w-full md:w-3/4 h-1/2 rounded-3xl"></iframe>
           </div>
         </div>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" className="absolute -bottom-20 z-10">
@@ -94,12 +94,12 @@ export default function HomePage() {
       {/* About section */}
       <section className="flex flex-col w-full h-full min-h-screen mt-28 items-center bg-white" id="about">
         <h1 className="text-5xl font-bold text-[#3D405B] mb-20">About Purely Trace</h1>
-        <div className="flex w-full h-full">
-          <div className="flex w-1/2 h-full justify-center items-center">
+        <div className="flex flex-col md:flex-row w-full h-full">
+          <div className="flex w-full md:w-1/2 h-full justify-center items-center">
             <img src="https://static.wixstatic.com/media/827c6d_f86a0bf6f6d84dc2bf0f49d03d3a3efe~mv2_d_2048_1367_s_2.jpg/v1/fill/w_2048,h_800,al_c,q_85,enc_avif,quality_auto/827c6d_f86a0bf6f6d84dc2bf0f49d03d3a3efe~mv2_d_2048_1367_s_2.jpg"
               alt="img" className="w-3/4 rounded-3xl" />
           </div>
-          <div className="flex w-1/2 h-full flex-col justify-center items-start pr-20">
+          <div className="flex w-full md:w-1/2 h-full flex-col justify-center items-start pr-20">
             <h2 className="text-4xl mb-5 text-[#3D405B] font-semibold">Our Mission</h2>
             <p className="text-3xl text-gray-500"><b>Revolutionizing Organic Dairy Supply Chain Management</b>, Final Project is dedicated to revoultionizing the organic dairy supply chain management through innovative bloackchain technology. Our comprehensive application provides end to end solutions for dairy producers, distributors, and retailers, ensuring transparency and effieciency  throughout the supply chain. With a focus on sustainability and ethical practices, we aim to transform the dairy industry for the better.</p>
           </div>
@@ -117,7 +117,7 @@ export default function HomePage() {
           <path fill="rgba(255, 255, 255, 1)" d="M 1127 67 C 1196 67 1196 0 1265 0 L 1265 0 L 1265 0 L 1127 0 Z" strokeWidth="0"></path>
         </svg>
         <div className="flex w-full h-full justify-start items-center px-20">
-          <div className="w-1/3 h-3/4 flex flex-col rounded-3xl justify-center items-start bg-white bg-opacity-75 p-10 gap-8">
+          <div className="w-full md:w-1/3 h-3/4 flex flex-col rounded-3xl justify-center items-start bg-white bg-opacity-75 p-10 gap-8">
             <h1 className="text-5xl font-bold text-[#3D405B] text-start">Our Story</h1>
             <p className="text-2xl text-gray-600">Final Project was born out of a vision to empower dairy farmers and promote sustainable practices in the industry.
               Our team is deeply rooted in the dairy farming community, and we understand the challenges and opportunities faced by
@@ -139,13 +139,13 @@ export default function HomePage() {
       {/* Get to know supply chain section */}
       <div className="flex flex-col w-full h-full min-h-screen items-center bg-white px-10" id="details">
         <h1 className="text-5xl font-bold text-[#3d405B]">Get to Know Supply Chain Management</h1>
-        <div className="flex flex-col w-2/5 h-full justify-center mt-10 self-start p-8 gap-5">
+        <div className="flex flex-col w-full md:w-2/5 h-full justify-center mt-10 self-start p-8 gap-5">
           <h1 className="text-4xl text-start font-semibold">Organic Dairy</h1>
           <p className="pl-5 text-2xl text-gray-500"><b>Our comprehensive organic dairy supply chain management application with blockchain is</b> designed to revolutionize the way dairy products are sources, processed, and delivered.
             With a focus on substainability and transparency, our platform ensures that every step of the dairy supply chain is optimized for effieciency and quality.
             From farm to table, our innovative solution brings together farmers, processors, distributors, and retailers in seamless ecosystem.</p>
         </div>
-        <div className="flex flex-col w-2/5 h-full justify-center text-start text-white bg-[#3D405B] p-10 gap-5 self-start m-8 rounded-3xl">
+        <div className="flex flex-col w-full md:w-2/5 h-full justify-center text-start text-white bg-[#3D405B] p-10 gap-5 self-start m-8 rounded-3xl">
           <h1 className="text-4xl text-start font-semibold">Blockchain Integration</h1>
           <p className="pl-5 text-2xl"><b>The integration of blockchain technology ensures the security and traceability of dairy products through the supply chain. </b>
             By leveraging bloackchain, we provide immutable records of every transaction and movement, offering unparalleled trust and accountability in the industry.
@@ -160,21 +160,21 @@ export default function HomePage() {
           <div className="flex flex-col w-full h-full justify-center items-start">
             <h1 className="text-5xl text-[#3D405F] font-bold">Meet the Final Project Team</h1>
           </div>
-          <div className="flex w-11/12 h-full gap-10 bg-white p-10 rounded-3xl">
-            <div className="flex w-1/3 h-full rounded-lg">
+          <div className="flex flex-col md:flex-row w-11/12 h-full gap-10 bg-white p-10 rounded-3xl">
+            <div className="flex w-full md:w-1/3 h-full rounded-lg">
               <img src="/images/MeetTeamPic1.avif" alt="farm" className="rounded-3xl" />
             </div>
-            <div className="flex flex-col w-2/3 h-full justify-center items-start gap-5">
+            <div className="flex flex-col w-full md:w-2/3 h-full justify-center items-start gap-5">
               <h1 className="text-4xl font-semibold text-[#3D405B]">Pioneers in Organic Dairy Supply Chain Management</h1>
               <p className="text-gray-500 text-2xl">Welcome to the forefront of comprehensive organic dairy supply chain management. Our team is dedicated to revolutionizing the industry through innovative application of blockchain technology.</p>
             </div>
           </div>
 
-          <div className="flex w-11/12 h-full gap-10 bg-white p-10 rounded-3xl">
-            <div className="flex w-1/3 h-full rounded-lg">
+          <div className="flex flex-col md:flex-row w-11/12 h-full gap-10 bg-white p-10 rounded-3xl">
+            <div className="flex w-full md:w-1/3 h-full rounded-lg">
               <img src="/images/MeetTeamPic2.avif" alt="farm" className="w-full h-full rounded-3xl" />
             </div>
-            <div className="flex flex-col w-2/3 h-full justify-center items-start gap-5">
+            <div className="flex flex-col w-full md:w-2/3 h-full justify-center items-start gap-5">
               <div className="flex flex-col gap-5 border-b-2 pb-5">
                 <h1 className="text-4xl font-semibold text-[#3D405B]">Our Offering</h1>
                 <p className="text-gray-500 text-2xl">Discover our commitment to sustainable sourcing, uncompromising quality assuracne, and cutting-edge blockchain integration.
@@ -195,12 +195,12 @@ export default function HomePage() {
       {/* Contact us section */}
       <div className="flex flex-col w-full h-full min-h-full bg-white p-10" id="contact">
         <h1 className="text-5xl font-bold text-[#3D405B] text-start p-10">Contact Purely Trace</h1>
-        <div className="flex w-full h-full">
+        <div className="flex flex-col md:flex-row w-full h-full">
           {/* left part */}
-          <div className="flex flex-col w-1/2 h-full justify-center items-start px-10 gap-5">
+          <div className="flex flex-col w-full md:w-1/2 h-full justify-center items-start px-10 gap-5">
             <div className="flex w-full h-full items-start gap-10">
-              <input type="text" placeholder="Full Name" className="p-3 text-[#3D405B] text-xl rounded-full border-2 w-1/2" />
-              <input type="text" placeholder="Email" className="p-3 text-[#3D405B] text-xl rounded-full border-2 w-1/2" />
+              <input type="text" placeholder="Full Name" className="p-3 text-[#3D405B] text-xl rounded-full border-2 w-full md:w-1/2" />
+              <input type="text" placeholder="Email" className="p-3 text-[#3D405B] text-xl rounded-full border-2 w-full md:w-1/2" />
             </div>
             <textarea name="message" id="message" placeholder="Message" className="p-3 w-full border-2 rounded-3xl h-28 text-xl"></textarea>
             <button className="bg-[#f2cc8f] text-white font-semibold p-3 rounded-full w-full text-xl">Submit Feedback</button>
@@ -208,8 +208,8 @@ export default function HomePage() {
           {/* end left part */}
 
           {/* right part */}
-          <div className="flex w-1/2 h-full justify-center items-center">
-            <div className="flex flex-col w-1/2 h-full justify-center items-center gap-5 bg-[#3D405B] rounded-3xl text-center text-white z-10">
+          <div className="flex w-full md:w-1/2 h-full justify-center items-center">
+            <div className="flex flex-col w-full md:w-1/2 h-full justify-center items-center gap-5 bg-[#3D405B] rounded-3xl text-center text-white z-10">
               <div className="flex flex-col gap-5 p-10">
                 <p className="text-xl font-semibold text-white text-center align-middle">King Mongkut's Institute of Technology Ladkrabang, Thailand</p>
                 <p className="text-xl">(+66) 02 329 8000</p>
@@ -227,8 +227,8 @@ export default function HomePage() {
       {/* end contact us section */}
 
       {/* Footer */}
-      <div className="flex w-full h-full justify-between items-center bg-white text-[#3D405B]">
-        <div className="flex w-1/2 h-full justify-start items-start p-10">
+      <div className="flex flex-col md:flex-row w-full h-full justify-between items-center bg-white text-[#3D405B]">
+        <div className="flex w-full md:w-1/2 h-full justify-start items-start p-10">
           <img src="/images/LogoNoBgNoTxt.png" alt="Logo" className="w-24 h-24" />
           <div className="flex flex-col justify-center items-start">
             <p className="text-xl font-bold">Purely</p>
@@ -236,14 +236,14 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="flex w-1/2 h-full justify-start items-center gap-10 p-10">
-          <div className="flex flex-col w-2/3 h-full gap-5">
+        <div className="flex w-full md:w-1/2 h-full justify-start items-center gap-10 p-10">
+          <div className="flex flex-col w-full md:w-2/3 h-full gap-5">
             <h1 className="text-2xl font-semibold">Contact Us</h1>
-            <div className="flex justify-evenly gap-10 text-gray-500 border-b-2 pb-5">
+            <div className="flex flex-col md:flex-row justify-evenly gap-10 text-gray-500 border-b-2 pb-5">
               <p className="text-xl font-semibold">Nawisa<br></br>Thanasuttawong</p>
               <p className="text-xl">64070264@kmitl.ac.th</p>
             </div>
-            <div className="flex justify-evenly gap-10 text-gray-500">
+            <div className="flex flex-col md:flex-row justify-evenly gap-10 text-gray-500">
               <p className="text-xl font-semibold">Pinya<br></br>Nuangudom</p>
               <p className="text-xl">64070266@kmitl.ac.th</p>
             </div>

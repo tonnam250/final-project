@@ -18,71 +18,93 @@ interface GeoData {
 
 const FactoryGeneral = () => {
 
+    const [isEditable, setIsEditable] = useState<boolean>(true);
+
+    const handleSaveEditToggle = () => {
+        setIsEditable(!isEditable);
+    };
+
     const [fileNames, setFileNames] = useState<string[]>(["No file selected."]);
-    
-        const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-            if (event.target.files) {
-                const files = Array.from(event.target.files).map((file) => file.name);
-                setFileNames(files.length ? files : ["ยังไม่ได้เลือกไฟล์"]);
-            } else {
-                setFileNames(["ยังไม่ได้เลือกไฟล์"]);
-            }
-        };
-    
-        const [geoData, setGeoData] = useState<GeoData[]>([]);
-        const [provinceList, setProvinceList] = useState<string[]>([]);
-        const [districtList, setDistrictList] = useState<string[]>([]);
-        const [subDistrictList, setSubDistrictList] = useState<string[]>([]);
-    
-        const [selectedProvince, setSelectedProvince] = useState<string>("");
-        const [selectedDistrict, setSelectedDistrict] = useState<string>("");
-        const [selectedSubDistrict, setSelectedSubDistrict] = useState<string>("");
-    
-        useEffect(() => {
-            fetch("/data/geography.json")
-                .then((res) => res.json())
-                .then((data: GeoData[]) => {
-                    setGeoData(data);
-    
-                    // ดึงจังหวัดที่ไม่ซ้ำ (ใช้ภาษาไทยให้ตรงกับ selectedProvince)
-                    const provinces = Array.from(new Set(data.map((item) => item.provinceNameEn)));
-                    setProvinceList(provinces);
-                })
-                .catch((err) => console.error("Fetch error:", err));
-        }, []);
-    
-        useEffect(() => {
-            if (selectedProvince) {
-                const filteredDistricts = Array.from(
-                    new Set(
-                        geoData.filter((item) => item.provinceNameEn === selectedProvince).map((item) => item.districtNameEn)
-                    )
-                );
-    
-                setDistrictList(filteredDistricts);
-                setSelectedDistrict("");
-                setSubDistrictList([]);
-                setSelectedSubDistrict("");
-            }
-        }, [selectedProvince]);
-    
-        useEffect(() => {
-            if (selectedDistrict) {
-                const filteredSubDistricts = Array.from(
-                    new Set(
-                        geoData.filter((item) => item.districtNameEn === selectedDistrict).map((item) => item.subdistrictNameEn)
-                    )
-                );
-    
-                setSubDistrictList(filteredSubDistricts);
-                setSelectedSubDistrict("");
-            }
-        }, [selectedDistrict]);
-    
-        const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-            event.preventDefault();
-            // Handle form submission logic here
-        };
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files) {
+            const files = Array.from(event.target.files).map((file) => file.name);
+            setFileNames(files.length ? files : ["ยังไม่ได้เลือกไฟล์"]);
+        } else {
+            setFileNames(["ยังไม่ได้เลือกไฟล์"]);
+        }
+    };
+
+    const [geoData, setGeoData] = useState<GeoData[]>([]);
+    const [provinceList, setProvinceList] = useState<string[]>([]);
+    const [districtList, setDistrictList] = useState<string[]>([]);
+    const [subDistrictList, setSubDistrictList] = useState<string[]>([]);
+
+    const [selectedProvince, setSelectedProvince] = useState<string>("");
+    const [selectedDistrict, setSelectedDistrict] = useState<string>("");
+    const [selectedSubDistrict, setSelectedSubDistrict] = useState<string>("");
+
+    useEffect(() => {
+        fetch("/data/geography.json")
+            .then((res) => res.json())
+            .then((data: GeoData[]) => {
+                setGeoData(data);
+
+                // ดึงจังหวัดที่ไม่ซ้ำ (ใช้ภาษาไทยให้ตรงกับ selectedProvince)
+                const provinces = Array.from(new Set(data.map((item) => item.provinceNameEn)));
+                setProvinceList(provinces);
+            })
+            .catch((err) => console.error("Fetch error:", err));
+    }, []);
+
+    useEffect(() => {
+        if (selectedProvince) {
+            const filteredDistricts = Array.from(
+                new Set(
+                    geoData.filter((item) => item.provinceNameEn === selectedProvince).map((item) => item.districtNameEn)
+                )
+            );
+
+            setDistrictList(filteredDistricts);
+            setSelectedDistrict("");
+            setSubDistrictList([]);
+            setSelectedSubDistrict("");
+        }
+    }, [selectedProvince]);
+
+    useEffect(() => {
+        if (selectedDistrict) {
+            const filteredSubDistricts = Array.from(
+                new Set(
+                    geoData.filter((item) => item.districtNameEn === selectedDistrict).map((item) => item.subdistrictNameEn)
+                )
+            );
+
+            setSubDistrictList(filteredSubDistricts);
+            setSelectedSubDistrict("");
+        }
+    }, [selectedDistrict]);
+
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        setIsEditable(false);
+
+        const formData = new FormData(event.currentTarget);
+        formData.append("province", selectedProvince);
+        formData.append("district", selectedDistrict);
+        formData.append("subDistrict", selectedSubDistrict);
+
+        // Handle form submission logic here
+        // For example, you can send formData to an API endpoint
+        // fetch('/api/submit', {
+        //     method: 'POST',
+        //     body: formData,
+        // }).then(response => {
+        //     // Handle response
+        // }).catch(error => {
+        //     // Handle error
+        // });
+    };
 
     return (
         <div className="flex flex-col text-center w-full justify-center items-center text- h-full pt-20">
@@ -98,8 +120,9 @@ const FactoryGeneral = () => {
                                 type="text"
                                 id="fName"
                                 name="fName"
-                                className="border border-gray-300 rounded-md p-2 w-full"
+                                className="border border-gray-300 rounded-full p-2 w-full"
                                 required
+                                disabled={!isEditable}
                             />
                         </div>
                         {/* end first name */}
@@ -111,8 +134,9 @@ const FactoryGeneral = () => {
                                 type="text"
                                 id="lName"
                                 name="lName"
-                                className="border border-gray-300 rounded-md p-2 w-full"
+                                className="border border-gray-300 rounded-full p-2 w-full"
                                 required
+                                disabled={!isEditable}
                             />
                         </div>
                         {/* end lastName */}
@@ -125,9 +149,10 @@ const FactoryGeneral = () => {
                             type="email"
                             id="email"
                             name="email"
-                            className="border border-gray-300 rounded-md p-2"
+                            className="border border-gray-300 rounded-full p-2"
                             placeholder="Example@gmail.com"
                             required
+                            disabled={!isEditable}
                         />
                     </div>
                     {/* end email */}
@@ -143,12 +168,11 @@ const FactoryGeneral = () => {
                                 <select
                                     name="areaCode"
                                     id="areaCode"
-                                    className="border border-gray-300 rounded-md p-2 w-full md:w-20 text-center"
+                                    className="border border-gray-300 rounded-full p-2 w-full md:w-20 text-center"
                                     required
+                                    disabled={!isEditable}
                                 >
                                     <option value="+66">+66</option>
-                                    <option value="+1">+1</option>
-                                    <option value="+44">+44</option>
                                 </select>
                             </div>
 
@@ -157,9 +181,10 @@ const FactoryGeneral = () => {
                                 type="tel"
                                 id="tel"
                                 name="tel"
-                                className="border border-gray-300 rounded-md p-2 flex-1 w-full"
+                                className="border border-gray-300 rounded-full p-2 flex-1 w-full"
                                 placeholder="Enter your phone number"
                                 required
+                                disabled={!isEditable}
                             />
                         </div>
                     </div>
@@ -168,16 +193,17 @@ const FactoryGeneral = () => {
                     {/* Address */}
                     <div className="flex flex-col text-start font-medium">
                         <label htmlFor="address">Address</label>
-                        <textarea name="address" id="address" className="border border-gray-300 rounded-md p-2 flex-1 w-full"></textarea>
+                        <textarea name="address" id="address" className="border border-gray-300 rounded-full p-2 flex-1 w-full" disabled={!isEditable}></textarea>
                     </div>
                     {/* end Address */}
 
                     {/* province */}
                     <div className="flex flex-col w-full text-start font-medium">
                         <label htmlFor="province">Province</label>
-                        <select name="province" id="province" className="border border-gray-300 rounded-md p-2 text-center"
+                        <select name="province" id="province" className="border border-gray-300 rounded-full p-2 text-center"
                             value={selectedProvince}
-                            onChange={(e) => setSelectedProvince(e.target.value)}>
+                            onChange={(e) => setSelectedProvince(e.target.value)}
+                            disabled={!isEditable}>
                             <option value="">Select province</option>
                             {provinceList.map((prov, index) => (
                                 <option key={index} value={prov}>
@@ -192,10 +218,10 @@ const FactoryGeneral = () => {
                     <div className="flex flex-col md:flex-row w-full gap-4">
                         <div className="flex flex-col text-start font-medium w-full md:w-6/12">
                             <label htmlFor="district">District</label>
-                            <select name="district" id="district" className="border border-gray-300 rounded-md p-2 text-center"
+                            <select name="district" id="district" className="border border-gray-300 rounded-full p-2 text-center"
                                 value={selectedDistrict}
                                 onChange={(e) => setSelectedDistrict(e.target.value)}
-                                disabled={!selectedProvince}>
+                                disabled={!selectedProvince || !isEditable}>
                                 <option value="">Select district</option>
                                 {districtList.map((dist, index) => (
                                     <option key={index} value={dist}>
@@ -207,10 +233,10 @@ const FactoryGeneral = () => {
 
                         <div className="flex flex-col text-start font-medium w-full md:w-6/12">
                             <label htmlFor="subDistrict">Sub-District</label>
-                            <select name="subDistrict" id="subDistrict" className="border border-gray-300 rounded-md p-2 text-center"
+                            <select name="subDistrict" id="subDistrict" className="border border-gray-300 rounded-full p-2 text-center"
                                 value={selectedSubDistrict}
                                 onChange={(e) => setSelectedSubDistrict(e.target.value)}
-                                disabled={!selectedDistrict}>
+                                disabled={!selectedDistrict || !isEditable}>
                                 <option value="">Select sub-district</option>
                                 {subDistrictList.map((subDist, index) => (
                                     <option key={index} value={subDist}>
@@ -223,6 +249,7 @@ const FactoryGeneral = () => {
                     {/* end district + sub-district */}
 
                     {/* Upload Organic certification */}
+                    <label htmlFor="" className="font-semibold text-start">Upload Organic Certification</label>
                     <div className="flex flex-col md:flex-row items-center justify-start gap-2 border p-2">
                         <label
                             htmlFor="file-upload"
@@ -239,6 +266,7 @@ const FactoryGeneral = () => {
                             className="hidden"
                             multiple
                             onChange={handleFileChange}
+                            disabled={!isEditable}
                         />
                     </div>
                     {/* end upload organic certification */}
@@ -246,10 +274,26 @@ const FactoryGeneral = () => {
                     {/* location */}
                     <div className="flex flex-col font-medium text-start">
                         <label htmlFor="location">Location</label>
-                        <input type="text" name="location" id="location" className="border border-gray-300 rounded-md p-2 flex-1 w-full" />
+                        <input type="text" name="location" id="location" className="border border-gray-300 rounded-full p-2 flex-1 w-full"
+                            disabled={!isEditable} />
                     </div>
 
-                    <button className="text- md:text-xl bg-[#C98986] w-full md:w-1/6 rounded-full  p-2 px-3 text-[#F7FCD4] hover:bg-[#6C0E23] self-center">Save</button>
+                    <button
+                        type="button"
+                        className="flex items-center justify-center text- md:text-xl bg-[#C98986] hover: w-full md:w-1/6 rounded-full p-2 px-3 text-[#F7FCD4] self-center"
+                        onClick={isEditable ? handleSubmit : handleSaveEditToggle}
+                    >
+                        {isEditable ? "Save" : "Edit"}
+                        {isEditable ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="ml-2 w-6 h-6">
+                                <path fill="currentColor" d="M15 9H5V5h10m-3 14a3 3 0 0 1-3-3a3 3 0 0 1 3-3a3 3 0 0 1-3 3a3 3 0 0 1-3-3m5-16H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7z" />
+                            </svg>
+                        ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" className="ml-2 w-6 h-6" viewBox="0 0 24 24">
+                                <path fill="currentColor" d="m14.06 9l.94.94L5.92 19H5v-.92zm3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83l3.75 3.75l1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94z" />
+                            </svg>
+                        )}
+                    </button>
                 </form>
             </div>
         </div>

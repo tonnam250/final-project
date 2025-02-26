@@ -12,9 +12,14 @@ const FarmRawMilk = async () => {
         <img src="/images/FarmLandscape2.webp" alt="Farm" className="w-full h-full relative object-cover" />
       </div>
       <div className="flex flex-col justify-center items-center w-full h-full mt-10 px-4 md:px-0">
-        <h1 className="text-4xl md:text-6xl font-semibold">Raw Milk</h1>
+        <h1 className="text-4xl md:text-6xl font-bold">Raw Milk</h1>
         <div className="flex justify-center items-center w-full h-full gap-5 mt-10 px-8">
-          <input type="search" name="search" id="search" placeholder="Search..." className="p-3 border-2 rounded-full w-1/2 text-xl" />
+          <div className="relative w-1/2">
+            <input type="search" name="search" id="search" placeholder="Search..." className="p-3 border-2 rounded-full w-full text-xl pr-10" />
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-6">
+              <path fill="currentColor" fillRule="evenodd" d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06zM10.5 7a3.5 3.5 0 1 1-7 0a3.5 3.5 0 0 1 7 0" clipRule="evenodd" />
+            </svg>
+          </div>
           <Link href={'/Farmer/FarmCreateRM'} className="bg-[#5E929E] text-white font-semibold p-3 w-fit text-xl rounded-full text-center">+ Add</Link>
         </div>
 
