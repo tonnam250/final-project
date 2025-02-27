@@ -4,47 +4,47 @@ const API_BASE_URL = "http://127.0.0.1:8080/api/v1/certifications";
 
 // ✅ ดึงข้อมูลใบเซอร์ของฟาร์ม (แก้ไข endpoint ให้ใช้ entityID)
 export const getCertificateInfo = async (entityID: string) => {
-  try {
-      const response = await fetch(`${API_BASE_URL}/entity/${entityID}`, {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-      });
+    try {
+        const response = await fetch(`${API_BASE_URL}/entity/${entityID}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+        });
 
-      if (!response.ok) {
-          throw new Error(`Failed to fetch certificate info: ${response.status}`);
-      }
+        if (!response.ok) {
+            throw new Error(`Failed to fetch certificate info: ${response.status}`);
+        }
 
-      const data = await response.json();
-      console.log("📌 [Frontend] Retrieved Certificate Data:", data);
-      
-      return Array.isArray(data) && data.length > 0 ? data : [];
-  } catch (error) {
-      console.error("❌ Error fetching certificate:", error);
-      return [];
-  }
+        const data = await response.json();
+        console.log("📌 [Frontend] Retrieved Certificate Data:", data);
+
+        return Array.isArray(data) && data.length > 0 ? data : [];
+    } catch (error) {
+        console.error("❌ Error fetching certificate:", error);
+        return [];
+    }
 };
 
 // ✅ อัปโหลดไฟล์ใบเซอร์ไป IPFS และคืนค่า CID
 export const uploadCertificate = async (file: File): Promise<string | null> => {
-  try {
-      if (!file) throw new Error("No file provided for upload");
+    try {
+        if (!file) throw new Error("No file provided for upload");
 
-      const formData = new FormData();
-      formData.append("file", file);
+        const formData = new FormData();
+        formData.append("file", file);
 
-      console.log("📌 DEBUG - Uploading File:", file.name);
+        console.log("📌 DEBUG - Uploading File:", file.name);
 
-      const response = await axios.post(`${API_BASE_URL}/upload`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-      });
+        const response = await axios.post(`${API_BASE_URL}/upload`, formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+        });
 
-      console.log("📌 DEBUG - IPFS Response:", response.data);
-      return response.data.cid;
-  } catch (error: any) {
-      console.error("❌ [ERROR] Uploading certificate:", error.response?.data || error.message);
-      return null;
-  }
+        console.log("📌 DEBUG - IPFS Response:", response.data);
+        return response.data.cid;
+    } catch (error: any) {
+        console.error("❌ [ERROR] Uploading certificate:", error.response?.data || error.message);
+        return null;
+    }
 };
 
 // ✅ ตรวจสอบว่า CID มีอยู่ใน Blockchain หรือไม่
@@ -59,23 +59,19 @@ export const checkUserCertification = async (certCID: string): Promise<boolean> 
     }
 };
 
-// ✅ อัปโหลดใบเซอร์และตั้งค่า state
-export const uploadAndSetCertificate = async (
-    file: File,
-    setCertificateData: React.Dispatch<React.SetStateAction<any | null>>,
-    setCertificateFile: React.Dispatch<React.SetStateAction<File | null>>,
-    setFileNames: React.Dispatch<React.SetStateAction<string[]>>
-): Promise<string | null> => {
-    const certCID = await uploadCertificate(file);
-    if (certCID) {
-        setCertificateData({ cid: certCID });
-        setCertificateFile(null);
-        setFileNames(["No file selected."]);
+// ✅ ตรวจสอบว่ามีใบเซอร์อยู่แล้วหรือไม่ (ใช้ entityID)
+const getExistingCertification = async (entityID: string) => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/entity/${entityID}`);
+        console.log("📌 [Check Certification] Existing Certificate Data:", response.data);
+        return response.data.length > 0 ? response.data[0] : null; // ✅ คืนค่าใบเซอร์ล่าสุดถ้ามี
+    } catch (error: any) {
+        console.error("❌ [ERROR] Checking existing certification:", error.response?.data || error.message);
+        return null;
     }
-    return certCID;
 };
 
-// ✅ สร้างหรืออัปเดตใบเซอร์ (แก้ไขให้จัดการใบเซอร์ที่หมดอายุอัตโนมัติ)
+// ✅ สร้างหรืออัปเดตใบเซอร์ (จัดการใบเซอร์ที่หมดอายุ)
 export const createOrUpdateCertificate = async (payload: {
     entityType: string;
     entityID: string;
@@ -95,21 +91,37 @@ export const createOrUpdateCertificate = async (payload: {
             return null;
         }
 
+        console.log("📌 Checking if Entity already has a Certification...");
+        const existingCert = await getExistingCertification(payload.entityID);
+
+        if (existingCert) {
+            console.log("🔄 Existing Certificate found. Updating instead...");
+            const updatePayload = { ...existingCert, certificationCID: payload.certificationCID };
+            const updateResponse = await axios.put(`${API_BASE_URL}/update`, updatePayload);
+            console.log("✅ Certification updated successfully:", updateResponse.data);
+            return updateResponse.data;
+        }
+
+        // ✅ ถ้ายังไม่มี → สร้างใหม่
+        console.log("📌 No existing certificate. Creating a new one...");
         const response = await axios.post(`${API_BASE_URL}/create`, payload);
-        console.log("✅ Certification created/updated:", response.data);
+        console.log("✅ Certification created:", response.data);
         return response.data;
     } catch (error: any) {
-        console.error("❌ [ERROR] Creating/updating certificate:", error.response?.data || error.message);
+        console.error("❌ [ERROR] Creating/updating certification:", error.response?.data || error.message);
         return null;
     }
 };
 
 // ✅ ลบใบเซอร์ (Soft Delete)
-export const deleteCertificate = async (entityID: string) => {
+export const deleteCertificate = async (entityID: string, eventID: string) => {
     try {
-        if (!entityID) throw new Error("Entity ID is required for deleting certificate");
+        if (!entityID || !eventID) throw new Error("Entity ID and Event ID are required for deleting certificate");
 
-        const response = await axios.delete(`${API_BASE_URL}/${entityID}`);
+        const response = await axios.delete(`${API_BASE_URL}/${entityID}`, {
+            data: { event_id: eventID }, // ✅ ส่ง eventID ผ่าน JSON Body
+        });
+
         console.log("✅ Certification deleted:", response.data);
         return response.data;
     } catch (error: any) {
@@ -118,19 +130,27 @@ export const deleteCertificate = async (entityID: string) => {
     }
 };
 
-// ✅ จัดการลบใบเซอร์และอัปเดต state
 export const handleDeleteCertificate = async (
     entityID: string,
-    setCertificateData: React.Dispatch<React.SetStateAction<any | null>>
+    eventID: string,
+    setCertificateData: React.Dispatch<React.SetStateAction<any[]>>
 ) => {
     const confirmDelete = window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบใบเซอร์นี้?");
     if (!confirmDelete) return;
 
-    const result = await deleteCertificate(entityID);
+    console.log("📌 [DEBUG] Deleting certificate with Event ID:", eventID);
+
+    const result = await deleteCertificate(entityID, eventID);
     if (result) {
-        setCertificateData(null);
+        setCertificateData((prevData = []) => {
+            console.log("📌 [DEBUG] Current Certificate Data Before Delete:", prevData);
+            const updatedData = prevData.filter((cert) => cert.event_id !== eventID);
+            console.log("📌 [DEBUG] Updated Certificate Data After Delete:", updatedData);
+            return updatedData;
+        });
         alert("✅ ใบเซอร์ถูกลบเรียบร้อยแล้ว");
     } else {
         alert("❌ ลบใบเซอร์ไม่สำเร็จ");
     }
 };
+

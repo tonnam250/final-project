@@ -1,6 +1,35 @@
 const API_URL = "http://127.0.0.1:8080/api/v1/farmers";
 
-import { uploadCertificate, createOrUpdateCertificate, checkUserCertification } from "./certificateService";
+import {
+    uploadCertificate,
+    createOrUpdateCertificate,
+    checkUserCertification,
+} from "./certificateService";
+
+// ✅ ฟังก์ชันอัปเดตข้อมูลฟาร์ม
+export const updateFarmInfo = async (farmData: any): Promise<any | null> => {
+    try {
+        console.log("📡 [UpdateFarmInfo] Updating farm data...");
+        console.log("📌 DEBUG - Payload being sent to Backend:", farmData);
+
+        const response = await fetch(`${API_URL}/update`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(farmData),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to update farm data: ${response.status}`);
+        }
+
+        console.log("✅ [UpdateFarmInfo] Farm data updated successfully");
+        return await response.json();
+    } catch (error) {
+        console.error("❌ [ERROR] Updating farm data failed:", error);
+        return null;
+    }
+};
 
 // ✅ ดึงข้อมูลฟาร์ม
 export const getFarmInfo = async (): Promise<any | null> => {
@@ -24,31 +53,7 @@ export const getFarmInfo = async (): Promise<any | null> => {
     }
 };
 
-// ✅ อัปเดตข้อมูลฟาร์ม
-export const updateFarmInfo = async (farmData: any): Promise<any | null> => {
-    try {
-        console.log("📡 [UpdateFarmInfo] Updating farm data...");
-        console.log("📌 DEBUG - Payload being sent to Backend:", farmData);
-        const response = await fetch(`${API_URL}/update`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify(farmData),
-        });
-
-        if (!response.ok) {
-            throw new Error(`Failed to update farm data: ${response.status}`);
-        }
-
-        console.log("✅ [UpdateFarmInfo] Farm data updated successfully");
-        return await response.json();
-    } catch (error) {
-        console.error("❌ [ERROR] Updating farm data failed:", error);
-        return null;
-    }
-};
-
-// ✅ ฟังก์ชันอัปเดตข้อมูลฟาร์มรวมกับอัปโหลดใบเซอร์
+// ✅ อัปเดตข้อมูลฟาร์มและใบเซอร์
 export const submitFarmData = async (
     farmData: any,
     certificateFile: File | null,
@@ -63,7 +68,7 @@ export const submitFarmData = async (
 ) => {
     let certCID = certificateData?.cid || "";
 
-    // ✅ อัปโหลดใบเซอร์ใหม่ถ้ามีไฟล์ใหม่
+    // ✅ ถ้ามีไฟล์ใบเซอร์ใหม่ → อัปโหลดไปยัง IPFS
     if (certificateFile) {
         try {
             console.log("📌 Uploading certificate file:", certificateFile.name);
@@ -86,7 +91,7 @@ export const submitFarmData = async (
         }
     }
 
-    // ✅ ตรวจสอบว่า CID นี้ซ้ำใน Blockchain หรือไม่
+    // ✅ ตรวจสอบว่า CID นี้มีอยู่บน Blockchain หรือไม่
     if (certCID) {
         console.log("📌 Checking if certification CID exists on Blockchain...");
         const isDuplicate = await checkUserCertification(certCID);
@@ -153,7 +158,6 @@ export const submitFarmData = async (
         alert("เกิดข้อผิดพลาดขณะอัปเดตข้อมูลฟาร์ม");
     }
 };
-
 
 // ✅ ฟังก์ชันสร้างฟาร์มใหม่
 export const createFarm = async (farmData: any, certificateFile: File | null): Promise<any | null> => {

@@ -8,7 +8,7 @@ export const login = async (email: string, password: string) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
-        credentials: "include", // ✅ สำคัญมาก! ต้องใช้เพื่อให้ Browser รับ-ส่ง Cookies
+        credentials: "include",
     });
 
     const data = await response.json();
@@ -21,11 +21,8 @@ export const login = async (email: string, password: string) => {
 
     console.log("✅ [Login] Success! Redirecting to:", data.role);
 
-    // ✅ เช็คว่า Cookies ถูกเก็บหรือไม่
-    const cookies = document.cookie;
-    console.log("🍪 [Cookies after login]:", cookies);
-
     // ✅ ถ้า `auth_token` ไม่อยู่ใน Cookies ให้แจ้งเตือน
+    const cookies = document.cookie;
     if (!cookies.includes("auth_token")) {
         console.error("❌ [Error]: `auth_token` is missing in cookies.");
         throw new Error("Login successful, but token is missing. Please check backend.");
@@ -36,7 +33,6 @@ export const login = async (email: string, password: string) => {
         redirectUrl: getRedirectUrl(data.role),
     };
 };
-
 
 // ✅ ฟังก์ชัน Logout
 export const logout = async () => {
@@ -50,7 +46,7 @@ export const logout = async () => {
     console.log("✅ [Logout] Success!");
 };
 
-// ✅ ฟังก์ชันดึง Role ของผู้ใช้จาก Cookie
+// ✅ ฟังก์ชันดึง Role ของผู้ใช้จาก Backend
 export const getUserRole = async (): Promise<string | null> => {
     console.log("📡 [GetUserRole] Fetching Role...");
 
@@ -59,7 +55,11 @@ export const getUserRole = async (): Promise<string | null> => {
         credentials: "include",
     });
 
-    if (!response.ok) return null;
+    if (!response.ok) {
+        console.warn("⚠️ [GetUserRole] User role not found.");
+        return null; // ✅ ถ้าไม่มี Role ให้คืนค่า null
+    }
+
     const data = await response.json();
     console.log("✅ [GetUserRole] User Role:", data.role);
 
@@ -79,11 +79,38 @@ export const getRedirectUrl = (userRole: string) => {
             return "/LogisticsDashboard";
         case "retailer":
             return "/RetailerDashboard";
+        case null:
+            return "/select-role"; // ✅ ถ้ายังไม่มี Role ให้เลือก Role ก่อน
         default:
             return "/dashboard"; // ✅ Default
     }
 };
 
+// ✅ อัปเดต Role ของผู้ใช้ (หลังสมัครหรือเปลี่ยน Role)
+export const updateUserRole = async (email: string, role: string, entityID: string) => {
+    try {
+        console.log(`📡 [UpdateUserRole] Updating user role to ${role}...`);
+
+        const response = await fetch(`${API_URL}/update-role`, {
+            method: "PUT",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, role, entityID }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to update user role: ${response.status}`);
+        }
+
+        console.log("✅ [UpdateUserRole] User role updated successfully");
+        return true;
+    } catch (error) {
+        console.error("❌ [ERROR] Updating user role failed:", error);
+        return false;
+    }
+};
+
+// ✅ ฟังก์ชันดึงข้อมูลผู้ใช้จาก Backend
 export const getUserInfo = async (): Promise<{ email: string; password: string } | null> => {
     console.log("📡 [GetUserInfo] Fetching user info...");
 
@@ -103,7 +130,31 @@ export const getUserInfo = async (): Promise<{ email: string; password: string }
     return data;
 };
 
-// ✅ ฟังก์ชันอัปเดตข้อมูลผู้ใช้ (email, password) ไปยัง Backend
+// ✅ ฟังก์ชันสมัครสมาชิก (ล็อกอินอัตโนมัติหลังสมัครเสร็จ)
+export const registerUser = async (username: string, email: string, password: string) => {
+    try {
+        console.log("📡 [Register] Registering user...");
+        
+        const response = await fetch(`${API_URL}/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, email, password }),
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Registration failed");
+
+        console.log("✅ [Register] Success! Logging in automatically...");
+        
+        // ✅ ล็อกอินอัตโนมัติหลังสมัครสมาชิกสำเร็จ
+        return await login(email, password);
+    } catch (error) {
+        console.error("❌ [SignUp] Error:", error);
+        throw new Error(error instanceof Error ? error.message : "Registration failed");
+    }
+};
+
+// ✅ ฟังก์ชันอัปเดตข้อมูลผู้ใช้ (email, password)
 export const updateUserInfo = async (email: string, password: string): Promise<boolean> => {
     console.log("📡 [UpdateUserInfo] Updating user info...");
 
@@ -129,27 +180,8 @@ export const checkEmailAvailability = async (email: string): Promise<boolean> =>
         const response = await fetch(`${API_URL}/check-email?email=${email}`);
         const data = await response.json();
         return data.available;
-    } catch (err) {
-        console.error("❌ [Check Email] Error:", err);
+    } catch (error) {
+        console.error("❌ [Check Email] Error:", error);
         return false;
-    }
-};
-
-// ✅ ฟังก์ชันสมัครสมาชิก
-export const registerUser = async (username: string, email: string, password: string) => {
-    try {
-        const response = await fetch(`${API_URL}/register`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, email, password }),
-        });
-
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || "Registration failed");
-
-        return data;
-    } catch (err) {
-        console.error("❌ [SignUp] Error:", err);
-        throw new Error(err instanceof Error ? err.message : "Registration failed");
     }
 };
