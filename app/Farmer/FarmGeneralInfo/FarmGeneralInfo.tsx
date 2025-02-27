@@ -5,7 +5,7 @@ import { MapProvider } from "@/providers/map-provider";
 import { MapComponent } from "@/components/map";
 import { updateUserRole } from "@/services/authService"; // ✅ ใช้ updateUserRole
 import { getFarmInfo, updateFarmInfo, submitFarmData, createFarm,  } from "@/services/farmService";
-import { getCertificateInfo, uploadAndSetCertificate, deleteCertificate, handleDeleteCertificate } from "@/services/certificateService";
+import { getCertificateInfo, uploadCertificate, deleteCertificate, handleDeleteCertificate } from "@/services/certificateService";
 import { handleFileChange } from "@/services/fileService";
 import { getGeoData, getProvinceList, getDistrictList, getSubDistrictList } from "@/services/geoService";
 
@@ -137,23 +137,26 @@ const FarmGeneralInfo = () => {
 
     // ✅ อัปเดตค่า input
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        if (!farmData) return;
         const { name, value } = e.target;
         setFarmData((prevData: any) => ({
             ...prevData,
             [name]: value,
         }));
     };
+    
 
     // ✅ อัปเดตค่า select
     const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        if (!farmData) return;
         const { name, value } = e.target;
         setFarmData((prevData: any) => ({
             ...prevData,
             [name]: value,
         }));
     };
-
     const handleSaveEditToggle = () => {
+        if (isCreating) return;
         setIsEditable(!isEditable);
     };
 
@@ -166,24 +169,40 @@ const FarmGeneralInfo = () => {
         event.preventDefault();
         try {
             // ✅ 1. ส่งข้อมูลไปที่ API `/create-farm`
-            const newFarm = await createFarm(farmData);
+            const newFarm = await createFarm(farmData, certificateFile); // 🛠 แก้ตรงนี้
+    
             console.log("✅ [Create Farm] Success:", newFarm);
-
+    
             // ✅ 2. อัปเดต Role และ EntityID (farmerID) ในตาราง users
             await updateUserRole(newFarm.email, "farmer", newFarm.farmerID);
             console.log("✅ [Update Role] User role updated to farmer");
-
+    
             // ✅ 3. ปิดโหมด Create → เปลี่ยนเป็นโหมด Edit
             setFarmData(newFarm);
             setIsCreating(false);
             setIsEditable(false);
-
+    
             // ✅ 4. เปลี่ยนไปหน้าหลักของ Farmer
         } catch (error) {
             console.error("❌ Error creating farm:", error);
         }
     };
+    
 
+    const handleUpdateFarm = async (event: React.FormEvent) => {
+        event.preventDefault();
+        try {
+            console.log("📌 Updating farm data...");
+            const updatedFarm = await updateFarmInfo(farmData);
+            console.log("✅ [Update Farm] Success:", updatedFarm);
+    
+            setFarmData(updatedFarm);
+            setIsEditable(false);
+        } catch (error) {
+            console.error("❌ Error updating farm:", error);
+        }
+    };
+    
     return (
         <div className="flex flex-col text-center w-full justify-center items-center h-full pt-20">
             {/* ✅ เปลี่ยนหัวข้อให้รองรับทั้ง Create และ Edit Mode */}
@@ -194,7 +213,6 @@ const FarmGeneralInfo = () => {
             <div className="flex h-full w-11/12 md:w-8/12 p-4 md:p-5 shadow-xl justify-center items-center border rounded-2xl m-2 md:m-5">
                 {/* ✅ ใช้ฟอร์มเดียวกัน */}
                 <form className="flex flex-col gap-4 w-full" onSubmit={isCreating ? handleCreateFarm : handleUpdateFarm}>
-                    <div className="flex flex-col md:flex-row gap-4 md:gap-5 text-start w-full">
 
 {/* Farm Name */}
 <div className="flex flex-col text-start w-full">
@@ -417,7 +435,7 @@ const FarmGeneralInfo = () => {
                     {isEditable && (
                         <button
                             type="button"
-                            onClick={() => handleDeleteCertificate(farmData?.farmerID, setCertificateData)}
+                            onClick={() => handleDeleteCertificate(farmData?.farmerID, cert.event_id, setCertificateData)}
                             className="ml-4 bg-red-500 text-white px-2 py-1 rounded"
                         >
                             Delete
