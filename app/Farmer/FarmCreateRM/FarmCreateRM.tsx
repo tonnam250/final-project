@@ -228,61 +228,6 @@ const FarmCreateRM = () => {
     };
     // end save form Data
 
-    // show map wiht url input
-    const [location, setLocation] = useState<string>(""); // ค่าที่อยู่
-    const [loaded, setLoaded] = useState<boolean>(false); // ✅ เพิ่ม useState ให้ใช้งานได้
-    const mapRef = useRef<HTMLDivElement | null>(null);
-    const [scriptLoaded, setScriptLoaded] = useState<boolean>(false);
-    const [geocodeError, setGeocodeError] = useState<string>("");
-
-    const handleLocationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setLocation(event.target.value);
-    };
-
-    // useEffect(() => {
-    //     if (!window.google) {
-    //         const script = document.createElement("script");
-    //         script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDv2_GeZtaAKIrztx8eAa5NxJoZWwMuEfM&callback=initMap`;
-    //         script.async = true;
-    //         script.defer = true;
-    //         document.head.appendChild(script);
-
-    //         window.initMap = () => {
-    //             setScriptLoaded(true);
-    //         };
-
-    //         return () => {
-    //             document.head.removeChild(script);
-    //         };
-    //     } else {
-    //         setScriptLoaded(true);
-    //     }
-    // }, []);
-
-    // useEffect(() => {
-    //     if (scriptLoaded && mapRef.current && location) {
-    //         const geocoder = new window.google.maps.Geocoder();
-    //         geocoder.geocode({ address: location }, (results, status) => {
-    //             if (status === window.google.maps.GeocoderStatus.OK) {
-    //                 const map = new window.google.maps.Map(mapRef.current, {
-    //                     zoom: 15,
-    //                     center: results[0].geometry.location,
-    //                 });
-
-    //                 new window.google.maps.Marker({
-    //                     position: results[0].geometry.location,
-    //                     map: map,
-    //                     title: location,
-    //                 });
-    //                 setGeocodeError(""); // Clear any previous error
-    //             } else {
-    //                 console.error("Geocoding failed:", status);
-    //                 setGeocodeError("Geocoding failed: No results found for the provided location.");
-    //             }
-    //         });
-    //     }
-    // }, [location, scriptLoaded]); // เรียกใช้เมื่อ location หรือ scriptLoaded เปลี่ยน
-
     return (
         <div className="flex flex-col justify-center items-center w-full min-h-screen">
             {/* Detail Status */}

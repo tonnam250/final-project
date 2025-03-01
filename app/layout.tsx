@@ -18,7 +18,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname().toLowerCase();
 
   let navbar = null;
-  if (pathname === '/' || pathname.startsWith('/signup')) {
+  if (pathname === '/' || pathname.startsWith('/signup') || pathname.startsWith('/tracking')) {
     navbar = <HomeNav />;
   } else if (pathname.startsWith('/farmer')) {
     navbar = <FarmerNavbar />;

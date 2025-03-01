@@ -574,6 +574,7 @@ const Recieving = () => {
                         <button
                             type="submit"
                             className="flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8]"
+                            onClick={() => router.push("/Logistic/Recieving/CheckDetails")}
                         >
                             Next
                         </button>

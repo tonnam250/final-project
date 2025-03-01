@@ -41,7 +41,7 @@ const HomeNav = () => {
   };
 
   return (
-    <div className={`fixed w-full h-24 flex justify-between px-5 items-center text-white text-xl z-50 transition-all duration-300 ${hasScrolled ? "bg-[#3D405B] shadow-md" : "bg-transparent"
+    <div className={`fixed w-full h-24 flex justify-between px-5 items-center text-white text-xl z-50 transition-all duration-300 bg-[#3D405B] shadow-md"
       }`} >
       <div className="flex justify-center items-center gap-4" >
         <a className="flex items-center gap-2">
