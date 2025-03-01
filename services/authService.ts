@@ -21,13 +21,6 @@ export const login = async (email: string, password: string) => {
 
     console.log("✅ [Login] Success! Redirecting to:", data.role);
 
-    // ✅ ถ้า `auth_token` ไม่อยู่ใน Cookies ให้แจ้งเตือน
-    const cookies = document.cookie;
-    if (!cookies.includes("auth_token")) {
-        console.error("❌ [Error]: `auth_token` is missing in cookies.");
-        throw new Error("Login successful, but token is missing. Please check backend.");
-    }
-
     return {
         role: data.role,
         redirectUrl: getRedirectUrl(data.role),
@@ -79,10 +72,8 @@ export const getRedirectUrl = (userRole: string) => {
             return "/LogisticsDashboard";
         case "retailer":
             return "/RetailerDashboard";
-        case null:
-            return "/select-role"; // ✅ ถ้ายังไม่มี Role ให้เลือก Role ก่อน
         default:
-            return "/dashboard"; // ✅ Default
+            return "/register/SelectRole"; // ✅ Default
     }
 };
 

@@ -44,21 +44,55 @@ const FarmGeneralInfo = () => {
         const fetchFarmData = async () => {
             try {
                 const data = await getFarmInfo();
+                console.log("📌 Farm Data:", data); // ✅ ตรวจสอบว่ามีข้อมูลฟาร์มหรือไม่
+    
                 if (data) {
                     setFarmData(data);
                     setSelectedProvince(data.province || "");
+                    setSelectedDistrict(data.district || "");
+                    setSelectedSubDistrict(data.subdistrict || "");
+                    setIsCreating(false);
+                    setIsEditable(false);
                 } else {
-                    setIsCreating(true); // ✅ ถ้ายังไม่มีฟาร์ม ให้เปลี่ยนเป็น Create Mode
+                    console.warn("🚨 No farm found → Switching to Create Mode");
+                    setIsCreating(true);
                     setIsEditable(true);
                 }
             } catch (error) {
-                console.error("Error fetching farm data:", error);
+                console.error("❌ Error fetching farm data:", error);
                 setIsCreating(true);
                 setIsEditable(true);
             }
         };
+    
         fetchFarmData();
     }, []);
+    
+    useEffect(() => {
+        if (isCreating && !farmData) {
+            setFarmData({
+                companyName: "",  // ✅ ใช้ companyName แทน firstName + lastName
+                email: "",
+                telephone: "",
+                address: "",
+                location: "",
+                province: "",
+                district: "",
+                subdistrict: "",
+                country: "",      
+                postCode: "",   
+                lineID: "",       
+                facebook: "",    
+            });
+        }
+    }, [isCreating, farmData]);
+    
+    
+    useEffect(() => {
+        console.log("🔄 Updated isCreating:", isCreating);
+        console.log("🔄 Updated isEditable:", isEditable);
+    }, [isCreating, isEditable]);    
+    
 
     // ✅ ดึงข้อมูลภูมิศาสตร์
     useEffect(() => {
@@ -68,29 +102,6 @@ const FarmGeneralInfo = () => {
             setProvinceList(getProvinceList(data)); // ✅ ใช้ geoService
         };
         fetchGeoData();
-    }, []);
-
-    // ✅ ดึงข้อมูลฟาร์ม
-    useEffect(() => {
-        const fetchFarmData = async () => {
-            try {
-                const data = await getFarmInfo();
-                if (data) {
-                    setFarmData(data);
-                    setSelectedProvince(data.province || "");
-                    setSelectedDistrict(data.district || "");
-                    setSelectedSubDistrict(data.subdistrict || "");
-                } else {
-                    setIsCreating(true); // ✅ ถ้าไม่มีฟาร์ม ให้เปลี่ยนเป็น Create Mode
-                    setIsEditable(true);
-                }
-            } catch (error) {
-                console.error("Error fetching farm data:", error);
-                setIsCreating(true);
-                setIsEditable(true);
-            }
-        };
-        fetchFarmData();
     }, []);
 
     // ✅ ดึงข้อมูลใบเซอร์ของฟาร์ม
@@ -156,9 +167,13 @@ const FarmGeneralInfo = () => {
         }));
     };
     const handleSaveEditToggle = () => {
-        if (isCreating) return;
-        setIsEditable(!isEditable);
+        if (isCreating) {
+            setIsEditable(true); // ✅ ถ้าเป็น Create Mode บังคับให้ `isEditable = true`
+        } else {
+            setIsEditable(!isEditable);
+        }
     };
+    
 
     // ✅ อัปโหลดไฟล์ใบเซอร์
     const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -167,33 +182,82 @@ const FarmGeneralInfo = () => {
 
     const handleCreateFarm = async (event: React.FormEvent) => {
         event.preventDefault();
-        try {
-            // ✅ 1. ส่งข้อมูลไปที่ API `/create-farm`
-            const newFarm = await createFarm(farmData, certificateFile); // 🛠 แก้ตรงนี้
+            // ✅ ตรวจสอบว่า `farmData` อัปเดตครบหรือยัง
+    console.log("📌 [Before CreateFarm] Current farmData:", farmData);
+
+    if (!farmData || !farmData.companyName || !farmData.district || !farmData.province) {
+        alert("⚠️ กรุณากรอกข้อมูลให้ครบก่อนสร้างฟาร์ม!");
+        return;
+    }
+
+    console.log("🚀 [Create Mode] Calling `createFarm()`...");
     
+    
+    
+        try {
+            const payload = {
+                companyName: farmData?.companyName ? farmData.companyName.trim() : "",
+                email: farmData?.email ? farmData.email.trim() : "",
+                address: farmData?.address ? farmData.address.trim() : "",
+                district: farmData?.district ? farmData.district.trim() : "",
+                subdistrict: farmData?.subdistrict ? farmData.subdistrict.trim() : "",
+                province: farmData?.province ? farmData.province.trim() : "",
+                phone: farmData?.telephone ? farmData.telephone.trim() : "",
+                areaCode: farmData?.areaCode ? farmData.areaCode.trim() : "",
+                location_link: farmData?.location ? farmData.location.trim() : "",
+                cert_file: certificateFile || null,
+                country: farmData?.country ? farmData.country.trim() : "",
+                postCode: farmData?.postCode ? farmData.postCode.trim() : "",
+                lineID: farmData?.lineID ? farmData.lineID.trim() : "",
+                facebook: farmData?.facebook ? farmData.facebook.trim() : "",
+            };
+            
+    
+            console.log("📌 [CreateFarm] Sending data:", payload);
+    
+            const newFarm = await createFarm(payload, certificateFile);
             console.log("✅ [Create Farm] Success:", newFarm);
     
-            // ✅ 2. อัปเดต Role และ EntityID (farmerID) ในตาราง users
-            await updateUserRole(newFarm.email, "farmer", newFarm.farmerID);
-            console.log("✅ [Update Role] User role updated to farmer");
+            if (newFarm?.email && newFarm?.farmerID) {
+                await updateUserRole(newFarm.email, "farmer", newFarm.farmerID);
+                console.log("✅ [Update Role] User role updated to farmer");
+            }
     
-            // ✅ 3. ปิดโหมด Create → เปลี่ยนเป็นโหมด Edit
             setFarmData(newFarm);
             setIsCreating(false);
             setIsEditable(false);
-    
-            // ✅ 4. เปลี่ยนไปหน้าหลักของ Farmer
         } catch (error) {
             console.error("❌ Error creating farm:", error);
         }
     };
     
-
+    
     const handleUpdateFarm = async (event: React.FormEvent) => {
         event.preventDefault();
         try {
             console.log("📌 Updating farm data...");
-            const updatedFarm = await updateFarmInfo(farmData);
+    
+            // ✅ เช็คว่าข้อมูลที่ส่งไปมีค่าครบ
+            const payload = {
+                farmName: farmData?.farmName || "",
+                email: farmData?.email || "",
+                address: farmData?.address || "",
+                district: farmData?.district || "",
+                subdistrict: farmData?.subdistrict || "",
+                province: farmData?.province || "",
+                phone: farmData?.telephone || "",
+                areaCode: farmData?.areaCode || "",
+                location_link: farmData?.location || "",
+                cert_file: farmData?.cert_file || "",
+                country: farmData?.country || "",  // ✅ เพิ่ม country
+                postCode: farmData?.postCode || "", // ✅ เพิ่ม postCode
+                lineID: farmData?.lineID || "", // ✅ เพิ่ม lineID
+                facebook: farmData?.facebook || "", // ✅ เพิ่ม facebook
+            };
+    
+            console.log("📌 [UpdateFarm] Sending data:", payload); // ✅ Debug ตรวจสอบค่าก่อนส่ง
+    
+            const updatedFarm = await updateFarmInfo(payload);
             console.log("✅ [Update Farm] Success:", updatedFarm);
     
             setFarmData(updatedFarm);
@@ -202,6 +266,7 @@ const FarmGeneralInfo = () => {
             console.error("❌ Error updating farm:", error);
         }
     };
+    
     
     return (
         <div className="flex flex-col text-center w-full justify-center items-center h-full pt-20">
@@ -223,40 +288,10 @@ const FarmGeneralInfo = () => {
         name="farmName"
         className="border border-gray-300 rounded-md p-2 w-full"
         required
-        disabled={!isCreating ? !isEditable : false} // ✅ ปรับเงื่อนไข
+        disabled={!isCreating && !isEditable}
         value={farmData?.farmName || ""}
         onChange={handleInputChange}
     />
-</div>
-
-{/* First Name & Last Name */}
-<div className="flex flex-col md:flex-row gap-4 md:gap-5 text-start w-full">
-    <div className="flex flex-col text-start w-full md:w-6/12">
-        <label htmlFor="fName" className="font-medium">First Name</label>
-        <input
-            type="text"
-            id="fName"
-            name="firstName"
-            className="border border-gray-300 rounded-md p-2 w-full"
-            required
-            disabled={!isCreating ? !isEditable : false} // ✅ ปรับเงื่อนไข
-            value={farmData?.firstName || ""}
-            onChange={handleInputChange}
-        />
-    </div>
-    <div className="flex flex-col text-start w-full md:w-6/12">
-        <label htmlFor="lName" className="font-medium">Last Name</label>
-        <input
-            type="text"
-            id="lName"
-            name="lastName"
-            className="border border-gray-300 rounded-md p-2 w-full"
-            required
-            disabled={!isCreating ? !isEditable : false} // ✅ ปรับเงื่อนไข
-            value={farmData?.lastName || ""}
-            onChange={handleInputChange}
-        />
-    </div>
 </div>
 
 
@@ -270,7 +305,7 @@ const FarmGeneralInfo = () => {
         className="border border-gray-300 rounded-full p-2"
         placeholder="Example@gmail.com"
         required
-        disabled={!isCreating ? !isEditable : false} // ✅ ปรับเงื่อนไข
+        disabled={!isCreating && !isEditable}
         value={farmData?.email || ""}
         onChange={handleInputChange}
     />
@@ -289,7 +324,7 @@ const FarmGeneralInfo = () => {
                 id="areaCode"
                 className="border border-gray-300 rounded-md p-2 w-full md:w-20 text-center"
                 required
-                disabled={!isCreating ? !isEditable : false} // ✅ ปรับเงื่อนไข
+                disabled={!isCreating && !isEditable}
                 value={farmData?.areaCode || "+66"}
                 onChange={handleSelectChange}
             >
@@ -306,7 +341,7 @@ const FarmGeneralInfo = () => {
             className="border border-gray-300 rounded-md p-2 flex-1 w-full"
             placeholder="Enter farm phone number"
             required
-            disabled={!isCreating ? !isEditable : false} // ✅ ปรับเงื่อนไข
+            disabled={!isCreating && !isEditable}
             value={farmData?.telephone || ""}
             onChange={handleInputChange}
         />
@@ -322,7 +357,7 @@ const FarmGeneralInfo = () => {
         className="border border-gray-300 rounded-md p-2 flex-1 w-full"
         placeholder="Enter farm address"
         required
-        disabled={!isCreating ? !isEditable : false} // ✅ ปรับเงื่อนไข
+        disabled={!isCreating && !isEditable}
         value={farmData?.address || ""}
         onChange={handleInputChange}
     ></textarea>
@@ -338,8 +373,8 @@ const FarmGeneralInfo = () => {
         className="border border-gray-300 rounded-md p-2 text-center"
         value={selectedProvince}
         onChange={(e) => setSelectedProvince(e.target.value)}
-        disabled={!isCreating ? !isEditable : false} // ✅ ปรับเงื่อนไข
-    >
+        disabled={!isCreating && !isEditable}
+        >
         <option value="">Select province</option>
         {provinceList.map((prov, index) => (
             <option key={index} value={prov}>
@@ -361,7 +396,9 @@ const FarmGeneralInfo = () => {
             className="border border-gray-300 rounded-md p-2 text-center"
             value={selectedDistrict}
             onChange={(e) => setSelectedDistrict(e.target.value)}
-            disabled={!selectedProvince || (!isCreating && !isEditable)} // ✅ เงื่อนไขใหม่
+            disabled={!selectedProvince || !isCreating && !isEditable}
+ 
+            // ✅ เงื่อนไขใหม่
         >
             <option value="">Select district</option>
             {districtList.map((dist, index) => (
@@ -381,7 +418,9 @@ const FarmGeneralInfo = () => {
             className="border border-gray-300 rounded-md p-2 text-center"
             value={selectedSubDistrict}
             onChange={(e) => setSelectedSubDistrict(e.target.value)}
-            disabled={!selectedDistrict || (!isCreating && !isEditable)} // ✅ เงื่อนไขใหม่
+            disabled={!selectedDistrict ||!isCreating && !isEditable}
+
+            // ✅ เงื่อนไขใหม่
         >
             <option value="">Select sub-district</option>
             {subDistrictList.map((subDist, index) => (
@@ -411,8 +450,8 @@ const FarmGeneralInfo = () => {
         type="file"
         className="hidden"
         onChange={handleFileUpload}
-        disabled={!isCreating && !isEditable} // ✅ เงื่อนไขใหม่
-    />
+        disabled={!isCreating && !isEditable}
+        />
 </div>
 
 {/* ✅ แสดงข้อมูลใบเซอร์ (Certificate) เฉพาะใน Edit Mode ✅ */}
@@ -458,7 +497,7 @@ const FarmGeneralInfo = () => {
         id="location"
         className="border border-gray-300 rounded-full p-2 flex-1 w-full"
         placeholder="Enter a location"
-        disabled={!isEditable || isCreating} // ❗ ปิดการแก้ไขในโหมด Create
+        disabled={!isCreating && !isEditable}
         value={farmData?.location || ""}
         onChange={handleInputChange} // ✅ เพิ่ม onChange เพื่ออัปเดตค่า
     />
@@ -470,29 +509,16 @@ const FarmGeneralInfo = () => {
     className="flex items-center justify-center text-md md:text-xl bg-[#abc32f] w-full md:w-1/6 rounded-full p-2 px-3 text-white self-center"
     onClick={async (event) => {
         event.preventDefault(); // ✅ ป้องกันการ reload หน้าเว็บ
-
         if (isCreating) {
-            // ✅ กรณี Create Mode → ส่ง API ไปสร้างฟาร์ม
-            await submitFarmData(
-                farmData,
-                certificateFile,
-                certificateData,
-                selectedDistrict,
-                selectedSubDistrict,
-                selectedProvince,
-                setFarmData,
-                setCertificateData,
-                setCertificateFile,
-                setFileNames
-            );
+            await handleCreateFarm(event); // ✅ เรียกฟังก์ชันสร้างฟาร์มโดยตรง
         } else if (isEditable) {
-            // ✅ กรณี Edit Mode → ส่ง API ไปอัปเดตฟาร์ม
-            await updateFarmInfo(farmData);
-            setIsEditable(false); // ปิด Edit Mode
+            await handleUpdateFarm(event); // ✅ เรียกฟังก์ชันอัปเดตฟาร์มโดยตรง
+            setIsEditable(false);
         } else {
-            handleSaveEditToggle(); // ✅ เปลี่ยนเป็น Edit Mode
+            handleSaveEditToggle();
         }
     }}
+    
 >
     {isCreating ? "Create Farm" : isEditable ? "Save" : "Edit"}
     {isCreating ? (
