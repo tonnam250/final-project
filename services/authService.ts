@@ -73,7 +73,7 @@ export const getRedirectUrl = (userRole: string) => {
         case "retailer":
             return "/RetailerDashboard";
         default:
-            return "/register/SelectRole"; // ✅ Default
+            return "/SignUp/SelectRole"; // ✅ Default
     }
 };
 
@@ -122,10 +122,10 @@ export const getUserInfo = async (): Promise<{ email: string; password: string }
 };
 
 // ✅ ฟังก์ชันสมัครสมาชิก (ล็อกอินอัตโนมัติหลังสมัครเสร็จ)
-export const registerUser = async (username: string, email: string, password: string) => {
+export const registerUser = async (username: string, email: string, password: string, router: any) => {
     try {
         console.log("📡 [Register] Registering user...");
-        
+
         const response = await fetch(`${API_URL}/register`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -137,13 +137,22 @@ export const registerUser = async (username: string, email: string, password: st
 
         console.log("✅ [Register] Success! Logging in automatically...");
         
-        // ✅ ล็อกอินอัตโนมัติหลังสมัครสมาชิกสำเร็จ
-        return await login(email, password);
+        // ✅ ล็อกอินอัตโนมัติ
+        await login(email, password);
+
+        // ✅ Reload หน้าเพื่อดึงโทเค็นจากคุกกี้
+        console.log("🔄 [Register] Reloading page to apply token...");
+        router.refresh();
+
+        // ✅ พาไปหน้าเลือก Role
+        router.push("/SignUp/SelectRole");
     } catch (error) {
         console.error("❌ [SignUp] Error:", error);
         throw new Error(error instanceof Error ? error.message : "Registration failed");
     }
 };
+
+
 
 // ✅ ฟังก์ชันอัปเดตข้อมูลผู้ใช้ (email, password)
 export const updateUserInfo = async (email: string, password: string): Promise<boolean> => {

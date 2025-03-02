@@ -31,10 +31,8 @@ const SignUp = () => {
         }
 
         try {
-            const data = await registerUser(fullName, email, password);
-            console.log("✅ [SignUp] Success:", data);
-            router.push("/SignUp/SelectRole");
-        } catch (err) {
+            await registerUser(fullName, email, password, router); // ✅ ส่ง router ไปด้วย
+        } catch (err: any) {
             setError(err.message);
         }
     };

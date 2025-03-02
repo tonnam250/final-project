@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { MapProvider } from "@/providers/map-provider";
 import { MapComponent } from "@/components/map";
 import { updateUserRole } from "@/services/authService"; // ✅ ใช้ updateUserRole
-import { getFarmInfo, updateFarmInfo, submitFarmData, createFarm,  } from "@/services/farmService";
-import { getCertificateInfo, uploadCertificate, deleteCertificate, handleDeleteCertificate } from "@/services/certificateService";
+import { getFarmInfo, updateFarmInfo, createFarm,  } from "@/services/farmService";
+import { getUserCertifications, uploadCertificateAndCheck,handleDeleteCertificate } from "@/services/certificateService";
 import { handleFileChange } from "@/services/fileService";
 import { getGeoData, getProvinceList, getDistrictList, getSubDistrictList } from "@/services/geoService";
 
@@ -64,28 +64,18 @@ const FarmGeneralInfo = () => {
                 setIsEditable(true);
             }
         };
+        const fetchCertificates = async () => {
+            try {
+                const data = await getUserCertifications();
+                setCertificateData(data);
+            } catch (error) {
+                console.error("❌ Error fetching certification data:", error);
+            }
+        };
     
         fetchFarmData();
+        fetchCertificates();
     }, []);
-    
-    useEffect(() => {
-        if (isCreating && !farmData) {
-            setFarmData({
-                companyName: "",  // ✅ ใช้ companyName แทน firstName + lastName
-                email: "",
-                telephone: "",
-                address: "",
-                location: "",
-                province: "",
-                district: "",
-                subdistrict: "",
-                country: "",      
-                postCode: "",   
-                lineID: "",       
-                facebook: "",    
-            });
-        }
-    }, [isCreating, farmData]);
     
     
     useEffect(() => {
@@ -109,7 +99,7 @@ const FarmGeneralInfo = () => {
         if (!farmData) return;
         const fetchCertificate = async () => {
             try {
-                const cert = await getCertificateInfo(farmData.farmerID);
+                const cert = await getUserCertifications(farmData.farmerID);
                 setCertificateData(cert || null);
                 
             } catch (error) {
@@ -150,84 +140,133 @@ const FarmGeneralInfo = () => {
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         if (!farmData) return;
         const { name, value } = e.target;
-        setFarmData((prevData: any) => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
     
+        setFarmData((prevData: any) => {
+            const updatedData = {
+                ...prevData,
+                [name]: value.trim(), // ✅ Trim ค่าเสมอ
+            };
+            console.log("📌 Updated farmData:", updatedData);
+            return updatedData;
+        });
+    };
 
-    // ✅ อัปเดตค่า select
     const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         if (!farmData) return;
         const { name, value } = e.target;
+    
+        setFarmData((prevData: any) => {
+            const updatedData = {
+                ...prevData,
+                [name]: value,
+            };
+    
+            console.log("📌 Updated farmData (Select):", updatedData);
+            return updatedData;
+        });
+    
+        // ✅ ถ้าเลือก Area Code ให้บันทึกลง `farmData.areaCode`
+        if (name === "areaCode") {
+            setFarmData((prevData: any) => ({
+                ...prevData,
+                areaCode: value,
+            }));
+        }
+    };
+    
+
+    useEffect(() => {
+        if (!farmData) return;
+    
         setFarmData((prevData: any) => ({
             ...prevData,
-            [name]: value,
+            province: selectedProvince || "",  // ✅ บันทึกลง `farmData`
+            district: selectedDistrict || "",
+            subdistrict: selectedSubDistrict || "",
         }));
+    
+        console.log("📌 Updated farmData (Province/District/Sub-District):", {
+            province: selectedProvince,
+            district: selectedDistrict,
+            subdistrict: selectedSubDistrict,
+        });
+    }, [selectedProvince, selectedDistrict, selectedSubDistrict]);
+
+    const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+    
+        if (!file) return;
+    
+        console.log("📌 Selected file:", file.name);
+        setFileNames([file.name]);
+        setCertificateFile(file);
+    
+        // ✅ อัปโหลดและตรวจสอบใบเซอร์
+        const certCID = await uploadCertificateAndCheck(file);
+        if (!certCID) {
+            console.error("🚨 Certificate already used. Please upload a new one.");
+            alert("❌ ใบเซอร์นี้ถูกใช้ไปแล้ว กรุณาใช้ใบเซอร์ใหม่");
+            setFileNames(["No file selected."]);
+            setCertificateFile(null);
+            return;
+        }
+    
+        console.log("✅ Certificate uploaded successfully, CID:", certCID);
     };
+    
+    const handleCreateFarm = async (event: React.FormEvent) => {
+        event.preventDefault();
+    
+        if (!farmData) {
+            console.error("🚨 FarmData is missing");
+            return;
+        }
+    
+        if (!certificateFile) {
+            alert("❌ กรุณาอัปโหลดใบเซอร์ก่อนสร้างฟาร์ม");
+            return;
+        }
+    
+        console.log("📌 Uploading certificate...");
+        const certCID = await uploadCertificateAndCheck(certificateFile);
+        if (!certCID) {
+            console.error("🚨 Certificate check failed. Cannot create farm.");
+            return;
+        }
+    
+        // ✅ ตรวจสอบค่า `subDistrict`, `areaCode`, `phone` ให้แน่ใจว่าไม่เป็น `undefined`
+        const cleanFarmData = {
+            farmName: farmData.farmName || "",
+            email: farmData.email || "",
+            address: farmData.address || "",
+            district: farmData.district || "",
+            subdistrict: farmData.subdistrict || "", // ✅ แก้ `undefined` เป็น `""`
+            province: farmData.province || "",
+            phone: farmData.telephone || "", // ✅ แก้ `undefined` เป็น `""`
+            areaCode: farmData.areaCode || "", // ✅ แก้ `undefined` เป็น `""`
+            location: farmData.location || "",
+            certCID: certCID, // ✅ ใส่ certCID ที่ได้จาก IPFS
+        };
+    
+        console.log("📌 Creating farm with cleaned data:", cleanFarmData);
+    
+        const response = await createFarm(cleanFarmData);
+        if (!response) {
+            console.error("🚨 Failed to create farm.");
+            return;
+        }
+    
+        console.log("✅ Farm created successfully:", response);
+        setIsCreating(false);
+        setIsEditable(false);
+    };
+    
+
     const handleSaveEditToggle = () => {
         if (isCreating) {
             setIsEditable(true); // ✅ ถ้าเป็น Create Mode บังคับให้ `isEditable = true`
         } else {
             setIsEditable(!isEditable);
-        }
-    };
-    
-
-    // ✅ อัปโหลดไฟล์ใบเซอร์
-    const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        await handleFileChange(event, setFileNames, setCertificateFile);
-    };
-
-    const handleCreateFarm = async (event: React.FormEvent) => {
-        event.preventDefault();
-            // ✅ ตรวจสอบว่า `farmData` อัปเดตครบหรือยัง
-    console.log("📌 [Before CreateFarm] Current farmData:", farmData);
-
-    if (!farmData || !farmData.companyName || !farmData.district || !farmData.province) {
-        alert("⚠️ กรุณากรอกข้อมูลให้ครบก่อนสร้างฟาร์ม!");
-        return;
-    }
-
-    console.log("🚀 [Create Mode] Calling `createFarm()`...");
-    
-    
-    
-        try {
-            const payload = {
-                companyName: farmData?.companyName ? farmData.companyName.trim() : "",
-                email: farmData?.email ? farmData.email.trim() : "",
-                address: farmData?.address ? farmData.address.trim() : "",
-                district: farmData?.district ? farmData.district.trim() : "",
-                subdistrict: farmData?.subdistrict ? farmData.subdistrict.trim() : "",
-                province: farmData?.province ? farmData.province.trim() : "",
-                phone: farmData?.telephone ? farmData.telephone.trim() : "",
-                areaCode: farmData?.areaCode ? farmData.areaCode.trim() : "",
-                location_link: farmData?.location ? farmData.location.trim() : "",
-                cert_file: certificateFile || null,
-                country: farmData?.country ? farmData.country.trim() : "",
-                postCode: farmData?.postCode ? farmData.postCode.trim() : "",
-                lineID: farmData?.lineID ? farmData.lineID.trim() : "",
-                facebook: farmData?.facebook ? farmData.facebook.trim() : "",
-            };
-            
-    
-            console.log("📌 [CreateFarm] Sending data:", payload);
-    
-            const newFarm = await createFarm(payload, certificateFile);
-            console.log("✅ [Create Farm] Success:", newFarm);
-    
-            if (newFarm?.email && newFarm?.farmerID) {
-                await updateUserRole(newFarm.email, "farmer", newFarm.farmerID);
-                console.log("✅ [Update Role] User role updated to farmer");
-            }
-    
-            setFarmData(newFarm);
-            setIsCreating(false);
-            setIsEditable(false);
-        } catch (error) {
-            console.error("❌ Error creating farm:", error);
         }
     };
     

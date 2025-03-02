@@ -2,28 +2,20 @@ import axios from "axios";
 
 const API_BASE_URL = "http://127.0.0.1:8080/api/v1/certifications";
 
-// ✅ ดึงข้อมูลใบเซอร์ของฟาร์ม (แก้ไข endpoint ให้ใช้ entityID)
-export const getCertificateInfo = async (entityID: string) => {
+// ✅ ดึงใบเซอร์ของฟาร์มของผู้ใช้ที่ล็อกอินอยู่
+export const getUserCertifications = async (includeExpired: boolean = false) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/entity/${entityID}`, {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
+        const response = await axios.get(`${API_BASE_URL}/me`, {
+            params: { includeExpired }, // ✅ ใช้ Query Param เพื่อเลือกดูเฉพาะ Active หรือทั้งหมด
+            withCredentials: true, // ✅ ส่ง Cookie/JWT เพื่อยืนยันตัวตน
         });
-
-        if (!response.ok) {
-            throw new Error(`Failed to fetch certificate info: ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log("📌 [Frontend] Retrieved Certificate Data:", data);
-
-        return Array.isArray(data) && data.length > 0 ? data : [];
-    } catch (error) {
-        console.error("❌ Error fetching certificate:", error);
-        return [];
+        return response.data.certifications; // ✅ ส่งข้อมูลใบเซอร์กลับไป
+    } catch (error: any) {
+        console.error("❌ Error fetching user certifications:", error.response?.data || error.message);
+        throw error;
     }
 };
+
 
 // ✅ อัปโหลดไฟล์ใบเซอร์ไป IPFS และคืนค่า CID
 export const uploadCertificate = async (file: File): Promise<string | null> => {
@@ -47,71 +39,45 @@ export const uploadCertificate = async (file: File): Promise<string | null> => {
     }
 };
 
-// ✅ ตรวจสอบว่า CID มีอยู่ใน Blockchain หรือไม่
-export const checkUserCertification = async (certCID: string): Promise<boolean> => {
+export const uploadCertificateAndCheck = async (certificateFile: File): Promise<string | null> => {
     try {
-        const response = await axios.get(`${API_BASE_URL}/check/${certCID}`);
-        console.log("📌 Certification Check Response:", response.data);
-        return response.data.exists;
-    } catch (error: any) {
-        console.error("❌ [ERROR] Checking certificate CID:", error.response?.data || error.message);
-        return false;
-    }
-};
+        console.log("📌 Uploading certificate file:", certificateFile.name);
+        const uploadResult = await uploadCertificate(certificateFile);
 
-// ✅ ตรวจสอบว่ามีใบเซอร์อยู่แล้วหรือไม่ (ใช้ entityID)
-const getExistingCertification = async (entityID: string) => {
-    try {
-        const response = await axios.get(`${API_BASE_URL}/entity/${entityID}`);
-        console.log("📌 [Check Certification] Existing Certificate Data:", response.data);
-        return response.data.length > 0 ? response.data[0] : null; // ✅ คืนค่าใบเซอร์ล่าสุดถ้ามี
-    } catch (error: any) {
-        console.error("❌ [ERROR] Checking existing certification:", error.response?.data || error.message);
-        return null;
-    }
-};
-
-// ✅ สร้างหรืออัปเดตใบเซอร์ (จัดการใบเซอร์ที่หมดอายุ)
-export const createOrUpdateCertificate = async (payload: {
-    entityType: string;
-    entityID: string;
-    certificationCID: string;
-    issuedDate: string;
-    expiryDate: string;
-}) => {
-    try {
-        if (!payload.entityID || !payload.certificationCID) {
-            throw new Error("Missing required fields for certification update");
+        if (!uploadResult) {
+            throw new Error("❌ อัปโหลดใบเซอร์ไม่สำเร็จ");
         }
 
-        console.log("📌 Checking if CID exists before storing...");
-        const isDuplicate = await checkUserCertification(payload.certificationCID);
-        if (isDuplicate) {
-            console.warn("⚠️ Certificate CID already exists on Blockchain");
+        console.log("📌 Received CID from IPFS:", uploadResult);
+
+        // ✅ ตรวจสอบ `certCID` ซ้ำทันทีหลังจากอัปโหลด
+        const certCheckResponse = await fetch(`${API_BASE_URL}/check/${uploadResult}`, {
+            method: "GET",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+        });
+
+        if (!certCheckResponse.ok) {
+            throw new Error("❌ ตรวจสอบใบเซอร์ล้มเหลว");
+        }
+
+        const certCheckData = await certCheckResponse.json();
+        console.log("📌 Cert Check Result:", certCheckData);
+
+        if (certCheckData.exists) {
+            console.error("🚨 ใบเซอร์นี้เคยถูกใช้แล้ว → ไม่อนุญาตให้อัปโหลดใหม่");
+            alert("❌ ใบเซอร์นี้ถูกใช้ไปแล้ว กรุณาใช้ใบเซอร์ใหม่");
             return null;
         }
 
-        console.log("📌 Checking if Entity already has a Certification...");
-        const existingCert = await getExistingCertification(payload.entityID);
-
-        if (existingCert) {
-            console.log("🔄 Existing Certificate found. Updating instead...");
-            const updatePayload = { ...existingCert, certificationCID: payload.certificationCID };
-            const updateResponse = await axios.put(`${API_BASE_URL}/update`, updatePayload);
-            console.log("✅ Certification updated successfully:", updateResponse.data);
-            return updateResponse.data;
-        }
-
-        // ✅ ถ้ายังไม่มี → สร้างใหม่
-        console.log("📌 No existing certificate. Creating a new one...");
-        const response = await axios.post(`${API_BASE_URL}/create`, payload);
-        console.log("✅ Certification created:", response.data);
-        return response.data;
-    } catch (error: any) {
-        console.error("❌ [ERROR] Creating/updating certification:", error.response?.data || error.message);
+        return uploadResult; // ✅ ส่ง `certCID` กลับไปใช้ต่อ
+    } catch (error) {
+        console.error("❌ [ERROR] Upload & Check Certificate Failed:", error);
+        alert("❌ อัปโหลดใบเซอร์ล้มเหลว หรือใบเซอร์นี้เคยถูกใช้แล้ว");
         return null;
     }
 };
+
 
 // ✅ ลบใบเซอร์ (Soft Delete)
 export const deleteCertificate = async (entityID: string, eventID: string) => {
