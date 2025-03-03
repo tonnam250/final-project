@@ -6,15 +6,57 @@ const API_BASE_URL = "http://127.0.0.1:8080/api/v1/certifications";
 export const getUserCertifications = async (includeExpired: boolean = false) => {
     try {
         const response = await axios.get(`${API_BASE_URL}/me`, {
-            params: { includeExpired }, // ✅ ใช้ Query Param เพื่อเลือกดูเฉพาะ Active หรือทั้งหมด
-            withCredentials: true, // ✅ ส่ง Cookie/JWT เพื่อยืนยันตัวตน
+            params: { includeExpired }, 
+            withCredentials: true, 
         });
-        return response.data.certifications; // ✅ ส่งข้อมูลใบเซอร์กลับไป
+
+        console.log("📌 [DEBUG] Fetched Certifications:", response.data.certifications);
+        return response.data.certifications; 
     } catch (error: any) {
         console.error("❌ Error fetching user certifications:", error.response?.data || error.message);
         throw error;
     }
 };
+
+export const storeCertification = async (certCID: string) => {
+    console.log("📡 [StoreCertification] Storing certificate on Blockchain...");
+    console.log("📌 [DEBUG] certCID:", certCID); // ✅ ตรวจสอบ certCID
+
+    if (!certCID) {
+        console.error("🚨 [ERROR] certCID is missing!");
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/store`, { 
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include", 
+            body: JSON.stringify({ certCID }),
+        });
+
+        console.log("📌 [DEBUG] storeCertification API Response Status:", response.status);
+
+        if (!response.ok) {
+            try {
+                const errorData = await response.json();
+                console.error("❌ [StoreCertification] Failed:", errorData.error);
+                throw new Error(errorData.error || "Failed to store certification");
+            } catch (err) {
+                console.error("❌ [StoreCertification] Failed - Response is not JSON", response.statusText);
+                throw new Error(`Failed to store certification: ${response.statusText}`);
+            }
+        }
+
+        const data = await response.json();
+        console.log("✅ [StoreCertification] Stored successfully. TX Hash:", data.blockchain_tx);
+        return data;
+    } catch (error) {
+        console.error("❌ [ERROR] storeCertification Request Failed:", error);
+        throw error;
+    }
+};
+
 
 
 // ✅ อัปโหลดไฟล์ใบเซอร์ไป IPFS และคืนค่า CID
@@ -79,13 +121,13 @@ export const uploadCertificateAndCheck = async (certificateFile: File): Promise<
 };
 
 
-// ✅ ลบใบเซอร์ (Soft Delete)
-export const deleteCertificate = async (entityID: string, eventID: string) => {
+export const deleteCertificate = async (eventID: string) => {
     try {
-        if (!entityID || !eventID) throw new Error("Entity ID and Event ID are required for deleting certificate");
+        if (!eventID) throw new Error("Event ID is required for deleting certificate");
 
-        const response = await axios.delete(`${API_BASE_URL}/${entityID}`, {
-            data: { event_id: eventID }, // ✅ ส่ง eventID ผ่าน JSON Body
+        const response = await axios.delete(`${API_BASE_URL}/`, { // ✅ ใช้ `/` ตาม API ใหม่
+            params: { eventID }, // ✅ ส่ง eventID ผ่าน Query Params
+            withCredentials: true, // ✅ ส่ง Cookie/JWT เพื่อให้ backend ดึง entityID เอง
         });
 
         console.log("✅ Certification deleted:", response.data);
@@ -96,27 +138,44 @@ export const deleteCertificate = async (entityID: string, eventID: string) => {
     }
 };
 
+
 export const handleDeleteCertificate = async (
-    entityID: string,
     eventID: string,
+    setCertificatesToDelete: React.Dispatch<React.SetStateAction<string[]>>,
     setCertificateData: React.Dispatch<React.SetStateAction<any[]>>
 ) => {
-    const confirmDelete = window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบใบเซอร์นี้?");
+    if (!eventID) {
+        console.error("🚨 [ERROR] Missing eventID for deletion", eventID);
+        return;
+    }
+
+    // ✅ ยืนยันก่อนลบ
+    const confirmDelete = window.confirm("⚠️ คุณแน่ใจหรือไม่ว่าต้องการลบใบเซอร์นี้?");
     if (!confirmDelete) return;
 
-    console.log("📌 [DEBUG] Deleting certificate with Event ID:", eventID);
+    console.log("📌 [DEBUG] Marking certificate for deletion. Event ID:", eventID);
 
-    const result = await deleteCertificate(entityID, eventID);
-    if (result) {
-        setCertificateData((prevData = []) => {
-            console.log("📌 [DEBUG] Current Certificate Data Before Delete:", prevData);
-            const updatedData = prevData.filter((cert) => cert.event_id !== eventID);
-            console.log("📌 [DEBUG] Updated Certificate Data After Delete:", updatedData);
-            return updatedData;
-        });
-        alert("✅ ใบเซอร์ถูกลบเรียบร้อยแล้ว");
-    } else {
-        alert("❌ ลบใบเซอร์ไม่สำเร็จ");
-    }
+    // ✅ อัปเดตรายการใบเซอร์ที่ต้องลบ
+    setCertificatesToDelete((prev) => {
+        const updatedList = [...prev, eventID];
+        console.log("📌 [DEBUG] Updated certificatesToDelete List:", updatedList);
+        return updatedList;
+    });
+
+    // ✅ ซ่อนใบเซอร์ที่ถูกลบออกจาก UI ชั่วคราว
+    setCertificateData((prev) => {
+        const updatedData = prev.filter((cert) => cert.EventID !== eventID);
+        console.log("📌 [DEBUG] Certificate list after delete:", updatedData);
+        return updatedData;
+    });
 };
+
+
+
+
+
+
+
+
+
 

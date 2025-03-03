@@ -5,7 +5,7 @@ import { MapProvider } from "@/providers/map-provider";
 import { MapComponent } from "@/components/map";
 import { updateUserRole } from "@/services/authService"; // ✅ ใช้ updateUserRole
 import { getFarmInfo, updateFarmInfo, createFarm,  } from "@/services/farmService";
-import { getUserCertifications, uploadCertificateAndCheck,handleDeleteCertificate } from "@/services/certificateService";
+import { getUserCertifications, uploadCertificateAndCheck,handleDeleteCertificate, deleteCertificate, storeCertification} from "@/services/certificateService";
 import { handleFileChange } from "@/services/fileService";
 import { getGeoData, getProvinceList, getDistrictList, getSubDistrictList } from "@/services/geoService";
 
@@ -24,11 +24,11 @@ interface GeoData {
 }
 
 const FarmGeneralInfo = () => {
-    const [farmData, setFarmData] = useState<any>(null);
+    const [farmData, setFarmData] = useState<any>({});
     const [isEditable, setIsEditable] = useState<boolean>(false);
     const [fileNames, setFileNames] = useState<string[]>(["No file selected."]);
     const [certificateFile, setCertificateFile] = useState<File | null>(null);
-    const [certificateData, setCertificateData] = useState<any | null>(null);
+    const [certificateData, setCertificateData] = useState<any[]>([]);
     const [geoData, setGeoData] = useState<GeoData[]>([]);
     const [provinceList, setProvinceList] = useState<string[]>([]);
     const [districtList, setDistrictList] = useState<string[]>([]);
@@ -37,6 +37,10 @@ const FarmGeneralInfo = () => {
     const [selectedDistrict, setSelectedDistrict] = useState<string>("");
     const [selectedSubDistrict, setSelectedSubDistrict] = useState<string>("");
     const [isCreating, setIsCreating] = useState<boolean>(false);
+    const [certificatesToDelete, setCertificatesToDelete] = useState<string[]>([]);
+
+
+
 
 
     // ✅ ตรวจสอบว่าผู้ใช้มีฟาร์มหรือยัง
@@ -81,9 +85,9 @@ const FarmGeneralInfo = () => {
     useEffect(() => {
         console.log("🔄 Updated isCreating:", isCreating);
         console.log("🔄 Updated isEditable:", isEditable);
+        console.log("🛠 DEBUG → farmData:", farmData);
     }, [isCreating, isEditable]);    
     
-
     // ✅ ดึงข้อมูลภูมิศาสตร์
     useEffect(() => {
         const fetchGeoData = async () => {
@@ -96,19 +100,20 @@ const FarmGeneralInfo = () => {
 
     // ✅ ดึงข้อมูลใบเซอร์ของฟาร์ม
     useEffect(() => {
-        if (!farmData) return;
+        if (!farmData || !farmData.farmerID) return;
         const fetchCertificate = async () => {
             try {
-                const cert = await getUserCertifications(farmData.farmerID);
-                setCertificateData(cert || null);
-                
+                const cert = await getUserCertifications();
+                console.log("📌 [DEBUG] Loaded Certificates:", cert);
+                setCertificateData(cert || []);
             } catch (error) {
-                console.error("Error fetching certificate:", error);
-                setCertificateData(null);
+                console.error("❌ Error fetching certificate:", error);
+                setCertificateData([]);
             }
         };
         fetchCertificate();
     }, [farmData]);
+    
 
     // ✅ ดึง Districts เมื่อ Province เปลี่ยน
     useEffect(() => {
@@ -142,13 +147,13 @@ const FarmGeneralInfo = () => {
         const { name, value } = e.target;
     
         setFarmData((prevData: any) => {
-            const updatedData = {
+            if (!prevData) prevData = {};
+            return {
                 ...prevData,
-                [name]: value.trim(), // ✅ Trim ค่าเสมอ
+                [e.target.name]: e.target.value.trim(),
             };
-            console.log("📌 Updated farmData:", updatedData);
-            return updatedData;
         });
+        
     };
 
     const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -261,6 +266,7 @@ const FarmGeneralInfo = () => {
         setIsEditable(false);
     };
     
+    
 
     const handleSaveEditToggle = () => {
         if (isCreating) {
@@ -273,40 +279,91 @@ const FarmGeneralInfo = () => {
     
     const handleUpdateFarm = async (event: React.FormEvent) => {
         event.preventDefault();
+        let farmUpdateSuccess = false;
+        let certTxHash: string | null = null;
+    
         try {
             console.log("📌 Updating farm data...");
-    
-            // ✅ เช็คว่าข้อมูลที่ส่งไปมีค่าครบ
             const payload = {
                 farmName: farmData?.farmName || "",
-                email: farmData?.email || "",
                 address: farmData?.address || "",
                 district: farmData?.district || "",
                 subdistrict: farmData?.subdistrict || "",
                 province: farmData?.province || "",
-                phone: farmData?.telephone || "",
+                postCode: farmData?.postCode || "",
+                telephone: farmData?.telephone || "",
                 areaCode: farmData?.areaCode || "",
                 location_link: farmData?.location || "",
-                cert_file: farmData?.cert_file || "",
-                country: farmData?.country || "",  // ✅ เพิ่ม country
-                postCode: farmData?.postCode || "", // ✅ เพิ่ม postCode
-                lineID: farmData?.lineID || "", // ✅ เพิ่ม lineID
-                facebook: farmData?.facebook || "", // ✅ เพิ่ม facebook
             };
     
-            console.log("📌 [UpdateFarm] Sending data:", payload); // ✅ Debug ตรวจสอบค่าก่อนส่ง
+            console.log("📌 [UpdateFarm] Sending data:", payload);
+            await updateFarmInfo(payload);
+            farmUpdateSuccess = true;
+            console.log("✅ [Update Farm] Success");
     
-            const updatedFarm = await updateFarmInfo(payload);
-            console.log("✅ [Update Farm] Success:", updatedFarm);
-    
-            setFarmData(updatedFarm);
-            setIsEditable(false);
         } catch (error) {
             console.error("❌ Error updating farm:", error);
         }
+    
+        // ✅ อัปเดตใบเซอร์บน Blockchain (เฉพาะใบเซอร์ที่อัปโหลดใหม่)
+        if (certificateFile) {
+            console.log("📌 Uploading new certificate...");
+            const certCID = await uploadCertificateAndCheck(certificateFile);
+            console.log("📌 [DEBUG] certCID received from IPFS:", certCID);
+    
+            if (!certCID) {
+                console.error("🚨 Certificate check failed. Cannot update certification.");
+            } else {
+                console.log("📌 Storing new certification on Blockchain...");
+                try {
+                    certTxHash = await storeCertification(certCID);
+                    console.log("✅ Certification stored successfully:", certTxHash);
+                } catch (error) {
+                    console.error("❌ [ERROR] Failed to store certification on blockchain:", error);
+                }
+            }
+        }
+    
+        // ✅ ลบใบเซอร์จาก Blockchain (ถ้ามีรายการรอลบ)
+        if (certificatesToDelete.length > 0) {
+            console.log(`📌 Deleting ${certificatesToDelete.length} Certificates from Blockchain...`);
+    
+            await Promise.all(
+                certificatesToDelete.map(async (eventID) => {
+                    if (!eventID) {
+                        console.warn("🚨 [WARNING] Skipping deletion because eventID is missing!");
+                        return;
+                    }
+                    console.log(`📌 Deleting Certificate from Blockchain: ${eventID}`);
+                    await deleteCertificate(eventID);
+                })
+            );
+    
+            console.log("✅ All selected certificates deleted.");
+        } else {
+            console.log("ℹ️ No certificates marked for deletion.");
+        }
+    
+        // ✅ รีโหลดข้อมูลใหม่หลังจากอัปเดตเสร็จ
+        console.log("📌 Fetching updated farm and certification data...");
+        const [updatedFarm, updatedCertificates] = await Promise.all([
+            getFarmInfo(),
+            getUserCertifications(),
+        ]);
+    
+        console.log("✅ [Update Farm] Reloaded Data:", updatedFarm);
+        console.log("✅ [Reload Certificates]", updatedCertificates);
+    
+        setFarmData(updatedFarm);
+        setCertificateData(updatedCertificates);
+        setCertificatesToDelete([]);
+    
+        if (farmUpdateSuccess) {
+            setIsEditable(false);
+        }
     };
     
-    
+
     return (
         <div className="flex flex-col text-center w-full justify-center items-center h-full pt-20">
             {/* ✅ เปลี่ยนหัวข้อให้รองรับทั้ง Create และ Edit Mode */}
@@ -513,7 +570,11 @@ const FarmGeneralInfo = () => {
                     {isEditable && (
                         <button
                             type="button"
-                            onClick={() => handleDeleteCertificate(farmData?.farmerID, cert.event_id, setCertificateData)}
+                            onClick={() => handleDeleteCertificate(
+                                cert.EventID, 
+                                setCertificatesToDelete, // ✅ ส่งไปอัปเดตรายการใบเซอร์ที่ต้องลบ
+                                setCertificateData // ✅ ส่งไปซ่อนใบเซอร์ออกจาก UI ชั่วคราว
+                            )}
                             className="ml-4 bg-red-500 text-white px-2 py-1 rounded"
                         >
                             Delete
@@ -526,6 +587,7 @@ const FarmGeneralInfo = () => {
         )}
     </div>
 )}
+
 
 {/* location */}
 <div className="flex flex-col font-medium text-start">

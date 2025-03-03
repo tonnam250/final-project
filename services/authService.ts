@@ -185,3 +185,58 @@ export const checkEmailAvailability = async (email: string): Promise<boolean> =>
         return false;
     }
 };
+
+export const refreshToken = async (): Promise<string | null> => {
+    console.log("📡 [RefreshToken] Requesting new token...");
+
+    try {
+        const response = await fetch(`${API_URL}/refresh-token`, {
+            method: "POST",
+            credentials: "include", // ส่ง Cookie ไปด้วย
+        });
+
+        if (!response.ok) {
+            console.warn("⚠️ [RefreshToken] Refresh token failed.");
+            return null;
+        }
+
+        const data = await response.json();
+        console.log("✅ [RefreshToken] Token refreshed successfully:", data.token);
+
+        return data.token; // คืนค่า Token ใหม่
+    } catch (error) {
+        console.error("❌ [RefreshToken] Error:", error);
+        return null;
+    }
+};
+
+// ✅ ฟังก์ชัน Fetch API พร้อม Refresh Token ถ้าหมดอายุ
+export const fetchWithAuth = async (url: string, options: RequestInit = {}): Promise<any> => {
+    console.log("📡 [fetchWithAuth] Fetching:", url);
+
+    let response = await fetch(url, {
+        ...options,
+        credentials: "include", // ✅ ส่ง Cookie ไปด้วย
+    });
+
+    if (response.status === 401) { // 🔄 ถ้า Token หมดอายุ
+        console.warn("⚠️ [fetchWithAuth] Token expired. Refreshing...");
+
+        const newToken = await refreshToken();
+        if (newToken) {
+            console.log("🔄 [fetchWithAuth] Retrying API call with new token...");
+
+            response = await fetch(url, {
+                ...options,
+                credentials: "include", // ✅ ใช้ Token ใหม่
+            });
+        } else {
+            console.error("❌ [fetchWithAuth] Refresh token failed. Redirecting to login...");
+            window.location.href = "/login"; // ✅ พาผู้ใช้ไปล็อกอินใหม่
+            return null;
+        }
+    }
+
+    return response.json();
+};
+

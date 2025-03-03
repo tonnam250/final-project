@@ -7,15 +7,41 @@ import {
 // ✅ ฟังก์ชันอัปเดตข้อมูลฟาร์ม
 export const updateFarmInfo = async (farmData: any) => {
     try {
-        const response = await api.put("/farmer/update", farmData);
-        return response.data;
+        const formData = new FormData();
+        formData.append("farmName", farmData?.farmName || "");
+        formData.append("address", farmData?.address || "");
+        formData.append("district", farmData?.district || "");
+        formData.append("subdistrict", farmData?.subdistrict || "");
+        formData.append("province", farmData?.province || "");
+        formData.append("postCode", farmData?.postCode || "");
+        formData.append("phone", farmData?.telephone || "");
+        formData.append("areaCode", farmData?.areaCode || "");
+        formData.append("location_link", farmData?.location || "");
+
+        console.log("📌 [DEBUG] Sending updateFarmInfo → FormData:");
+        for (const pair of formData.entries()) {
+            console.log(`${pair[0]}: ${pair[1]}`);
+        }
+
+        const response = await fetch(`${API_URL}/update`, {
+            method: "PUT",
+            credentials: "include",
+            body: formData,
+        });
+
+        if (!response.ok) {
+            throw new Error(`Updating farm failed: ${response.status}`);
+        }
+
+        return await response.json();
     } catch (error) {
         console.error("❌ Error updating farm:", error);
         throw error;
     }
 };
 
-// ✅ ดึงข้อมูลฟาร์ม
+
+
 export const getFarmInfo = async (): Promise<any | null> => {
     try {
         const response = await fetch(`${API_URL}/me`, {
@@ -28,24 +54,38 @@ export const getFarmInfo = async (): Promise<any | null> => {
 
         if (response.status === 403) {
             console.warn("🚨 User is not a farmer (403 Forbidden)");
-            return null; // ✅ ให้ค่า null แทน Error
+            return null;
         }
 
         if (response.status === 404) {
             console.warn("🚨 No farm found (404 Not Found)");
-            return null; // ✅ ให้ค่า null แทน Error
+            return null;
         }
 
         if (!response.ok) {
             throw new Error(`Fetching farm data failed: ${response.status}`);
         }
 
-        return await response.json();
+        const data = await response.json();
+
+        // ✅ แปลงชื่อ property ให้ตรงกับ React
+        return {
+            farmName: data.farm_name,  // ✅ ตรงกับ React
+            email: data.email,
+            address: data.address,
+            district: data.district,
+            subdistrict: data.subdistrict,
+            province: data.province,
+            telephone: data.telephone,
+            areaCode: data.areaCode,
+            location: data.location_link,  // ✅ ตรงกับ React
+        };
     } catch (error) {
         console.error("❌ [ERROR] Fetching farm data failed:", error);
-        return null; // ✅ ให้ค่า null แทน Error
+        return null;
     }
 };
+
 
 
 
