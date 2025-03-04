@@ -1,3 +1,5 @@
+import axios from "axios"; 
+
 const API_URL = "http://127.0.0.1:8080/api/v1/auth"; // ✅ แก้ให้ตรงกับ Backend
 
 // ✅ ฟังก์ชัน Login (คืนค่า role และ URL ที่ต้อง Redirect)
@@ -28,16 +30,25 @@ export const login = async (email: string, password: string) => {
 };
 
 // ✅ ฟังก์ชัน Logout
-export const logout = async () => {
-    console.log("📡 [Logout] Sending Request to API...");
+export const logout = async (): Promise<boolean> => {
+    try {
+        const response = await axios.post(`${API_URL}/logout`, {}, {
+            withCredentials: true, // ✅ ให้ลบคุกกี้ `auth_token`
+        });
 
-    await fetch(`${API_URL}/logout`, {
-        method: "POST",
-        credentials: "include",
-    });
+        if (response.status !== 200) {
+            console.error("❌ [Logout] Failed:", response.status);
+            return false;
+        }
 
-    console.log("✅ [Logout] Success!");
+        console.log("✅ [Logout] Success");
+        return true;
+    } catch (error) {
+        console.error("❌ [Logout] Error:", error);
+        return false;
+    }
 };
+
 
 // ✅ ฟังก์ชันดึง Role ของผู้ใช้จาก Backend
 export const getUserRole = async (): Promise<string | null> => {
@@ -102,23 +113,16 @@ export const updateUserRole = async (email: string, role: string, entityID: stri
 };
 
 // ✅ ฟังก์ชันดึงข้อมูลผู้ใช้จาก Backend
-export const getUserInfo = async (): Promise<{ email: string; password: string } | null> => {
-    console.log("📡 [GetUserInfo] Fetching user info...");
-
-    const response = await fetch(`${API_URL}/user-info`, {
-        method: "GET",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-    });
-
-    if (!response.ok) {
-        console.error("❌ [GetUserInfo] Failed to fetch user info:", response.status);
+export const getUserInfo = async () => {
+    try {
+        const response = await axios.get(`${API_URL}/user-info`, {
+            withCredentials: true,
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching user info:", error);
         return null;
     }
-
-    const data = await response.json();
-    console.log("✅ [GetUserInfo] User info:", data);
-    return data;
 };
 
 // ✅ ฟังก์ชันสมัครสมาชิก (ล็อกอินอัตโนมัติหลังสมัครเสร็จ)
@@ -152,26 +156,45 @@ export const registerUser = async (username: string, email: string, password: st
     }
 };
 
-
-
-// ✅ ฟังก์ชันอัปเดตข้อมูลผู้ใช้ (email, password)
-export const updateUserInfo = async (email: string, password: string): Promise<boolean> => {
+export const updateUserInfo = async (
+    email: string,
+    telephone: string,
+    firstName: string,
+    lastName: string,
+    password?: string,
+    profileImage?: File
+): Promise<boolean> => {
     console.log("📡 [UpdateUserInfo] Updating user info...");
 
-    const response = await fetch(`${API_URL}/update-user`, {
-        method: "PUT",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-    });
-
-    if (!response.ok) {
-        console.error("❌ [UpdateUserInfo] Failed to update user info:", response.status);
-        return false;
+    const formData = new FormData();
+    formData.append("email", email);
+    formData.append("telephone", telephone);
+    formData.append("firstName", firstName);
+    formData.append("lastName", lastName);
+    if (password) {
+        formData.append("password", password);
+    }
+    if (profileImage) {
+        formData.append("profileImage", profileImage);
     }
 
-    console.log("✅ [UpdateUserInfo] User info updated successfully");
-    return true;
+    try {
+        const response = await axios.put(`${API_URL}/update-user`, formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+            withCredentials: true,
+        });
+
+        if (response.status !== 200) {
+            console.error("❌ [UpdateUserInfo] Failed:", response.status);
+            return false;
+        }
+
+        console.log("✅ [UpdateUserInfo] Success");
+        return true;
+    } catch (error) {
+        console.error("❌ [UpdateUserInfo] Error:", error);
+        return false;
+    }
 };
 
 // ✅ ตรวจสอบว่าอีเมลซ้ำหรือไม่

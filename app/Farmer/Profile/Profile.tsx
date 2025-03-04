@@ -1,23 +1,17 @@
 
 "use client";
 import { useState, useEffect } from 'react';
-import { getFarmInfo } from "../../../services/farmService";
 import { getUserInfo, updateUserInfo } from "../../../services/authService";
 
 const Profile = () => {
     const [profileImage, setProfileImage] = useState("/images/profile2.jpg");
     const [isEditing, setIsEditing] = useState(false);
-
-    
-    // ข้อมูลผู้ใช้จากตาราง user (email, password)
-    const [email, setEmail] = useState("jdoe@gmail.com");
-    const [password, setPassword] = useState("12345");
-    
-    // ข้อมูลฟาร์มจากตาราง farmer (ชื่อและเบอร์โทร)
-    const [firstName, setFirstName] = useState("John");
-    const [lastName, setLastName] = useState("Doe");
-    const [telephone, setTelephone] = useState("+1234567890");
-    
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [telephone, setTelephone] = useState("");
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [role, setRole] = useState("Farmer");
     const [showPassword, setShowPassword] = useState(false);
 
@@ -25,18 +19,13 @@ const Profile = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // ดึงข้อมูลฟาร์มจาก backend
-                const farmData = await getFarmInfo();
-                if (farmData) {
-                    setFirstName(farmData.firstName || "John");
-                    setLastName(farmData.lastName || "Doe");
-                    setTelephone(farmData.telephone || "+1234567890");
-                }
-                // ดึงข้อมูลผู้ใช้ (email, password) จาก backend
                 const userInfo = await getUserInfo();
                 if (userInfo) {
                     setEmail(userInfo.email);
-                    setPassword(userInfo.password);
+                    setFirstName(userInfo.firstName);
+                    setLastName(userInfo.lastName);
+                    setTelephone(userInfo.telephone);
+                    setProfileImage(userInfo.profileImage || "/images/profile2.jpg"); // ✅ ใช้รูปจาก backend ถ้ามี
                 }
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -45,23 +34,26 @@ const Profile = () => {
         fetchData();
     }, []);
 
+
+
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
+            const file = event.target.files[0];
+            setSelectedFile(file);
             const reader = new FileReader();
             reader.onload = (e) => {
                 if (e.target?.result) {
                     setProfileImage(e.target.result as string);
                 }
             };
-            reader.readAsDataURL(event.target.files[0]);
+            reader.readAsDataURL(file);
         }
     };
 
     const handleEditClick = async () => {
         if (isEditing) {
-            // เมื่อกด Save ให้เรียก updateUserInfo เพื่ออัปเดต email และ password
             try {
-                const success = await updateUserInfo(email, password);
+                const success = await updateUserInfo(email, telephone, firstName, lastName, password, selectedFile);
                 if (!success) {
                     alert("Failed to update user info.");
                     return;
@@ -74,6 +66,7 @@ const Profile = () => {
         }
         setIsEditing(!isEditing);
     };
+
 
     return (
         <div className="flex flex-col items-center min-h-screen pt-24 px-10 p-10 bg-slate-100">
