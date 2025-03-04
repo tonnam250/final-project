@@ -1,6 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { MapProvider } from "@/providers/map-provider";
+import { MapComponent } from "@/components/map";
+import { updateUserRole } from "@/services/authService"; // ✅ ใช้ updateUserRole
+import { getFactoryInfo, updateFactoryInfo, createFactory } from "@/services/factoryService";
+import { getUserCertifications, uploadCertificateAndCheck, handleDeleteCertificate, deleteCertificate, storeCertification } from "@/services/certificateService";
+import { handleFileChange } from "@/services/fileService";
+import { getGeoData, getProvinceList, getDistrictList, getSubDistrictList } from "@/services/geoService";
+
 
 interface GeoData {
     id: number;
@@ -17,14 +25,201 @@ interface GeoData {
 }
 
 const FactoryGeneral = () => {
+    const [factoryData, setFactoryData] = useState<any>({});
+    const [isEditable, setIsEditable] = useState<boolean>(false);
+    const [fileNames, setFileNames] = useState<string[]>(["No file selected."]);
+    const [certificateFile, setCertificateFile] = useState<File | null>(null);
+    const [certificateData, setCertificateData] = useState<any[]>([]);
+    const [geoData, setGeoData] = useState<GeoData[]>([]);
+    const [provinceList, setProvinceList] = useState<string[]>([]);
+    const [districtList, setDistrictList] = useState<string[]>([]);
+    const [subDistrictList, setSubDistrictList] = useState<string[]>([]);
+    const [selectedProvince, setSelectedProvince] = useState<string>("");
+    const [selectedDistrict, setSelectedDistrict] = useState<string>("");
+    const [selectedSubDistrict, setSelectedSubDistrict] = useState<string>("");
+    const [isCreating, setIsCreating] = useState<boolean>(false);
+    const [certificatesToDelete, setCertificatesToDelete] = useState<string[]>([]);
 
-    const [isEditable, setIsEditable] = useState<boolean>(true);
+    // ✅ ตรวจสอบว่าผู้ใช้มีโรงงานหรือยัง
+useEffect(() => {
+    const fetchFactoryData = async () => {
+        try {
+            const data = await getFactoryInfo();
+            console.log("📌 Factory Data:", data); // ✅ ตรวจสอบว่ามีข้อมูลโรงงานหรือไม่
 
-    const handleSaveEditToggle = () => {
-        setIsEditable(!isEditable);
+            if (data) {
+                setFactoryData(data);
+                setSelectedProvince(data.province || "");
+                setSelectedDistrict(data.district || "");
+                setSelectedSubDistrict(data.subdistrict || "");
+                setIsCreating(false);
+                setIsEditable(false);
+            } else {
+                console.warn("🚨 No factory found → Switching to Create Mode");
+                setIsCreating(true);
+                setIsEditable(true);
+            }
+        } catch (error) {
+            console.error("❌ Error fetching factory data:", error);
+            setIsCreating(true);
+            setIsEditable(true);
+        }
     };
 
-    const [fileNames, setFileNames] = useState<string[]>(["No file selected."]);
+    const fetchCertificates = async () => {
+        try {
+            const data = await getUserCertifications();
+            setCertificateData(data);
+        } catch (error) {
+            console.error("❌ Error fetching certification data:", error);
+        }
+    };
+
+    fetchFactoryData();
+    fetchCertificates();
+}, []);
+
+useEffect(() => {
+    console.log("🔄 Updated isCreating:", isCreating);
+    console.log("🔄 Updated isEditable:", isEditable);
+    console.log("🛠 DEBUG → factoryData:", factoryData);
+}, [isCreating, isEditable]);    
+
+// ✅ ดึงข้อมูลภูมิศาสตร์
+useEffect(() => {
+    const fetchGeoData = async () => {
+        const data = await getGeoData();
+        setGeoData(data);
+        setProvinceList(getProvinceList(data)); // ✅ ใช้ geoService
+    };
+    fetchGeoData();
+}, []);
+
+// ✅ ดึง Districts เมื่อ Province เปลี่ยน
+useEffect(() => {
+    if (selectedProvince && geoData.length > 0) {
+        const filteredDistricts = [...new Set(
+            geoData.filter((item) => item.provinceNameEn === selectedProvince).map((item) => item.districtNameEn)
+        )];
+        setDistrictList(filteredDistricts);
+        if (!filteredDistricts.includes(selectedDistrict)) {
+            setSelectedDistrict(factoryData?.district || "");
+        }
+    }
+}, [selectedProvince, geoData]);
+
+// ✅ ดึง Sub-Districts เมื่อ District เปลี่ยน
+useEffect(() => {
+    if (selectedDistrict && geoData.length > 0) {
+        const filteredSubDistricts = [...new Set(
+            geoData.filter((item) => item.districtNameEn === selectedDistrict).map((item) => item.subdistrictNameEn)
+        )];
+        setSubDistrictList(filteredSubDistricts);
+        if (!filteredSubDistricts.includes(selectedSubDistrict)) {
+            setSelectedSubDistrict(factoryData?.subdistrict || "");
+        }
+    }
+}, [selectedDistrict, geoData]);
+
+// ✅ ดึงข้อมูลใบเซอร์ของโรงงาน
+useEffect(() => {
+    if (!factoryData || !factoryData.factoryID) return;
+    const fetchCertificate = async () => {
+        try {
+            const cert = await getUserCertifications();
+            console.log("📌 [DEBUG] Loaded Certificates:", cert);
+            setCertificateData(cert || []);
+        } catch (error) {
+            console.error("❌ Error fetching certificate:", error);
+            setCertificateData([]);
+        }
+    };
+    fetchCertificate();
+}, [factoryData]);
+
+useEffect(() => {
+    if (!factoryData) return;
+
+    setFactoryData((prevData: any) => ({
+        ...prevData,
+        province: selectedProvince || "",  // ✅ บันทึกลง `factoryData`
+        district: selectedDistrict || "",
+        subdistrict: selectedSubDistrict || "",
+    }));
+
+    console.log("📌 Updated factoryData (Province/District/Sub-District):", {
+        province: selectedProvince,
+        district: selectedDistrict,
+        subdistrict: selectedSubDistrict,
+    });
+}, [selectedProvince, selectedDistrict, selectedSubDistrict]);
+
+// ✅ อัปเดตค่า input
+const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    if (!factoryData) return;
+    const { name, value } = e.target;
+
+    setFactoryData((prevData: any) => {
+        if (!prevData) prevData = {};
+        return {
+            ...prevData,
+            [e.target.name]: e.target.value.trim(),
+        };
+    });
+};
+
+const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (!factoryData) return;
+    const { name, value } = e.target;
+
+    setFactoryData((prevData: any) => {
+        const updatedData = {
+            ...prevData,
+            [name]: value,
+        };
+
+        console.log("📌 Updated factoryData (Select):", updatedData);
+        return updatedData;
+    });
+
+    // ✅ ถ้าเลือก Area Code ให้บันทึกลง `factoryData.areaCode`
+    if (name === "areaCode") {
+        setFactoryData((prevData: any) => ({
+            ...prevData,
+            areaCode: value,
+        }));
+    }
+};
+
+const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    console.log("📌 Selected file:", file.name);
+    setFileNames([file.name]);
+    setCertificateFile(file);
+
+    // ✅ อัปโหลดและตรวจสอบใบเซอร์
+    const certCID = await uploadCertificateAndCheck(file);
+    if (!certCID) {
+        console.error("🚨 Certificate already used. Please upload a new one.");
+        alert("❌ ใบเซอร์นี้ถูกใช้ไปแล้ว กรุณาใช้ใบเซอร์ใหม่");
+        setFileNames(["No file selected."]);
+        setCertificateFile(null);
+        return;
+    }
+
+    console.log("✅ Certificate uploaded successfully, CID:", certCID);
+};
+
+const handleSaveEditToggle = () => {
+    if (isCreating) {
+        setIsEditable(true); // ✅ ถ้าเป็น Create Mode บังคับให้ `isEditable = true`
+    } else {
+        setIsEditable(!isEditable);
+    }
+};
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
@@ -35,265 +230,403 @@ const FactoryGeneral = () => {
         }
     };
 
-    const [geoData, setGeoData] = useState<GeoData[]>([]);
-    const [provinceList, setProvinceList] = useState<string[]>([]);
-    const [districtList, setDistrictList] = useState<string[]>([]);
-    const [subDistrictList, setSubDistrictList] = useState<string[]>([]);
-
-    const [selectedProvince, setSelectedProvince] = useState<string>("");
-    const [selectedDistrict, setSelectedDistrict] = useState<string>("");
-    const [selectedSubDistrict, setSelectedSubDistrict] = useState<string>("");
-
-    useEffect(() => {
-        fetch("/data/geography.json")
-            .then((res) => res.json())
-            .then((data: GeoData[]) => {
-                setGeoData(data);
-
-                // ดึงจังหวัดที่ไม่ซ้ำ (ใช้ภาษาไทยให้ตรงกับ selectedProvince)
-                const provinces = Array.from(new Set(data.map((item) => item.provinceNameEn)));
-                setProvinceList(provinces);
-            })
-            .catch((err) => console.error("Fetch error:", err));
-    }, []);
-
-    useEffect(() => {
-        if (selectedProvince) {
-            const filteredDistricts = Array.from(
-                new Set(
-                    geoData.filter((item) => item.provinceNameEn === selectedProvince).map((item) => item.districtNameEn)
-                )
-            );
-
-            setDistrictList(filteredDistricts);
-            setSelectedDistrict("");
-            setSubDistrictList([]);
-            setSelectedSubDistrict("");
-        }
-    }, [selectedProvince]);
-
-    useEffect(() => {
-        if (selectedDistrict) {
-            const filteredSubDistricts = Array.from(
-                new Set(
-                    geoData.filter((item) => item.districtNameEn === selectedDistrict).map((item) => item.subdistrictNameEn)
-                )
-            );
-
-            setSubDistrictList(filteredSubDistricts);
-            setSelectedSubDistrict("");
-        }
-    }, [selectedDistrict]);
-
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleCreateFactory = async (event: React.FormEvent) => {
         event.preventDefault();
+    
+        if (!factoryData) {
+            console.error("🚨 FactoryData is missing");
+            return;
+        }
+    
+        if (!certificateFile) {
+            alert("❌ กรุณาอัปโหลดใบเซอร์ก่อนสร้างโรงงาน");
+            return;
+        }
+    
+        console.log("📌 Uploading certificate...");
+        const certCID = await uploadCertificateAndCheck(certificateFile);
+        if (!certCID) {
+            console.error("🚨 Certificate check failed. Cannot create factory.");
+            return;
+        }
+    
+        // ✅ ตรวจสอบค่า `subDistrict`, `areaCode`, `phone` ให้แน่ใจว่าไม่เป็น `undefined`
+        const cleanFactoryData = {
+            factoryName: factoryData.factoryName || "",
+            email: factoryData.email || "",
+            address: factoryData.address || "",
+            district: factoryData.district || "",
+            subdistrict: factoryData.subdistrict || "", // ✅ แก้ `undefined` เป็น `""`
+            province: factoryData.province || "",
+            phone: factoryData.telephone || "", // ✅ แก้ `undefined` เป็น `""`
+            areaCode: factoryData.areaCode || "", // ✅ แก้ `undefined` เป็น `""`
+            location: factoryData.location || "",
+            certCID: certCID, // ✅ ใส่ certCID ที่ได้จาก IPFS
+        };
+    
+        console.log("📌 Creating factory with cleaned data:", cleanFactoryData);
+    
+        const response = await createFactory(cleanFactoryData);
+        if (!response) {
+            console.error("🚨 Failed to create factory.");
+            return;
+        }
+    
+        console.log("✅ Factory created successfully:", response);
+        setIsCreating(false);
         setIsEditable(false);
-
-        const formData = new FormData(event.currentTarget);
-        formData.append("province", selectedProvince);
-        formData.append("district", selectedDistrict);
-        formData.append("subDistrict", selectedSubDistrict);
-
-        // Handle form submission logic here
-        // For example, you can send formData to an API endpoint
-        // fetch('/api/submit', {
-        //     method: 'POST',
-        //     body: formData,
-        // }).then(response => {
-        //     // Handle response
-        // }).catch(error => {
-        //     // Handle error
-        // });
     };
+    
+    const handleUpdateFactory = async (event: React.FormEvent) => {
+        event.preventDefault();
+        let factoryUpdateSuccess = false;
+        let certTxHash: string | null = null;
+    
+        try {
+            console.log("📌 Updating factory data...");
+            const payload = {
+                factoryName: factoryData?.factoryName || "",
+                address: factoryData?.address || "",
+                district: factoryData?.district || "",
+                subdistrict: factoryData?.subdistrict || "",
+                province: factoryData?.province || "",
+                postCode: factoryData?.postCode || "",
+                telephone: factoryData?.telephone || "",
+                areaCode: factoryData?.areaCode || "",
+                location_link: factoryData?.location || "",
+            };
+    
+            console.log("📌 [UpdateFactory] Sending data:", payload);
+            await updateFactoryInfo(payload);
+            factoryUpdateSuccess = true;
+            console.log("✅ [Update Factory] Success");
+    
+        } catch (error) {
+            console.error("❌ Error updating factory:", error);
+        }
+    
+        // ✅ อัปเดตใบเซอร์บน Blockchain (เฉพาะใบเซอร์ที่อัปโหลดใหม่)
+        if (certificateFile) {
+            console.log("📌 Uploading new certificate...");
+            const certCID = await uploadCertificateAndCheck(certificateFile);
+            console.log("📌 [DEBUG] certCID received from IPFS:", certCID);
+    
+            if (!certCID) {
+                console.error("🚨 Certificate check failed. Cannot update certification.");
+            } else {
+                console.log("📌 Storing new certification on Blockchain...");
+                try {
+                    certTxHash = await storeCertification(certCID);
+                    console.log("✅ Certification stored successfully:", certTxHash);
+                } catch (error) {
+                    console.error("❌ [ERROR] Failed to store certification on blockchain:", error);
+                }
+            }
+        }
+    
+        // ✅ ลบใบเซอร์จาก Blockchain (ถ้ามีรายการรอลบ)
+        if (certificatesToDelete.length > 0) {
+            console.log(`📌 Deleting ${certificatesToDelete.length} Certificates from Blockchain...`);
+    
+            await Promise.all(
+                certificatesToDelete.map(async (eventID) => {
+                    if (!eventID) {
+                        console.warn("🚨 [WARNING] Skipping deletion because eventID is missing!");
+                        return;
+                    }
+                    console.log(`📌 Deleting Certificate from Blockchain: ${eventID}`);
+                    await deleteCertificate(eventID);
+                })
+            );
+    
+            console.log("✅ All selected certificates deleted.");
+        } else {
+            console.log("ℹ️ No certificates marked for deletion.");
+        }
+    
+        // ✅ รีโหลดข้อมูลใหม่หลังจากอัปเดตเสร็จ
+        console.log("📌 Fetching updated factory and certification data...");
+        const [updatedFactory, updatedCertificates] = await Promise.all([
+            getFactoryInfo(),
+            getUserCertifications(),
+        ]);
+    
+        console.log("✅ [Update Factory] Reloaded Data:", updatedFactory);
+        console.log("✅ [Reload Certificates]", updatedCertificates);
+    
+        setFactoryData(updatedFactory);
+        setCertificateData(updatedCertificates);
+        setCertificatesToDelete([]);
+    
+        if (factoryUpdateSuccess) {
+            setIsEditable(false);
+        }
+    };
+    
 
     return (
-        <div className="flex flex-col text-center w-full justify-center items-center text- h-full pt-20">
-            <h1 className="text-3xl md:text-4xl font-bold my-4 md:my-8">General Information</h1>
-            <div className="flex h-full w-11/12 md:w-8/12 h-11/12 p-4 md:p-5 shadow-xl justify-center items-center border rounded-2xl m-2 md:m-5">
-                <form action="" className="flex flex-col gap-4 w-full" onSubmit={handleSubmit}>
-                    <div className="flex flex-col md:flex-row gap-4 md:gap-5 text-start w-full">
+        <div className="flex flex-col text-center w-full justify-center items-center h-full pt-20">
+        <h1 className="text-3xl md:text-4xl font-bold my-4 md:my-8">{isCreating ? "Create Your Factory" : "General Information"}</h1>
+        <div className="flex h-full w-11/12 md:w-8/12 p-4 md:p-5 shadow-xl justify-center items-center border rounded-2xl m-2 md:m-5">
+        <form className="flex flex-col gap-4 w-full" onSubmit={isCreating ? handleCreateFactory : handleUpdateFactory}>
 
-                        {/* first name */}
-                        <div className="flex flex-col text-start w-full md:w-6/12">
-                            <label htmlFor="fName" className="font-medium">First Name</label>
-                            <input
-                                type="text"
-                                id="fName"
-                                name="fName"
-                                className="border border-gray-300 rounded-full p-2 w-full"
-                                required
-                                disabled={!isEditable}
-                            />
-                        </div>
-                        {/* end first name */}
+                    {/* Factory Name */}
+<div className="flex flex-col text-start w-full">
+    <label htmlFor="factoryName" className="font-medium">Factory Name</label>
+    <input
+        type="text"
+        id="factoryName"
+        name="factoryName"
+        className="border border-gray-300 rounded-full p-2 w-full" 
+        required
+        disabled={!isCreating && !isEditable}
+        value={factoryData?.factoryName || ""}
+        onChange={handleInputChange}
+    />
+</div>
 
-                        {/* lastName */}
-                        <div className="flex flex-col text-start w-full md:w-6/12">
-                            <label htmlFor="lName" className="font-medium">Last Name</label>
-                            <input
-                                type="text"
-                                id="lName"
-                                name="lName"
-                                className="border border-gray-300 rounded-full p-2 w-full"
-                                required
-                                disabled={!isEditable}
-                            />
-                        </div>
-                        {/* end lastName */}
-                    </div>
+                    {/* Email */}
+<div className="flex flex-col text-start w-full">
+    <label htmlFor="email" className="font-medium">Factory Email</label>
+    <input
+        type="email"
+        id="email"
+        name="email"
+        className="border border-gray-300 rounded-full p-2"
+        placeholder="Example@gmail.com"
+        required
+        disabled={!isCreating && !isEditable}
+        value={factoryData?.email || ""}
+        onChange={handleInputChange}
+    />
+</div>
 
-                    {/* email */}
-                    <div className="flex flex-col text-start w-full">
-                        <label htmlFor="email" className="font-medium">Email</label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            className="border border-gray-300 rounded-full p-2"
-                            placeholder="Example@gmail.com"
-                            required
-                            disabled={!isEditable}
-                        />
-                    </div>
-                    {/* end email */}
 
                     {/* Phone Number */}
-                    <div className="flex flex-col text-start">
-                        <label htmlFor="tel" className="font-medium">Phone Number</label>
-                        <div className="flex flex-col md:flex-row gap-2">
+<div className="flex flex-col text-start">
+    <label htmlFor="tel" className="font-medium">Factory Phone Number</label>
+    <div className="flex flex-col md:flex-row gap-2">
+        {/* Area Code */}
+        <div className="flex flex-col">
+            <label htmlFor="areaCode" className="sr-only">Area Code</label>
+            <select
+                name="areaCode"
+                id="areaCode"
+                className="border border-gray-300 rounded-md p-2 w-full md:w-20 text-center"
+                required
+                disabled={!isCreating && !isEditable}
+                value={factoryData?.areaCode || "+66"}
+                onChange={handleSelectChange}
+            >
+                <option value="+66">+66</option>
+                <option value="+1">+1</option>
+                <option value="+44">+44</option>
+            </select>
+        </div>
+        {/* Phone Input */}
+        <input
+            type="tel"
+            id="tel"
+            name="telephone"
+            className="border border-gray-300 rounded-md p-2 flex-1 w-full"
+            placeholder="Enter factory phone number"
+            required
+            disabled={!isCreating && !isEditable}
+            value={factoryData?.telephone || ""}
+            onChange={handleInputChange}
+        />
+    </div>
+</div>
 
-                            {/* Area Code */}
-                            <div className="flex flex-col">
-                                <label htmlFor="areaCode" className="sr-only">Area Code</label>
-                                <select
-                                    name="areaCode"
-                                    id="areaCode"
-                                    className="border border-gray-300 rounded-full p-2 w-full md:w-20 text-center"
-                                    required
-                                    disabled={!isEditable}
-                                >
-                                    <option value="+66">+66</option>
-                                </select>
-                            </div>
-
-                            {/* Phone Input */}
-                            <input
-                                type="tel"
-                                id="tel"
-                                name="tel"
-                                className="border border-gray-300 rounded-full p-2 flex-1 w-full"
-                                placeholder="Enter your phone number"
-                                required
-                                disabled={!isEditable}
-                            />
-                        </div>
-                    </div>
-                    {/* end Phone number */}
 
                     {/* Address */}
-                    <div className="flex flex-col text-start font-medium">
-                        <label htmlFor="address">Address</label>
-                        <textarea name="address" id="address" className="border border-gray-300 rounded-full p-2 flex-1 w-full" disabled={!isEditable}></textarea>
-                    </div>
-                    {/* end Address */}
+<div className="flex flex-col text-start font-medium">
+    <label htmlFor="address">Factory Address</label>
+    <textarea
+        name="address"
+        id="address"
+        className="border border-gray-300 rounded-md p-2 flex-1 w-full"
+        placeholder="Enter factory address"
+        required
+        disabled={!isCreating && !isEditable}
+        value={factoryData?.address || ""}
+        onChange={handleInputChange}
+    ></textarea>
+</div>
 
-                    {/* province */}
-                    <div className="flex flex-col w-full text-start font-medium">
-                        <label htmlFor="province">Province</label>
-                        <select name="province" id="province" className="border border-gray-300 rounded-full p-2 text-center"
-                            value={selectedProvince}
-                            onChange={(e) => setSelectedProvince(e.target.value)}
-                            disabled={!isEditable}>
-                            <option value="">Select province</option>
-                            {provinceList.map((prov, index) => (
-                                <option key={index} value={prov}>
-                                    {prov}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    {/* end province */}
+{/* Province */}
+<div className="flex flex-col w-full text-start font-medium">
+    <label htmlFor="province">Province</label>
+    <select
+        name="province"
+        id="province"
+        className="border border-gray-300 rounded-md p-2 text-center"
+        value={selectedProvince}
+        onChange={(e) => setSelectedProvince(e.target.value)}
+        disabled={!isCreating && !isEditable}
+    >
+        <option value="">Select province</option>
+        {provinceList.map((prov, index) => (
+            <option key={index} value={prov}>
+                {prov}
+            </option>
+        ))}
+    </select>
+</div>
 
-                    {/* district + Sub-District */}
-                    <div className="flex flex-col md:flex-row w-full gap-4">
-                        <div className="flex flex-col text-start font-medium w-full md:w-6/12">
-                            <label htmlFor="district">District</label>
-                            <select name="district" id="district" className="border border-gray-300 rounded-full p-2 text-center"
-                                value={selectedDistrict}
-                                onChange={(e) => setSelectedDistrict(e.target.value)}
-                                disabled={!selectedProvince || !isEditable}>
-                                <option value="">Select district</option>
-                                {districtList.map((dist, index) => (
-                                    <option key={index} value={dist}>
-                                        {dist}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+{/* District & Sub-District */}
+<div className="flex flex-col md:flex-row w-full gap-4">
+    {/* District */}
+    <div className="flex flex-col text-start font-medium w-full md:w-6/12">
+        <label htmlFor="district">District</label>
+        <select
+            name="district"
+            id="district"
+            className="border border-gray-300 rounded-md p-2 text-center"
+            value={selectedDistrict}
+            onChange={(e) => setSelectedDistrict(e.target.value)}
+            disabled={!selectedProvince || !isCreating && !isEditable}
+        >
+            <option value="">Select district</option>
+            {districtList.map((dist, index) => (
+                <option key={index} value={dist}>
+                    {dist}
+                </option>
+            ))}
+        </select>
+    </div>
 
-                        <div className="flex flex-col text-start font-medium w-full md:w-6/12">
-                            <label htmlFor="subDistrict">Sub-District</label>
-                            <select name="subDistrict" id="subDistrict" className="border border-gray-300 rounded-full p-2 text-center"
-                                value={selectedSubDistrict}
-                                onChange={(e) => setSelectedSubDistrict(e.target.value)}
-                                disabled={!selectedDistrict || !isEditable}>
-                                <option value="">Select sub-district</option>
-                                {subDistrictList.map((subDist, index) => (
-                                    <option key={index} value={subDist}>
-                                        {subDist}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-                    {/* end district + sub-district */}
+    {/* Sub-District */}
+    <div className="flex flex-col text-start font-medium w-full md:w-6/12">
+        <label htmlFor="subDistrict">Sub-District</label>
+        <select
+            name="subDistrict"
+            id="subDistrict"
+            className="border border-gray-300 rounded-md p-2 text-center"
+            value={selectedSubDistrict}
+            onChange={(e) => setSelectedSubDistrict(e.target.value)}
+            disabled={!selectedDistrict || !isCreating && !isEditable}
+        >
+            <option value="">Select sub-district</option>
+            {subDistrictList.map((subDist, index) => (
+                <option key={index} value={subDist}>
+                    {subDist}
+                </option>
+            ))}
+        </select>
+    </div>
+</div>
 
-                    {/* Upload Organic certification */}
-                    <label htmlFor="" className="font-semibold text-start">Upload Organic Certification</label>
-                    <div className="flex flex-col md:flex-row items-center justify-start gap-2 border p-2">
-                        <label
-                            htmlFor="file-upload"
-                            className="cursor-pointer px-4 py-2 bg-[#C98986] text-[#F7FCD4] rounded-lg hover:bg-[#6C0E23] transition"
-                        >
-                            Import file
-                        </label>
-                        <span className="text-sm text-gray-600">
-                            {fileNames.length > 1 ? `${fileNames.length} files selected` : fileNames[0]}
-                        </span>
-                        <input
-                            id="file-upload"
-                            type="file"
-                            className="hidden"
-                            multiple
-                            onChange={handleFileChange}
-                            disabled={!isEditable}
-                        />
-                    </div>
-                    {/* end upload organic certification */}
+<label htmlFor="" className="font-semibold text-start">Upload Organic Certification</label>
+{/* Upload Factory Certification */}
+<div className="flex flex-col md:flex-row items-center justify-start gap-2 border p-2">
+    <label
+        htmlFor="file-upload"
+        className={`cursor-pointer px-4 py-2 bg-[#abc32f] text-white rounded-full hover:bg-[#607c3c] transition ${
+            (!isCreating && !isEditable) && "opacity-50 cursor-not-allowed"
+        }`}
+    >
+        Import file
+    </label>
+    <span className="text-sm text-gray-600">
+        {fileNames.length > 1 ? `${fileNames.length} files selected` : fileNames[0]}
+    </span>
+    <input
+        id="file-upload"
+        type="file"
+        className="hidden"
+        onChange={handleFileUpload}
+        disabled={!isCreating && !isEditable}
+    />
+</div>
 
-                    {/* location */}
-                    <div className="flex flex-col font-medium text-start">
-                        <label htmlFor="location">Location</label>
-                        <input type="text" name="location" id="location" className="border border-gray-300 rounded-full p-2 flex-1 w-full"
-                            disabled={!isEditable} />
-                    </div>
-
-                    <button
-                        type="button"
-                        className="flex items-center justify-center text- md:text-xl bg-[#C98986] hover: w-full md:w-1/6 rounded-full p-2 px-3 text-[#F7FCD4] self-center"
-                        onClick={isEditable ? handleSubmit : handleSaveEditToggle}
+{/* ✅ แสดงข้อมูลใบเซอร์ (Certificate) เฉพาะใน Edit Mode ✅ */}
+{!isCreating && (
+    <div className="flex flex-col border p-2">
+        <h3 className="font-medium">Factory Certificates</h3>
+        {certificateData && certificateData.length > 0 ? (
+            certificateData.map((cert: any, index: number) => (
+                <div key={index} className="flex justify-between items-center border p-2 my-2 rounded-md">
+                    <a
+                        href={`https://ipfs.io/ipfs/${cert.CertificationCID}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline"
                     >
-                        {isEditable ? "Save" : "Edit"}
-                        {isEditable ? (
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="ml-2 w-6 h-6">
-                                <path fill="currentColor" d="M15 9H5V5h10m-3 14a3 3 0 0 1-3-3a3 3 0 0 1 3-3a3 3 0 0 1-3 3a3 3 0 0 1-3-3m5-16H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7z" />
-                            </svg>
-                        ) : (
-                            <svg xmlns="http://www.w3.org/2000/svg" className="ml-2 w-6 h-6" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="m14.06 9l.94.94L5.92 19H5v-.92zm3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83l3.75 3.75l1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94z" />
-                            </svg>
-                        )}
-                    </button>
+                        View Certificate {index + 1}
+                    </a>
+
+                    {/* ✅ แสดงปุ่มลบเฉพาะ Edit Mode */}
+                    {isEditable && (
+                        <button
+                            type="button"
+                            onClick={() => handleDeleteCertificate(
+                                cert.EventID, 
+                                setCertificatesToDelete, // ✅ ส่งไปอัปเดตรายการใบเซอร์ที่ต้องลบ
+                                setCertificateData // ✅ ส่งไปซ่อนใบเซอร์ออกจาก UI ชั่วคราว
+                            )}
+                            className="ml-4 bg-red-500 text-white px-2 py-1 rounded"
+                        >
+                            Delete
+                        </button>
+                    )}
+                </div>
+            ))
+        ) : (
+            <div className="text-red-500">❌ No certificates available.</div>
+        )}
+    </div>
+)}
+
+
+
+                    {/* Location */}
+<div className="flex flex-col font-medium text-start">
+    <label htmlFor="location">Factory Location</label>
+    <input
+        type="text"
+        name="location"
+        id="location"
+        className="border border-gray-300 rounded-full p-2 flex-1 w-full"
+        placeholder="Enter factory location"
+        disabled={!isCreating && !isEditable}
+        value={factoryData?.location || ""}
+        onChange={handleInputChange} // ✅ เพิ่ม onChange เพื่ออัปเดตค่า
+    />
+</div>
+
+
+<button
+    type="button"
+    className="flex items-center justify-center text-md md:text-xl bg-[#abc32f] w-full md:w-1/6 rounded-full p-2 px-3 text-white self-center"
+    onClick={async (event) => {
+        event.preventDefault(); // ✅ ป้องกันการ reload หน้าเว็บ
+        if (isCreating) {
+            await handleCreateFactory(event); // ✅ เรียกฟังก์ชันสร้างโรงงานโดยตรง
+        } else if (isEditable) {
+            await handleUpdateFactory(event); // ✅ เรียกฟังก์ชันอัปเดตโรงงานโดยตรง
+            setIsEditable(false);
+        } else {
+            handleSaveEditToggle();
+        }
+    }}
+>
+    {isCreating ? "Create Factory" : isEditable ? "Save" : "Edit"}
+    {isCreating ? (
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="ml-2 w-6 h-6">
+            <path fill="currentColor" d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+        </svg>
+    ) : isEditable ? (
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="ml-2 w-6 h-6">
+            <path fill="currentColor" d="M15 9H5V5h10m-3 14a3 3 0 0 1-3-3a3 3 0 0 1 3-3a3 3 0 0 1-3 3a3 3 0 0 1-3-3m5-16H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7z" />
+        </svg>
+    ) : (
+        <svg xmlns="http://www.w3.org/2000/svg" className="ml-2 w-6 h-6" viewBox="0 0 24 24">
+            <path fill="currentColor" d="m14.06 9l.94.94L5.92 19H5v-.92zm3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83l3.75 3.75l1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94z" />
+        </svg>
+    )}
+</button>
+
                 </form>
             </div>
         </div>
