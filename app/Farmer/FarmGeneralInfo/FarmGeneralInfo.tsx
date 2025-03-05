@@ -155,11 +155,11 @@ const FarmGeneralInfo = () => {
         });
         
     };
+    
 
     const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         if (!farmData) return;
         const { name, value } = e.target;
-    
         setFarmData((prevData: any) => {
             const updatedData = {
                 ...prevData,
@@ -169,7 +169,6 @@ const FarmGeneralInfo = () => {
             console.log("📌 Updated farmData (Select):", updatedData);
             return updatedData;
         });
-    
         // ✅ ถ้าเลือก Area Code ให้บันทึกลง `farmData.areaCode`
         if (name === "areaCode") {
             setFarmData((prevData: any) => ({
@@ -179,7 +178,6 @@ const FarmGeneralInfo = () => {
         }
     };
     
-
     useEffect(() => {
         if (!farmData) return;
     
@@ -362,8 +360,8 @@ const FarmGeneralInfo = () => {
             setIsEditable(false);
         }
     };
-    
 
+    
     return (
         <div className="flex flex-col text-center w-full justify-center items-center h-full pt-20">
             {/* ✅ เปลี่ยนหัวข้อให้รองรับทั้ง Create และ Edit Mode */}

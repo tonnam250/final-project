@@ -49,7 +49,6 @@ export const logout = async (): Promise<boolean> => {
     }
 };
 
-
 // ✅ ฟังก์ชันดึง Role ของผู้ใช้จาก Backend
 export const getUserRole = async (): Promise<string | null> => {
     console.log("📡 [GetUserRole] Fetching Role...");
@@ -83,6 +82,8 @@ export const getRedirectUrl = (userRole: string) => {
             return "/LogisticsDashboard";
         case "retailer":
             return "/RetailerDashboard";
+        case null:
+            return "/select-role"; // ✅ ถ้ายังไม่มี Role ให้เลือก Role ก่อน
         default:
             return "/SignUp/SelectRole"; // ✅ Default
     }
