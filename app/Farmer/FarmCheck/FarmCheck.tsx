@@ -2,44 +2,75 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { createMilkTank } from "@/services/rawMilkService";
+
 
 const FarmCheck = () => {
-    const [data, setData] = useState(null);
+    const [showShippingAddress, setShowShippingAddress] = useState<boolean>(false);
+    const shippingAddressRef = useRef<HTMLDivElement | null>(null);
+    const [data, setData] = useState<any | null>(null); // ✅ เพิ่ม Type ให้ state
     const router = useRouter();
 
     useEffect(() => {
-        const storedData = localStorage.getItem("formData");
-        if (storedData) {
-            setData(JSON.parse(storedData));
+        try {
+            const storedData = localStorage.getItem("formData");
+            if (storedData) {
+                setData(JSON.parse(storedData));
+            }
+        } catch (error) {
+            console.error("Error parsing formData from localStorage:", error);
+            localStorage.removeItem("formData"); // ลบข้อมูลที่เสียหาย
         }
     }, []);
 
-    const handleSubmit = () => {
-        router.push("/Farmer/FarmDetails");
-        // localStorage.clear(); // Clear the form data in localStorage after submission
+
+    const handleSubmit = async () => {
+        if (!data) {
+            alert("No data to submit!");
+            return;
+        }
+    
+        try {
+            const result = await createMilkTank(data);
+    
+            if (result.success) {
+                alert("Milk Tank Created Successfully!");
+                localStorage.removeItem("formData"); // ✅ ล้างข้อมูลหลังจากส่ง
+                router.push("/Farmer/FarmDetails"); // ✅ Redirect เมื่อสำเร็จ
+            } else {
+                alert(result.message || "Failed to create milk tank");
+            }
+        } catch (error) {
+            alert("Network error: Unable to reach the server");
+        }
     };
-
+    
     // Step status update function
-    const [showShippingAddress, setShowShippingAddress] = useState<boolean>(false);
-    const shippingAddressRef = useRef<HTMLDivElement>(null);
-    const [stepStatus, setStepStatus] = useState({
-        step1: 'completed',
-        step2: 'completed',
-        step3: 'in-progress'
+    const [stepStatus, setStepStatus] = useState<{
+        step1: "completed" | "in-progress" | "not-started";
+        step2: "completed" | "in-progress" | "not-started";
+        step3: "completed" | "in-progress" | "not-started";
+    }>({
+        step1: "completed",
+        step2: "completed",
+        step3: "in-progress",
     });
-
+    
     const handleNextClick = () => {
         setShowShippingAddress(true);
         setStepStatus({
-            step1: 'completed',
-            step2: 'in-progress',
-            step3: 'not-started'
+            step1: "completed",
+            step2: "in-progress",
+            step3: "not-started",
         });
-
-        setTimeout(() => {
-            shippingAddressRef.current?.scrollIntoView({ behavior: "smooth" });
-        }, 100); // Delay to ensure the section is rendered
-    }
+    
+        if (shippingAddressRef.current) {
+            setTimeout(() => {
+                shippingAddressRef.current?.scrollIntoView({ behavior: "smooth" });
+            }, 100); // ✅ ตรวจสอบก่อนเรียกใช้ scroll
+        }
+    };
+    
 
     return (
         <div className="flex flex-col w-full h-full min-h-screen items-center justify-center pt-24 bg-gray-100">
@@ -108,10 +139,6 @@ const FarmCheck = () => {
                             <div className="flex justify-between">
                                 <p className="font-semibold">Farm Name:</p>
                                 <p>{data.milkTankInfo.farmName}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Tank ID:</p>
-                                <p>{data.milkTankInfo.milkTankNo}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Person in charge:</p>

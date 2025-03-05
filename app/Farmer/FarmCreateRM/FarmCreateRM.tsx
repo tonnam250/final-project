@@ -107,7 +107,6 @@ const FarmCreateRM = () => {
     const [formData, setFormData] = useState({
         milkTankInfo: {
             farmName: "",
-            milkTankNo: "",
             personInCharge: "",
             quantity: 0,
             quantityUnit: "Ton",
@@ -350,12 +349,6 @@ const FarmCreateRM = () => {
                         <input type="text" id="farmName"
                             placeholder="Enter your farm name" className="border rounded-full p-3 w-full"
                             name="milkTankInfo.farmName" value={formData.milkTankInfo.farmName} onChange={handleFormDataChange} />
-                    </div>
-                    {/* Milk tank no. */}
-                    <div className="flex flex-col w-full items-start gap-3">
-                        <label htmlFor="milkTankNo" className="font-semibold">Milk Tank No.</label>
-                        <input type="text" id="milkTankNo" placeholder="Enter your milk tank number" className="border rounded-full p-3 w-full"
-                            name="milkTankInfo.milkTankNo" value={formData.milkTankInfo.milkTankNo} onChange={handleFormDataChange} />
                     </div>
                     {/* Person in charge */}
                     <div className="flex flex-col w-full items-start gap-3">
