@@ -2,17 +2,32 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from 'next/navigation';
+import { getMilkTankDetails, getQRCodeByTankID } from "@/services/rawMilkService"; // ✅ ใช้ชื่อฟังก์ชันให้ตรงกับเซอร์วิซ
 
 const FarmDetails = () => {
+    const searchParams = useSearchParams();
+    const tankId = searchParams.get("id"); // ✅ ดึง tankId จาก URL
 
     const [data, setData] = useState(null);
+    const [qrCode, setQRCode] = useState<string | null>(null); // ✅ ให้ตรงกับเซอร์วิซ (string | null)
 
     useEffect(() => {
-        const storedData = localStorage.getItem("formData");
-        if (storedData) {
-            setData(JSON.parse(storedData));
-        }
-    }, []);
+        const fetchData = async () => {
+            if (tankId) {
+                try {
+                    const milkTankData = await getMilkTankDetails(tankId); // ✅ เรียก API ดึงข้อมูล
+                    setData(milkTankData);
+
+                    const qrCodeUrl = await getQRCodeByTankID(tankId); // ✅ เรียก API ดึง QR Code
+                    setQRCode(qrCodeUrl);
+                } catch (error) {
+                    console.error("❌ Error fetching milk tank details:", error);
+                }
+            }
+        };
+
+        fetchData();
+    }, [tankId]); // ✅ โหลดข้อมูลใหม่เมื่อ tankId เปลี่ยน
 
     return (
         <div className="flex flex-col w-full h-full min-h-screen items-center justify-center pt-24 bg-gray-100">
@@ -167,8 +182,17 @@ const FarmDetails = () => {
             )}
 
             {/* Qrcode generate section: Require API */}
-            <div className="flex">
-                <h1 className="text-6xl">Qrcode Generate Section</h1>
+            <div className="flex flex-col items-center justify-center mt-10">
+            <h1 className="text-6xl">Qrcode Generate Section</h1>                
+            {qrCode ? (
+                <img 
+                    src={qrCode} 
+                    alt="Milk Tank QR Code" 
+                    className="mt-4 w-1/4 h-auto border-4 border-gray-400 rounded-xl shadow-2xl"
+                />
+                ) : (
+                <p className="text-gray-500 mt-4">No QR Code available</p>
+                )}
             </div>
         </div>
     );
