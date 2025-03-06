@@ -16,6 +16,7 @@ const FarmCheck = () => {
 
     const handleSubmit = () => {
         router.push("/Farmer/FarmDetails");
+        alert("Submitted successfully!");
         // localStorage.clear(); // Clear the form data in localStorage after submission
     };
 

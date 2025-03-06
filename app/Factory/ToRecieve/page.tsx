@@ -11,7 +11,7 @@ const DeliveredRM = async () => {
                 <img src="/images/FarmLandscape2.webp" alt="Farm" className="w-full h-full relative object-cover" />
             </div>
             <div className="flex flex-col justify-center items-center w-full h-full mt-10 px-4 md:px-0">
-                <h1 className="text-4xl md:text-6xl font-bold text-center">Delivered Order</h1>
+                <h1 className="text-4xl md:text-6xl font-bold text-center">To Recieve Order</h1>
 
                 {/* Delivered item */}
                 <div className="flex flex-col justify-center items-center w-full h-full my-10 gap-8">

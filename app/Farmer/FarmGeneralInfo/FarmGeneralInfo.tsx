@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { MapProvider } from "@/providers/map-provider";
-import { MapComponent } from "@/components/map";
 
 interface GeoData {
     id: number;
@@ -39,11 +37,6 @@ const FarmGeneralInfo = () => {
     const [selectedProvince, setSelectedProvince] = useState<string>("");
     const [selectedDistrict, setSelectedDistrict] = useState<string>("");
     const [selectedSubDistrict, setSelectedSubDistrict] = useState<string>("");
-
-    const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number }>({
-        lat: 35.8799866,
-        lng: 76.5048004,
-    });
 
     useEffect(() => {
         fetch("/data/geography.json")
@@ -116,36 +109,7 @@ const FarmGeneralInfo = () => {
         formData.append("province", selectedProvince);
         formData.append("district", selectedDistrict);
         formData.append("subDistrict", selectedSubDistrict);
-
-        // Handle form submission logic here
-        // For example, you can send formData to an API endpoint
-        // fetch('/api/submit', {
-        //     method: 'POST',
-        //     body: formData,
-        // }).then(response => {
-        //     // Handle response
-        // }).catch(error => {
-        //     // Handle error
-        // });
     };
-
-    // const fetchCoordinates = async (address: string) => {
-    //     const response = await fetch(
-    //         `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_API}`
-    //     );
-    //     const data = await response.json();
-    //     if (data.results && data.results.length > 0) {
-    //         const location = data.results[0].geometry.location;
-    //         setMapCenter({ lat: location.lat, lng: location.lng });
-    //     } else {
-    //         console.error("Geocoding API error:", data);
-    //     }
-    // };
-
-    // const handleLocationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    //     const address = event.target.value;
-    //     fetchCoordinates(address);
-    // };
 
     return (
         <div className="flex flex-col text-center w-full justify-center items-center text- h-full pt-20">
@@ -323,10 +287,6 @@ const FarmGeneralInfo = () => {
                             placeholder="Enter a location"
                             disabled={!isEditable}
                         />
-
-                        {/* <MapProvider>
-                            <MapComponent center={mapCenter} />
-                        </MapProvider> */}
                     </div>
 
                     <button

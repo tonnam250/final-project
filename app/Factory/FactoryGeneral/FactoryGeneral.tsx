@@ -250,10 +250,10 @@ const FactoryGeneral = () => {
 
                     {/* Upload Organic certification */}
                     <label htmlFor="" className="font-semibold text-start">Upload Organic Certification</label>
-                    <div className="flex flex-col md:flex-row items-center justify-start gap-2 border p-2">
+                    <div className="flex flex-col md:flex-row items-center justify-start gap-2 border rounded-full p-2">
                         <label
                             htmlFor="file-upload"
-                            className="cursor-pointer px-4 py-2 bg-[#C98986] text-[#F7FCD4] rounded-lg hover:bg-[#6C0E23] transition"
+                            className="cursor-pointer px-4 py-2 bg-[#C98986] text-[#F7FCD4] rounded-full hover:bg-[#6C0E23] transition"
                         >
                             Import file
                         </label>
