@@ -6,7 +6,7 @@ const Details = () => {
     const [data, setData] = useState(null);
 
     useEffect(() => {
-        const storedData = localStorage.getItem("recievedForm");
+        const storedData = localStorage.getItem("LogisRecieve");
         if (storedData) {
             setData(JSON.parse(storedData));
         }
