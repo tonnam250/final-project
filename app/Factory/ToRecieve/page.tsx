@@ -1,9 +1,31 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { getFactoryRawMilkTanks } from "@/services/rawMilkFacService";
 import Link from "next/link";
 
-const DeliveredRM = async () => {
 
-    const res = await fetch('http://localhost:3000/data/DeliveredData.json');
-    const data = await res.json();
+const DeliveredRM = () => {
+    const [token, setToken] = useState<string | null>(null);
+    const [filteredData, setFilteredData] = useState<any[]>([]);
+
+    useEffect(() => {
+        setToken(document.cookie.split("; ").find(row => row.startsWith("token="))?.split("=")[1] || null);
+
+        const fetchData = async () => {
+            try {
+                const data = await getFactoryRawMilkTanks();
+                const pendingMilkTanks = data.filter(
+                    (item: { status: string }) => item.status.toLowerCase() === "pending"
+                );
+                setFilteredData(pendingMilkTanks);
+            } catch (error) {
+                console.error("❌ Error fetching factory raw milk tanks:", error);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     return (
         <div className="flex flex-col w-full h-full min-h-screen">
@@ -15,10 +37,10 @@ const DeliveredRM = async () => {
 
                 {/* Delivered item */}
                 <div className="flex flex-col justify-center items-center w-full h-full my-10 gap-8">
-                    {data.map((item: { milkTankInfo: { tankId: string, personInCharge: string }, status: string }, index: number) => (
+                    {filteredData.map((item: { milkTankInfo: { tankId: string, personInCharge: string }, status: string }, index: number) => (
                         <div key={index} className="flex flex-col justify-center items-center w-full md:w-1/3 h-auto gap-5 bg-white text-slate-500 shadow-xl border rounded-2xl p-5">
                             <div className="flex flex-col md:flex-row justify-between items-center w-full">
-                                <span className="text-xl md:text-2xl font-semibold">Milk Tank no: <p className="font-normal inline">{item.milkTankInfo.tankId}</p></span>
+                            <span className="text-xl md:text-2xl font-semibold">Milk Tank no: <span className="font-normal">{`${item.milkTankInfo.tankId.split("-")[0].slice(-4)}-${item.milkTankInfo.tankId.split("-")[1].slice(6, 8)}/${item.milkTankInfo.tankId.split("-")[1].slice(4, 6)}-${item.milkTankInfo.tankId.split("-")[2]}`}</span></span>
                                 <div className={`flex gap-2 text-center items-center rounded-xl text-lg md:text-xl ${item.status.toLowerCase() === 'pending' ? 'text-[#ffc107] bg-[#fff3cd]' : item.status.toLowerCase() === 'received' ? 'text-[#198755] bg-[#d1e7dd]' : ''} px-2 py-1 mt-2 md:mt-0`}>
                                     {item.status.toLowerCase() === 'pending' && (
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -39,7 +61,7 @@ const DeliveredRM = async () => {
                                 <span className="text-xl md:text-2xl font-semibold">Person In Charge: <p className="inline font-normal">{item.milkTankInfo.personInCharge}</p></span>
                                 <Link href={`/Factory/DeliveredRM/Details`} className="text-lg md:text-xl underline italic cursor-pointer mt-2 md:mt-0">More info</Link>
                             </div>
-                            <Link href={'/Factory/Recieving'} className="bg-[#198754] text-white p-2 w-full rounded-xl hover:bg-[#3eb055] text-center">Recieved</Link>
+                            <Link href={'/Factory/Recieving'} className="bg-[#198754] text-white p-2 w-full rounded-xl hover:bg-[#3eb055] text-center">Recieve Now</Link>
                         </div>  
                     ))}
                 </div>
