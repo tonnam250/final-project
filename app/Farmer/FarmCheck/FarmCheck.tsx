@@ -36,7 +36,7 @@ const FarmCheck = () => {
             if (result.success) {
                 alert("Milk Tank Created Successfully!");
                 localStorage.removeItem("formData"); // ✅ ล้างข้อมูลหลังจากส่ง
-                router.push("/Farmer/FarmDetails"); // ✅ Redirect เมื่อสำเร็จ
+                router.push(`/Farmer/FarmDetails?id=${result.tankId}`); // ✅ Redirect ไปยังหน้า FarmDetails พร้อม tankId
             } else {
                 alert(result.message || "Failed to create milk tank");
             }
@@ -44,6 +44,7 @@ const FarmCheck = () => {
             alert("Network error: Unable to reach the server");
         }
     };
+    
     
     // Step status update function
     const [stepStatus, setStepStatus] = useState<{

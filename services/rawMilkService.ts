@@ -1,6 +1,12 @@
 const API_URL = "http://127.0.0.1:8080/api/v1/farm/milk/";
 
-export const createMilkTank = async (data: any): Promise<{ success: boolean; message?: string; txHash?: string; qrCodeCID?: string }> => {
+export const createMilkTank = async (data: any): Promise<{ 
+    success: boolean; 
+    message?: string; 
+    txHash?: string; 
+    qrCodeCID?: string; 
+    tankId?: string;  // ✅ เพิ่ม tankId ที่ต้องใช้ในการ Redirect
+}> => {
     try {
         const response = await fetch(API_URL + "create", {
             method: "POST",
@@ -8,7 +14,7 @@ export const createMilkTank = async (data: any): Promise<{ success: boolean; mes
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(data),
-            credentials: "include", // ✅ ส่ง Cookie ไปกับ Request
+            credentials: "include",
         });
 
         if (!response.ok) {
@@ -17,11 +23,13 @@ export const createMilkTank = async (data: any): Promise<{ success: boolean; mes
         }
 
         const result = await response.json();
+
         return {
             success: true,
             message: "Milk Tank Created Successfully!",
             txHash: result.txHash,
-            qrCodeCID: result.qrCodeCID
+            qrCodeCID: result.qrCodeCID,
+            tankId: result.tankId, // ✅ ส่ง tankId กลับไปให้ Frontend ใช้
         };
     } catch (error) {
         return {
@@ -30,6 +38,7 @@ export const createMilkTank = async (data: any): Promise<{ success: boolean; mes
         };
     }
 };
+
 
 export const getFarmRawMilkTanks = async (): Promise<any> => {
     try {
@@ -56,12 +65,13 @@ export const getFarmRawMilkTanks = async (): Promise<any> => {
         // ✅ แปลงข้อมูลให้ตรงกับ `FarmRawMilk.tsx`
         const formattedData = data.displayedMilkTanks.map((tank: any) => ({
             milkTankInfo: {
-                tankId: tank.moreInfoLink.split("=")[1], // ✅ ดึงค่า tankId จาก URL
+                tankId: tank.moreInfoLink.split("=")[1].trim(), // ✅ ใช้ trim() เพื่อลบ `\u0000`
                 personInCharge: tank.personInCharge,
             },
-            status: tank.status === 0 ? "Pending" : "Received", // ✅ แปลง status จาก `0` เป็น `"Pending"`
-            id: tank.moreInfoLink.split("=")[1], // ✅ ใช้ tankId เป็น id
+            status: tank.status === 0 ? "Pending" : "Received",
+            id: tank.moreInfoLink.split("=")[1].trim(), // ✅ ใช้ trim() เพื่อลบ `\u0000`
         }));
+        
 
         console.log("✅ Formatted Milk Tanks:", formattedData);
         return formattedData;
