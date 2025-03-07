@@ -1,11 +1,9 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
 
 const CheckDetails = () => {
     const [data, setData] = useState(null);
-    const router = useRouter();
 
     useEffect(() => {
         const storedData = localStorage.getItem("recievedForm");
@@ -13,32 +11,6 @@ const CheckDetails = () => {
             setData(JSON.parse(storedData));
         }
     }, []);
-
-    const handleSubmit = () => {
-        router.push("/Factory/FactoryDetails");
-        // localStorage.clear(); // Clear the form data in localStorage after submission
-    };
-
-    const [showShippingAddress, setShowShippingAddress] = useState<boolean>(false);
-    const shippingAddressRef = useRef<HTMLDivElement>(null);
-    const [stepStatus, setStepStatus] = useState({
-        step1: 'completed',
-        step2: 'completed',
-        step3: 'in-progress'
-    });
-
-    const handleNextClick = () => {
-        setShowShippingAddress(true);
-        setStepStatus({
-            step1: 'completed',
-            step2: 'in-progress',
-            step3: 'not-started'
-        });
-
-        setTimeout(() => {
-            shippingAddressRef.current?.scrollIntoView({ behavior: "smooth" });
-        }, 100); // Delay to ensure the section is rendered
-    }
 
     return (
         <div className="flex flex-col justify-center items-center pt-20 w-full h-full min-h-screen">
@@ -48,7 +20,7 @@ const CheckDetails = () => {
                     {/* Recipient Info */}
                     <div className="flex flex-col gap-4 md:gap-10 w-full h-fit md:w-1/2 bg-white border p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
                         <h1 className="text-xl md:text-3xl font-bold text-center">Recipient Info</h1>
-                        <div className="flex flex-col space-y-2 gap-3">
+                        <div className="flex flex-col space-y-2 gap-3 text-gray-500">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Person in charge:</p>
                                 <p>{data.RecipientInfo.personInCharge}</p>
@@ -67,7 +39,7 @@ const CheckDetails = () => {
                     {/* Quantity Info */}
                     <div className="flex flex-col gap-4 md:gap-10 w-full md:w-1/2 border bg-white p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
                         <h1 className="text-xl md:text-3xl font-bold text-center">Quantity Info</h1>
-                        <div className="flex flex-col space-y-2 gap-3">
+                        <div className="flex flex-col space-y-2 gap-3 text-gray-500">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Quantity:</p>
                                 <p>{data.Quantity.quantity} {data.Quantity.quantityUnit}</p>
