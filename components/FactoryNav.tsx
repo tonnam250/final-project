@@ -49,7 +49,7 @@ const FactoryNav = () => {
                     {isDropdownOpen && (
                         <div className="absolute mt-2 w-full md:w-40 bg-white rounded-md shadow-lg left-0 md:left-auto">
                             <Link href={'/Factory/ToRecieve'} className="block px-4 py-2 text-gray-800 text-lg hover:bg-gray-200 hover:rounded-md" onClick={closeDropdown}>To Recieve</Link>
-                            <Link href={'/Factory/Recieving'} className="block px-4 py-2 text-gray-800 text-lg hover:bg-gray-200 hover:rounded-md" onClick={closeDropdown}>Recieving</Link>
+                            <Link href={'/Factory/RecieveRM'} className="block px-4 py-2 text-gray-800 text-lg hover:bg-gray-200 hover:rounded-md" onClick={closeDropdown}>Recieving</Link>
                         </div>
                     )}
                 </div>
