@@ -306,7 +306,7 @@ const Recieving = () => {
                         <div className="flex w-full items-start gap-3">
                             {/* Quantity */}
                             <div className="flex flex-col w-1/2 items-start gap-3">
-                                <label htmlFor="quantity" className="font-semibold">Quantity</label>
+                                <label htmlFor="quantity" className="font-semibold">Qualiity</label>
                                 <div className="flex gap-3 w-full">
                                     <input type="number" name="Quantity.quantity" id="quantity"
                                         className="border rounded-full p-3 w-4/5" placeholder="0.00" step="0.01"

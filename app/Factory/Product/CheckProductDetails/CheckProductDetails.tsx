@@ -108,19 +108,19 @@ const CheckProductDetails = () => {
                         <div className="flex flex-col space-y-2 gap-3">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Product Name:</p>
-                                <p>{data.GeneralInfo.productName}</p>
+                                <p>{data?.GeneralInfo?.productName}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Category:</p>
-                                <p>{data.GeneralInfo.category}</p>
+                                <p>{data?.GeneralInfo?.category}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Description:</p>
-                                <p>{data.GeneralInfo.description}</p>
+                                <p>{data?.GeneralInfo?.description}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Quantity:</p>
-                                <p>{data.GeneralInfo.quantity}</p>
+                                <p>{data?.GeneralInfo?.quantity}</p>
                             </div>
                         </div>
                     </div>
@@ -131,96 +131,96 @@ const CheckProductDetails = () => {
                         <div className="flex flex-col space-y-2 gap-3">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Quantity:</p>
-                                <p>{data.Nutrition.quantity} {data.Nutrition.quantityUnit}</p>
+                                <p>{data?.Nutrition?.quantity} {data?.Nutrition?.quantityUnit}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Temperature:</p>
-                                <p>{data.Nutrition.temp} {data.Nutrition.tempUnit}</p>
+                                <p>{data?.Nutrition?.temp} {data?.Nutrition?.tempUnit}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">pH:</p>
-                                <p>{data.Nutrition.pH}</p>
+                                <p>{data?.Nutrition?.pH}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Fat:</p>
-                                <p>{data.Nutrition.fat} %</p>
+                                <p>{data?.Nutrition?.fat} %</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Protein:</p>
-                                <p>{data.Nutrition.protein} %</p>
+                                <p>{data?.Nutrition?.protein} %</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Calories:</p>
-                                <p>{data.Nutrition.calories}</p>
+                                <p>{data?.Nutrition?.calories}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Total Fat:</p>
-                                <p>{data.Nutrition.totalFat}</p>
+                                <p>{data?.Nutrition?.totalFat}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Colestoral:</p>
-                                <p>{data.Nutrition.colestoral}</p>
+                                <p>{data?.Nutrition?.colestoral}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Sodium:</p>
-                                <p>{data.Nutrition.sodium}</p>
+                                <p>{data?.Nutrition?.sodium}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Potassium:</p>
-                                <p>{data.Nutrition.potassium}</p>
+                                <p>{data?.Nutrition?.potassium}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Total Carbohydrates:</p>
-                                <p>{data.Nutrition.totalCarbohydrates}</p>
+                                <p>{data?.Nutrition?.totalCarbohydrates}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Fiber:</p>
-                                <p>{data.Nutrition.fiber}</p>
+                                <p>{data?.Nutrition?.fiber}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Sugar:</p>
-                                <p>{data.Nutrition.sugar}</p>
+                                <p>{data?.Nutrition?.sugar}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Vitamin C:</p>
-                                <p>{data.Nutrition.vitaminC}</p>
+                                <p>{data?.Nutrition?.vitaminC}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Calcium:</p>
-                                <p>{data.Nutrition.calcium}</p>
+                                <p>{data?.Nutrition?.calcium}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Iron:</p>
-                                <p>{data.Nutrition.iron}</p>
+                                <p>{data?.Nutrition?.iron}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Vitamin D:</p>
-                                <p>{data.Nutrition.vitaminD}</p>
+                                <p>{data?.Nutrition?.vitaminD}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Vitamin B6:</p>
-                                <p>{data.Nutrition.vitaminB6}</p>
+                                <p>{data?.Nutrition?.vitaminB6}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Vitamin B12:</p>
-                                <p>{data.Nutrition.vitaminB12}</p>
+                                <p>{data?.Nutrition?.vitaminB12}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Magnesium:</p>
-                                <p>{data.Nutrition.magnesium}</p>
+                                <p>{data?.Nutrition?.magnesium}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Bacteria:</p>
                                 <div className="flex flex-col gap-2">
-                                    <p>{data.Nutrition.bacteria === true ? "True" : "False"}</p>
-                                    <p>{data.Nutrition.bacteriaInfo}</p>
+                                    <p>{data?.Nutrition?.bacteria === true ? "True" : "False"}</p>
+                                    <p>{data?.Nutrition?.bacteriaInfo}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Contaminants:</p>
                                 <div className="flex flex-col gap-2">
-                                    <p>{data.Nutrition.contaminants === true ? "True" : "False"}</p>
-                                    <p>{data.Nutrition.contaminantInfo}</p>
+                                    <p>{data?.Nutrition?.contaminants === true ? "True" : "False"}</p>
+                                    <p>{data?.Nutrition?.contaminantInfo}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between">
@@ -238,15 +238,15 @@ const CheckProductDetails = () => {
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-3">
-                                    <p>{data.Nutrition.abnormalChar === true ? "True" : "False"}</p>
-                                    <p>{data.Nutrition.abnormalType.smellBad === true ? "True" : "False"}</p>
-                                    <p>{data.Nutrition.abnormalType.smellNotFresh === true ? "True" : "False"}</p>
-                                    <p>{data.Nutrition.abnormalType.abnormalColor === true ? "True" : "False"}</p>
-                                    <p>{data.Nutrition.abnormalType.sour === true ? "True" : "False"}</p>
-                                    <p>{data.Nutrition.abnormalType.bitter === true ? "True" : "False"}</p>
-                                    <p>{data.Nutrition.abnormalType.cloudy === true ? "True" : "False"}</p>
-                                    <p>{data.Nutrition.abnormalType.lumpy === true ? "True" : "False"}</p>
-                                    <p>{data.Nutrition.abnormalType.separation === true ? "True" : "False"}</p>
+                                    <p>{data?.Nutrition?.abnormalChar === true ? "True" : "False"}</p>
+                                    <p>{data?.Nutrition?.abnormalType?.smellBad === true ? "True" : "False"}</p>
+                                    <p>{data?.Nutrition?.abnormalType?.smellNotFresh === true ? "True" : "False"}</p>
+                                    <p>{data?.Nutrition?.abnormalType?.abnormalColor === true ? "True" : "False"}</p>
+                                    <p>{data?.Nutrition?.abnormalType?.sour === true ? "True" : "False"}</p>
+                                    <p>{data?.Nutrition?.abnormalType?.bitter === true ? "True" : "False"}</p>
+                                    <p>{data?.Nutrition?.abnormalType?.cloudy === true ? "True" : "False"}</p>
+                                    <p>{data?.Nutrition?.abnormalType?.lumpy === true ? "True" : "False"}</p>
+                                    <p>{data?.Nutrition?.abnormalType?.separation === true ? "True" : "False"}</p>
                                 </div>
                             </div>
                         </div>

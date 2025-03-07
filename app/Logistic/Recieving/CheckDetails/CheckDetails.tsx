@@ -4,18 +4,19 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 const CheckDetails = () => {
-    const [data, setData] = useState(null);
+    const [data, setData] = useState<any>(null);
     const router = useRouter();
 
     useEffect(() => {
-        const storedData = localStorage.getItem("recievedForm");
+        const storedData = localStorage.getItem("LogisRecieve");
         if (storedData) {
             setData(JSON.parse(storedData));
         }
     }, []);
 
     const handleSubmit = () => {
-        router.push("/Factory/FactoryDetails");
+        router.push("/Logistic/Recieving/Details");
+        alert("Submitted successfully!");
         // localStorage.clear(); // Clear the form data in localStorage after submission
     };
 
@@ -56,7 +57,7 @@ const CheckDetails = () => {
                             <div className={`h-2 rounded-full ${stepStatus.step1 === 'completed' ? 'bg-emerald-500 w-full' : 'bg-yellow-400 w-1/5'}`}></div>
                         </div>
                         <p className="text-xl font-semibold">STEP 1</p>
-                        <h1 className="text-3xl font-semibold mb-3">Recipient</h1>
+                        <h1 className="text-3xl font-semibold mb-3">General Information</h1>
                         <div className={`flex flex-wrap text-center w-fit items-center justify-center rounded-full p-1 px-2 mx-5 ${stepStatus.step1 === 'completed' ? 'bg-emerald-500 text-white' : 'bg-yellow-200 text-amber-500'}`}>
                             <p className="text-lg font-semibold">{stepStatus.step1 === 'completed' ? 'Completed' : 'In Progress'}</p>
                         </div>
@@ -72,7 +73,7 @@ const CheckDetails = () => {
                             <div className={`h-2 rounded-full ${stepStatus.step2 === 'completed' ? 'bg-emerald-500 w-full' : 'bg-yellow-400 w-1/5'}`}></div>
                         </div>
                         <p className={`text-xl font-semibold ${stepStatus.step2 === 'completed' ? 'text-emerald-500' : 'text-amber-500'}`}>STEP 2</p>
-                        <h1 className={`text-3xl font-semibold mb-3`}>Quality</h1>
+                        <h1 className={`text-3xl font-semibold mb-3`}>Product Detail</h1>
                         <div className={`flex flex-wrap text-center w-fit items-center justify-center rounded-full mx-5 p-1 px-2 ${stepStatus.step2 === 'completed' ? 'bg-emerald-500 text-white' : 'bg-yellow-200 text-amber-500'}`}>
                             <p className="text-lg font-semibold">{stepStatus.step2 === 'completed' ? 'Completed' : 'In Progress'}</p>
                         </div>
@@ -97,97 +98,92 @@ const CheckDetails = () => {
             </div>
             {/* End Detail Status */}
 
-            {data && (
+            {data && data.GeneralInfo && data.ProductDetail && (
                 <div className="flex flex-col md:flex-row justify-between gap-10 w-full p-4 md:p-14">
-                    {/* Recipient Info */}
+                    {/* General Info */}
                     <div className="flex flex-col gap-4 md:gap-10 w-full h-fit md:w-1/2 bg-white border p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
-                        <h1 className="text-xl md:text-3xl font-bold text-center">Recipient Info</h1>
+                        <h1 className="text-xl md:text-3xl font-bold text-center">General Info</h1>
                         <div className="flex flex-col space-y-2 gap-3">
                             <div className="flex justify-between">
-                                <p className="font-semibold">Person in charge:</p>
+                                <p className="font-semibold">Farm Name:</p>
+                                <p>{data.GeneralInfo.farmName}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Milk Tank No:</p>
+                                <p>{data.GeneralInfo.milkTankNo}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Person In Charge:</p>
                                 <p>{data.GeneralInfo.personInCharge}</p>
                             </div>
                             <div className="flex justify-between">
-                                <p className="font-semibold">Location:</p>
-                                <p>{data.productDetail.location}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Pick Up Time:</p>
-                                <p>{data.productDetail.pickUpTime}</p>
+                                <p className="font-semibold">Recieve Status</p>
+                                <p>{data.GeneralInfo.recieveStatus}</p>
                             </div>
                         </div>
                     </div>
 
-                    {/* Quantity Info */}
-                    <div className="flex flex-col gap-4 md:gap-10 w-full md:w-1/2 border bg-white p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
-                        <h1 className="text-xl md:text-3xl font-bold text-center">Quantity Info</h1>
-                        <div className="flex flex-col space-y-2 gap-3">
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Quantity:</p>
-                                <p>{data.GeneralInfo.quantity} {data.GeneralInfo.quantityUnit}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Temperature:</p>
-                                <p>{data.GeneralInfo.temp} {data.GeneralInfo.tempUnit}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">pH:</p>
-                                <p>{data.GeneralInfo.pH}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Fat:</p>
-                                <p>{data.GeneralInfo.fat} %</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Protein:</p>
-                                <p>{data.GeneralInfo.protein} %</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Bacteria:</p>
-                                <div className="flex flex-col gap-2">
-                                    <p>{data.GeneralInfo.bacteria === true ? "True" : "False"}</p>
-                                    <p>{data.GeneralInfo.bacteriaInfo}</p>
+                    {/* Product Detail */}
+                    {data.ProductDetail && (
+                        <div className="flex flex-col gap-4 md:gap-10 w-full md:w-1/2 border bg-white p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
+                            <h1 className="text-xl md:text-3xl font-bold text-center">Product Detail</h1>
+                            <div className="flex flex-col space-y-2 gap-3">
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Quantity:</p>
+                                    <p>{data.ProductDetail.quantity} {data.ProductDetail.quantityUnit}</p>
                                 </div>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Contaminants:</p>
-                                <div className="flex flex-col gap-2">
-                                    <p>{data.GeneralInfo.contaminants === true ? "True" : "False"}</p>
-                                    <p>{data.GeneralInfo.contaminantInfo}</p>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Temperature:</p>
+                                    <p>{data.ProductDetail.temp} {data.ProductDetail.tempUnit}</p>
                                 </div>
-                            </div>
-                            <div className="flex justify-between">
-                                <div className="flex flex-col gap-3">
-                                    <p className="font-semibold">Abnormal Characteristic:</p>
-                                    <div className="flex flex-col gap-3">
-                                        <p className="font-semibold">Smell Bad:</p>
-                                        <p className="font-semibold">Smell Not Fresh:</p>
-                                        <p className="font-semibold">Abnormal Color:</p>
-                                        <p className="font-semibold">Sour:</p>
-                                        <p className="font-semibold">Bitter:</p>
-                                        <p className="font-semibold">Cloudy:</p>
-                                        <p className="font-semibold">Lumpy:</p>
-                                        <p className="font-semibold">Separation of milk and water:</p>
-                                    </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Company Name:</p>
+                                    <p>{data?.ProductDetail?.companyName}</p>
                                 </div>
-                                <div className="flex flex-col gap-3">
-                                    <p>{data.GeneralInfo.abnormalChar === true ? "True" : "False"}</p>
-                                    <p>{data.GeneralInfo.abnormalType.smellBad === true ? "True" : "False"}</p>
-                                    <p>{data.GeneralInfo.abnormalType.smellNotFresh === true ? "True" : "False"}</p>
-                                    <p>{data.GeneralInfo.abnormalType.abnormalColor === true ? "True" : "False"}</p>
-                                    <p>{data.GeneralInfo.abnormalType.sour === true ? "True" : "False"}</p>
-                                    <p>{data.GeneralInfo.abnormalType.bitter === true ? "True" : "False"}</p>
-                                    <p>{data.GeneralInfo.abnormalType.cloudy === true ? "True" : "False"}</p>
-                                    <p>{data.GeneralInfo.abnormalType.lumpy === true ? "True" : "False"}</p>
-                                    <p>{data.GeneralInfo.abnormalType.separation === true ? "True" : "False"}</p>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Name:</p>
+                                    <p>{data?.ProductDetail?.firstName} {data?.ProductDetail?.lastName}</p>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Email:</p>
+                                    <p>{data?.ProductDetail?.email}</p>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Phone:</p>
+                                    <p>{data?.ProductDetail?.areaCode} {data?.ProductDetail?.phoneNumber}</p>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Address:</p>
+                                    <p>{data?.ProductDetail?.address}</p>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Province:</p>
+                                    <p>{data?.ProductDetail?.province}</p>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">District:</p>
+                                    <p>{data?.ProductDetail?.district}</p>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Sub-District:</p>
+                                    <p>{data?.ProductDetail?.subDistrict}</p>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Zip Code:</p>
+                                    <p>{data?.ProductDetail?.postalCode}</p>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Location:</p>
+                                    <p>{data?.ProductDetail?.location}</p>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    )}
                 </div>
-            )}
+            )
+            }
             <button type="button" onClick={handleSubmit} className="text-xl bg-emerald-400 p-3 mb-5 self-end mx-14 rounded-3xl text-white font-semibold">Submit</button>
-        </div>
+        </div >
     );
 };
 export default CheckDetails;

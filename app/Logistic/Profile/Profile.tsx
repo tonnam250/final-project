@@ -34,7 +34,7 @@ const Profile = () => {
                 <h1 className="text-5xl font-semibold">Your Profile</h1>
                 <div className="flex justify-center w-full items-center gap-10 mt-10">
                     <div className="flex flex-col items-center gap-5 w-1/2">
-                        <div className="flex justify-center items-center overflow-hidden w-1/2 rounded-full">
+                        <div className="flex justify-center items-center overflow-hidden w-56 h-56 rounded-full">
                             <img src={profileImage} alt="Profile Picture" className="flex justify-center items-center rounded-full" />
                         </div>
                         <label className="cursor-pointer bg-emerald-400 text-white py-2 px-4 rounded-full hover:bg-green-700">
@@ -43,19 +43,6 @@ const Profile = () => {
                         </label>
                     </div>
                     <div className="flex flex-col items-center gap-3 w-1/2">
-                        <div className="flex justify-between gap-6 w-full">
-                            <p className='text-lg font-bold'>Display name:</p>
-                            {isEditing ? (
-                                <input
-                                    type="text"
-                                    value={displayName}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                    className="text-lg text-left w-32 border-b-2 border-gray-300 focus:outline-none"
-                                />
-                            ) : (
-                                <p className="text-lg text-left w-32">{displayName}</p>
-                            )}
-                        </div>
                         <div className="flex justify-between gap-6 w-full">
                             <p className="text-lg font-bold">Username:</p>
                             {isEditing ? (

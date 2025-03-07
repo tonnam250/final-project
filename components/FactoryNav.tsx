@@ -4,9 +4,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const FactoryNav = () => {
-
     const pathname = usePathname();
-
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -16,6 +14,10 @@ const FactoryNav = () => {
 
     const toggleDropdown = () => {
         setIsDropdownOpen(!isDropdownOpen);
+    };
+
+    const closeDropdown = () => {
+        setIsDropdownOpen(false);
     };
 
     return (
@@ -46,8 +48,8 @@ const FactoryNav = () => {
                     </button>
                     {isDropdownOpen && (
                         <div className="absolute mt-2 w-full md:w-40 bg-white rounded-md shadow-lg left-0 md:left-auto">
-                            <Link href={'/Factory/DeliveredRM'} className="block px-4 py-2 text-gray-800 text-lg hover:bg-gray-200 hover:rounded-md">Delivered</Link>
-                            <Link href={'/Factory/RecieveRM'} className="block px-4 py-2 text-gray-800 text-lg hover:bg-gray-200 hover:rounded-md">Received</Link>
+                            <Link href={'/Factory/ToRecieve'} className="block px-4 py-2 text-gray-800 text-lg hover:bg-gray-200 hover:rounded-md" onClick={closeDropdown}>To Recieve</Link>
+                            <Link href={'/Factory/Recieving'} className="block px-4 py-2 text-gray-800 text-lg hover:bg-gray-200 hover:rounded-md" onClick={closeDropdown}>Recieving</Link>
                         </div>
                     )}
                 </div>

@@ -1,8 +1,8 @@
-import CheckDetails from "./CheckDetails";
+import Details from "./Details";
 
 const Page = () => {
     return (
-        <CheckDetails />
+        <Details />
     );
 };
 export default Page;

@@ -181,18 +181,58 @@ const AddProductLot = () => {
         }
     });
 
-    // ✅ \u04E04\u04E27\u04E1A\u04E04\u04E38\u04E23\u04E07\u04E01\u04E23\u04E32\u04E07\u04E2B\u04E27\u04E31\u04E14\u04E17\u04E35\u04E48 abnormalType
+    const [shippingAddresses, setShippingAddresses] = useState([{
+        companyName: "",
+        firstName: "",
+        lastName: "",
+        email: "",
+        areaCode: "+66",
+        phoneNumber: "",
+        address: "",
+        province: "",
+        district: "",
+        subDistrict: "",
+        postalCode: "",
+        location: ""
+    }]);
+
+    const addShippingAddress = () => {
+        setShippingAddresses([...shippingAddresses, {
+            companyName: "",
+            firstName: "",
+            lastName: "",
+            email: "",
+            areaCode: "+66",
+            phoneNumber: "",
+            address: "",
+            province: "",
+            district: "",
+            subDistrict: "",
+            postalCode: "",
+            location: ""
+        }]);
+    };
+
+    const handleShippingAddressChange = (index: number, event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = event.target;
+        const updatedAddresses = [...shippingAddresses];
+        updatedAddresses[index] = { ...updatedAddresses[index], [name]: value };
+        setShippingAddresses(updatedAddresses);
+
+        // อัปเดต province, district และ subdistrict
+        if (name === "province") {
+            setSelectedProvince(value);
+        } else if (name === "district") {
+            setSelectedDistrict(value);
+        } else if (name === "subDistrict") {
+            setSelectedSubDistrict(value);
+        }
+    };
+
     const [showAbnormalInfo, setShowAbnormalInfo] = useState(false);
     const [showBacteriaInfo, setShowBacteriaInfo] = useState(false);
     const [showContaminantInfo, setShowContaminantInfo] = useState(false);
 
-    // ✅ \u04E42\u04E2D\u04E14\u04E02\u04E49\u04E21\u04E39\u04E25\u04E08\u04E32\u04E01 localStorage \u04E40\u04E21\u04E37\u04E48\u04E2D\u04E2B\u04E19\u04E49\u04E32\u04E40\u04E2B\u04E25\u04E14
-    // Removed localStorage retrieval
-
-    // ✅ \u04E42\u04E1A\u04E17\u04E36\u04E01\u04E02\u04E49\u04E21\u04E39\u04E25\u04E07 localStorage \u04E17\u04E38\u04E01\u04E04\u04E23\u04E32\u04E07\u04E17\u04E35\u04E48 recieveForm \u04E40\u04E1B\u04E25\u04E35\u04E48\u04E19
-    // Removed localStorage saving
-
-    // ✅ \u04E1F\u04E31\u04E07\u04E01\u04E4C\u04E32\u04E19 handleFormDataChange \u04E23\u04E2D\u04E07\u04E23\u04E31\u04E1A text, select \u04E41\u04E25\u04E30 checkbox
     const handleFormDataChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, type, value, checked } = event.target;
         const keys = name.split(".");
@@ -208,20 +248,19 @@ const AddProductLot = () => {
             // ถ้าเป็น checkbox ให้ใช้ checked ถ้าไม่ใช่ให้ใช้ value
             temp[keys[keys.length - 1]] = type === "checkbox" ? checked : value;
 
-            // อัปเดต province, district และ subdistrict
-            if (name === "shippingAddress.province") {
-                setSelectedProvince(value);
-            } else if (name === "shippingAddress.district") {
-                setSelectedDistrict(value);
-            } else if (name === "shippingAddress.subDistrict") {
-                setSelectedSubDistrict(value);
-            }
-
             return updatedData;
         });
+
+        // อัปเดต province, district และ subdistrict
+        if (name === "shippingAddress.province") {
+            setSelectedProvince(value);
+        } else if (name === "shippingAddress.district") {
+            setSelectedDistrict(value);
+        } else if (name === "shippingAddress.subDistrict") {
+            setSelectedSubDistrict(value);
+        }
     };
 
-    // ✅ \u04E1F\u04E31\u04E07\u04E01\u04E4C\u04E32\u04E19 handleAbnormalChange \u04E21\u04E49\u04E48 \u04E40\u04E0A\u04E47 abnormalChar \u04E41\u04E25\u04E30\u04E42\u04E0A abnormalType
     const handleAbnormalChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         // handleFormDataChange(event);
         setShowAbnormalInfo(event.target.checked);
@@ -237,7 +276,6 @@ const AddProductLot = () => {
         setShowContaminantInfo(event.target.checked);
     };
 
-    // ✅ \u04E1F\u04E31\u04E07\u04E01\u04E4C\u04E32\u04E19 handleNestedCheckboxChange \u04E2A\u04E33\u04E2B\u04E23\u04E31\u04E1A abnormalType
     const handleNestedCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, checked } = event.target;
 
@@ -252,14 +290,13 @@ const AddProductLot = () => {
     };
 
 
-    // ✅ \u04E1F\u04E31\u04E07\u04E01\u04E4C\u04E32\u04E19 Submit \u04E21\u04E49\u04E48 \u04E1A\u04E17\u04E36\u04E01\u04E02\u04E49\u04E21\u04E39\u04E25\u04E07 localStorage
     const saveToLocalStorage = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        // Removed localStorage saving
-        alert("Form Save!");
-        console.log(productLotForm);
+        const formDataWithShipping = { ...productLotForm, shippingAddresses };
+        localStorage.setItem("productLotForm", JSON.stringify(formDataWithShipping));
+        alert("Form saved to localStorage!");
+        console.log("Saved data:", formDataWithShipping); // Debugging line
     };
-    // end save form Data
 
     const router = useRouter();
 
@@ -460,18 +497,6 @@ const AddProductLot = () => {
                         </div>
                     </div>
 
-                    <div className="flex justify-center items-center w-full gap-5">
-                        <span className="text-2xl font-bold">Total Quantity: <p className="inline font-normal">10</p></span>
-                        <select name="milkTankInfo.quantityUnit" id="quantityUnit" className="border rounded-full p-3 w-1/10 text-center font-semibold">
-                            <option value="Ton">Ton</option>
-                            <option value="Liter">Liter</option>
-                            <option value="Ml">Milliliter</option>
-                            <option value="Oz">Ounce</option>
-                            <option value="CC">cc</option>
-                            <option value="Gallon">Gallon</option>
-                        </select>
-                    </div>
-
                     <button
                         type="button"
                         className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8] ${stepStatus.step2 === 'completed' ? 'hidden' : ''}`}
@@ -484,141 +509,29 @@ const AddProductLot = () => {
                 {/* Quality */}
                 <div id="section3" className={`flex flex-col items-center w-full h-full text-xl gap-8 mt-20 ${visibleSection >= 3 ? '' : 'hidden'}`}>
                     <h1 className="text-5xl font-bold">Quality</h1>
-                    {/* Temperature */}
+                    {/* Grade */}
                     <div className="flex flex-col w-full items-start gap-3">
-                        <label htmlFor="temp" className="font-semibold">Temperature</label>
-                        <div className="flex w-full items-start gap-3">
-                            <input type="number" name="milkTankInfo.temp" id="temp" className="p-3 rounded-full border w-4/5" placeholder="0.00" step="0.01"
-                            />
-                            <select name="milkTankInfo.tempUnit" id="tempUnit" className="border rounded-full p-3 w-1/5 font-semibold"
-                            >
-                                <option value="Celcius">°C</option>
-                                <option value="Farenheit">°F</option>
-                            </select>
-                        </div>
-                    </div>
-                    {/* pH of Milk */}
-                    <div className="flex flex-col w-full items-start gap-3">
-                        <label htmlFor="pH" className="font-semibold">pH of Milk</label>
-                        <input type="number" name="milkTankInfo.pH" id="pH" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01"
+                        <label htmlFor="grade" className="font-semibold">Grade</label>
+                        <input type="text" name="Quality.grade" id="grade" className="p-3 border rounded-full w-full" placeholder="Enter grade"
                         />
                     </div>
-                    {/* Fat + Protein */}
-                    <div className="flex w-full items-start gap-3">
-                        {/* Fat */}
-                        <div className="flex flex-col w-1/2 items-start gap-3">
-                            <label htmlFor="fat" className="font-semibold">Fat (%)</label>
-                            <input type="number" name="milkTankInfo.fat" id="fat" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01"
-                            />
-                        </div>
-                        {/* Protein */}
-                        <div className="flex flex-col w-1/2 items-start gap-3">
-                            <label htmlFor="protein" className="font-semibold">Protein (%)</label>
-                            <input type="number" name="milkTankInfo.protein" id="protein" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01"
-                            />
-                        </div>
+                    {/* Inspection Date */}
+                    <div className="flex flex-col w-full items-start gap-3">
+                        <label htmlFor="inspectionDate" className="font-semibold">Inspection Date</label>
+                        <input type="date" name="Quality.inspectionDate" id="inspectionDate" className="p-3 border rounded-full w-full"
+                        />
                     </div>
-                    {/* bacteria testing */}
-                    <div className="flex flex-col w-full justify-center gap-3">
-                        <div className="flex w-full items-center gap-3">
-                            <input
-                                type="checkbox"
-                                name="milkTankInfo.bacteria"
-                                id="bacteria"
-                                className="w-5 h-5 appearance-none border border-gray-400 rounded-full checked:bg-[#D3D596] checked:border-[#305066]"
-                                onChange={handleBacteriaChange}
-                            />
-                            <label htmlFor="bacteria" className="font-semibold">Bacteria Testing</label>
-                        </div>
-                        {showBacteriaInfo && (
-                            <input
-                                type="text"
-                                name="milkTankInfo.bacteriaInfo"
-                                id="bacteriaInfo"
-                                className="border rounded-full p-3"
-                                placeholder="Please fill additional information"
-                            />
-                        )}
+                    {/* Inspector */}
+                    <div className="flex flex-col w-full items-start gap-3">
+                        <label htmlFor="inspector" className="font-semibold">Inspector</label>
+                        <input type="text" name="Quality.inspector" id="inspector" className="p-3 border rounded-full w-full" placeholder="Enter inspector name"
+                        />
                     </div>
-                    {/* Contaminants */}
-                    <div className="flex flex-col w-full justify-center gap-3">
-                        <div className="flex w-full items-center gap-3">
-                            <input
-                                type="checkbox"
-                                name="milkTankInfo.contaminants"
-                                id="milkTankInfo.contaminants"
-                                className="w-5 h-5 appearance-none border border-gray-400 rounded-full checked:bg-[#D3D596] checked:border-[#305066]"
-                                onChange={handleContaminantChange}
-                            />
-                            <label htmlFor="contaminants" className="font-semibold">Contaminants</label>
-                        </div>
-                        {showContaminantInfo && (
-                            <input
-                                type="text"
-                                name="milkTankInfo.contaminantInfo"
-                                id="milkTankInfo.contaminantInfo"
-                                className="border rounded-full p-3"
-                                placeholder="Please fill additional information"
-                            />
-                        )}
-                    </div>
-                    {/* Abnormal Characteristic */}
-                    <div className="flex flex-col w-full justify-center items-start gap-3">
-                        <div className="flex w-full items-center gap-3">
-                            <input
-                                type="checkbox"
-                                name="milkTankInfo.abnormalChar"
-                                id="abnormalChar"
-                                className="w-5 h-5 appearance-none border border-gray-400 rounded-full checked:bg-[#D3D596] checked:border-[#305066]"
-                                onChange={handleAbnormalChange}
-                            />
-                            <label htmlFor="abnormalChar" className="font-semibold">Abnormal Characteristic</label>
-                        </div>
-                        {showAbnormalInfo && (
-                            <div className="flex flex-col w-full items-center gap-3 px-8">
-                                <div className="flex w-full items-center gap-3">
-                                    <input type="checkbox" name="milkTankInfo.abnormalType.smellBad" id="smellBad" className="border w-4 h-4"
-                                         />
-                                    <label htmlFor="smellBad" className="font-semibold">Smell Bad</label>
-                                </div>
-                                <div className="flex w-full items-center gap-3">
-                                    <input type="checkbox" name="milkTankInfo.abnormalType.smellNotFresh" id="smellNotFresh" className="border w-4 h-4"
-                                         />
-                                    <label htmlFor="smellNotFresh" className="font-semibold">Smell not fresh</label>
-                                </div>
-                                <div className="flex w-full items-center gap-3">
-                                    <input type="checkbox" name="milkTankInfo.abnormalType.abnormalColor" id="abnormalColor" className="border w-4 h-4"
-                                         />
-                                    <label htmlFor="abnormalColor" className="font-semibold">Abnormal Color</label>
-                                    <p className="text-gray-500">ex. yellow or green</p>
-                                </div>
-                                <div className="flex w-full items-center gap-3">
-                                    <input type="checkbox" name="milkTankInfo.abnormalType.sour" id="sour" className="border w-4 h-4"
-                                         />
-                                    <label htmlFor="sour" className="font-semibold">Sour taste</label>
-                                </div>
-                                <div className="flex w-full items-center gap-3">
-                                    <input type="checkbox" name="milkTankInfo.abnormalType.bitter" id="bitter" className="border w-4 h-4"
-                                         />
-                                    <label htmlFor="bitter" className="font-semibold">Bitter taste</label>
-                                </div>
-                                <div className="flex w-full items-center gap-3">
-                                    <input type="checkbox" name="milkTankInfo.abnormalType.cloudy" id="cloudy" className="border w-4 h-4"
-                                         />
-                                    <label htmlFor="cloudy" className="font-semibold">Cloudy Appearance</label>
-                                </div>
-                                <div className="flex w-full items-center gap-3">
-                                    <input type="checkbox" name="milkTankInfo.abnormalType.lumpy" id="lumpy" className="border w-4 h-4"
-                                         />
-                                    <label htmlFor="lumpy" className="font-semibold">Lumpy Appearance</label>
-                                </div>
-                                <div className="flex w-full items-center gap-3">
-                                    <input type="checkbox" name="milkTankInfo.abnormalType.separation" id="separation" className="border w-4 h-4"
-                                         />
-                                    <label htmlFor="separation" className="font-semibold">Separation between water and fat</label>
-                                </div>
-                            </div>
-                        )}
+                    {/* Comments */}
+                    <div className="flex flex-col w-full items-start gap-3">
+                        <label htmlFor="comments" className="font-semibold">Comments</label>
+                        <textarea name="Quality.comments" id="comments" className="p-3 border rounded-3xl w-full" placeholder="Enter comments"
+                        ></textarea>
                     </div>
 
                     <button
@@ -772,131 +685,132 @@ const AddProductLot = () => {
                 {/* Shipping Address section */}
                 <div id="section5" ref={shippingAddressRef} className={`flex flex-col items-center w-full h-full text-xl gap-8 mt-20 ${visibleSection >= 5 ? '' : 'hidden'}`}>
                     <h1 className="text-5xl font-bold">Shipping Address</h1>
-                    {/* Company Name */}
-                    <div className="flex flex-col w-full gap-5 mt-10">
-                        <label htmlFor="companyName" className="font-semibold">Company Name</label>
-                        <input type="text" name="shippingAddress.companyName" id="companyName" className="border p-3 rounded-full" placeholder="Enter your company name"
-                        />
-                    </div>
-                    {/* First name + Last name */}
-                    <div className="flex items-center w-full gap-5">
-                        <div className="flex flex-col w-1/2 gap-3">
-                            <label htmlFor="fName" className="font-semibold">First Name</label>
-                            <input type="text" name="shippingAddress.firstName" id="fName" className="border p-3 rounded-full" placeholder="Enter your first name"
-                            />
-                        </div>
-                        <div className="flex flex-col w-1/2 gap-3">
-                            <label htmlFor="lName" className="font-semibold">Last Name</label>
-                            <input type="text" name="shippingAddress.lastName" id="lName" className="border p-3 rounded-full" placeholder="Enter your last name"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col w-full gap-3">
-                        <label htmlFor="email" className="font-semibold">Email</label>
-                        <input type="text" name="shippingAddress.email" id="email" className="border p-3 rounded-full" placeholder="Enter your Email"
-                        />
-                    </div>
-
-                    {/* Phone Number */}
-                    <div className="flex flex-col w-full text-start gap-3">
-                        <label htmlFor="tel" className="font-semibold">Phone Number</label>
-                        <div className="flex flex-row gap-3">
-
-                            {/* Area Code */}
-                            <div className="flex flex-col">
-                                <label htmlFor="areaCode" className="sr-only">Area Code</label>
-                                <select
-                                    name="shippingAddress.areaCode"
-                                    id="areaCode"
-                                    className="border border-gray-300 rounded-full p-3 w-auto text-center"
-                                    required
-                                >
-                                    <option value="+66">+66</option>
+                    {shippingAddresses.map((address, index) => (
+                        <div key={index} className="flex flex-col w-full gap-8 mt-10">
+                            {/* Company Name */}
+                            <div className="flex flex-col w-full gap-5">
+                                <label htmlFor={`companyName-${index}`} className="font-semibold">Company Name</label>
+                                <input type="text" name="companyName" id={`companyName-${index}`} className="border p-3 rounded-full" placeholder="Enter your company name"
+                                    value={address.companyName} onChange={(e) => handleShippingAddressChange(index, e)} />
+                            </div>
+                            {/* First name + Last name */}
+                            <div className="flex items-center w-full gap-5">
+                                <div className="flex flex-col w-1/2 gap-3">
+                                    <label htmlFor={`firstName-${index}`} className="font-semibold">First Name</label>
+                                    <input type="text" name="firstName" id={`firstName-${index}`} className="border p-3 rounded-full" placeholder="Enter your first name"
+                                        value={address.firstName} onChange={(e) => handleShippingAddressChange(index, e)} />
+                                </div>
+                                <div className="flex flex-col w-1/2 gap-3">
+                                    <label htmlFor={`lastName-${index}`} className="font-semibold">Last Name</label>
+                                    <input type="text" name="lastName" id={`lastName-${index}`} className="border p-3 rounded-full" placeholder="Enter your last name"
+                                        value={address.lastName} onChange={(e) => handleShippingAddressChange(index, e)} />
+                                </div>
+                            </div>
+                            {/* Email */}
+                            <div className="flex flex-col w-full gap-3">
+                                <label htmlFor={`email-${index}`} className="font-semibold">Email</label>
+                                <input type="text" name="email" id={`email-${index}`} className="border p-3 rounded-full" placeholder="Enter your Email"
+                                    value={address.email} onChange={(e) => handleShippingAddressChange(index, e)} />
+                            </div>
+                            {/* Phone Number */}
+                            <div className="flex flex-col w-full text-start gap-3">
+                                <label htmlFor={`phoneNumber-${index}`} className="font-semibold">Phone Number</label>
+                                <div className="flex flex-row gap-3">
+                                    {/* Area Code */}
+                                    <div className="flex flex-col">
+                                        <label htmlFor={`areaCode-${index}`} className="sr-only">Area Code</label>
+                                        <select
+                                            name="areaCode"
+                                            id={`areaCode-${index}`}
+                                            className="border border-gray-300 rounded-full p-3 w-auto text-center"
+                                            value={address.areaCode} onChange={(e) => handleShippingAddressChange(index, e)}
+                                            required
+                                        >
+                                            <option value="+66">+66</option>
+                                        </select>
+                                    </div>
+                                    {/* Phone Input */}
+                                    <input
+                                        type="tel"
+                                        id={`phoneNumber-${index}`}
+                                        name="phoneNumber"
+                                        className="border border-gray-300 rounded-full p-3 flex-1 w-10/12"
+                                        placeholder="Enter your phone number"
+                                        value={address.phoneNumber} onChange={(e) => handleShippingAddressChange(index, e)}
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            {/* Address */}
+                            <div className="flex flex-col text-start font-medium w-full h-40 gap-3">
+                                <label htmlFor={`address-${index}`}>Address</label>
+                                <textarea name="address" id={`address-${index}`} className="border border-gray-300 rounded-3xl p-3 flex-1 w-full"
+                                    value={address.address} onChange={(e) => handleShippingAddressChange(index, e)}></textarea>
+                            </div>
+                            {/* Province */}
+                            <div className="flex flex-col w-full text-start gap-3">
+                                <label htmlFor={`province-${index}`} className="font-semibold">Province</label>
+                                <select name="province" id={`province-${index}`} className="border border-gray-300 rounded-full p-3 text-center"
+                                    value={address.province} onChange={(e) => handleShippingAddressChange(index, e)}>
+                                    <option value="">Select province</option>
+                                    {provinceList.map((prov, idx) => (
+                                        <option key={idx} value={prov}>
+                                            {prov}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
-
-                            {/* Phone Input */}
-                            <input
-                                type="tel"
-                                id="tel"
-                                name="shippingAddress.phoneNumber"
-                                className="border border-gray-300 rounded-full p-3 flex-1 w-10/12"
-                                placeholder="Enter your phone number"
-                                required
-                            />
+                            {/* District + Sub-District */}
+                            <div className="flex flex-row w-full gap-4">
+                                <div className="flex flex-col text-start w-6/12 gap-3">
+                                    <label htmlFor={`district-${index}`} className="font-semibold">District</label>
+                                    <select name="district" id={`district-${index}`} className="border border-gray-300 rounded-full p-3 text-center"
+                                        value={address.district} onChange={(e) => handleShippingAddressChange(index, e)} disabled={!address.province}>
+                                        <option value="">Select district</option>
+                                        {districtList.map((dist, idx) => (
+                                            <option key={idx} value={dist}>
+                                                {dist}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="flex flex-col text-start w-6/12 gap-3">
+                                    <label htmlFor={`subDistrict-${index}`} className="font-semibold">Sub-District</label>
+                                    <select name="subDistrict" id={`subDistrict-${index}`} className="border border-gray-300 rounded-full p-3 text-center"
+                                        value={address.subDistrict} onChange={(e) => handleShippingAddressChange(index, e)} disabled={!address.district}>
+                                        <option value="">Select sub-district</option>
+                                        {subDistrictList.map((subDist, idx) => (
+                                            <option key={idx} value={subDist}>
+                                                {subDist}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+                            {/* Zip/Postal Code */}
+                            <div className="flex flex-col text-start w-full gap-3">
+                                <label htmlFor={`postalCode-${index}`} className="font-semibold">Zip/Postal Code</label>
+                                <input type="text" name="postalCode" id={`postalCode-${index}`} className="border border-gray-300 rounded-full p-3 w-full" placeholder="Enter postal code"
+                                    value={address.postalCode} onChange={(e) => handleShippingAddressChange(index, e)} />
+                            </div>
+                            {/* Location */}
+                            <div className="flex flex-col text-start w-full gap-3">
+                                <label htmlFor={`location-${index}`} className="font-semibold">Location</label>
+                                <input type="text" name="location" id={`location-${index}`} className="border border-gray-300 rounded-full p-3 flex-1 w-full"
+                                    placeholder="Paste location url" value={address.location} onChange={(e) => handleShippingAddressChange(index, e)} />
+                            </div>
                         </div>
-                    </div>
-
-                    {/* Address */}
-                    <div className="flex flex-col text-start font-medium w-full h-40 gap-3">
-                        <label htmlFor="address">Address</label>
-                        <textarea name="shippingAddress.address" id="address" className="border border-gray-300 rounded-3xl p-3 flex-1 w-full"
-                        ></textarea>
-                    </div>
-
-                    {/* province */}
-                    <div className="flex flex-col w-full text-start gap-3">
-                        <label htmlFor="province" className="font-semibold" >Province</label>
-                        <select name="shippingAddress.province" id="province" className="border border-gray-300 rounded-full p-3 text-center"
-                            value={selectedProvince} onChange={handleFormDataChange}>
-                            <option value="">Select province</option>
-                            {provinceList.map((prov, index) => (
-                                <option key={index} value={prov}>
-                                    {prov}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    {/* district + Sub-District */}
-                    <div className="flex flex-row w-full gap-4">
-                        <div className="flex flex-col text-start w-6/12 gap-3">
-                            <label htmlFor="district" className="font-semibold">District</label>
-                            <select name="shippingAddress.district" id="district" className="border border-gray-300 rounded-full p-3 text-center"
-                                value={selectedDistrict} onChange={handleFormDataChange} disabled={!selectedProvince}>
-                                <option value="">Select district</option>
-                                {districtList.map((dist, index) => (
-                                    <option key={index} value={dist}>
-                                        {dist}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div className="flex flex-col text-start w-6/12 gap-3">
-                            <label htmlFor="subDistrict" className="font-semibold">Sub-District</label>
-                            <select name="shippingAddress.subDistrict" id="subDistrict" className="border border-gray-300 rounded-full p-3 text-center"
-                                value={selectedSubDistrict} onChange={handleFormDataChange} disabled={!selectedDistrict}>
-                                <option value="">Select sub-district</option>
-                                {subDistrictList.map((subDist, index) => (
-                                    <option key={index} value={subDist}>
-                                        {subDist}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-
-                    {/* Zip/Postal Code */}
-                    <div className="flex flex-col text-start w-full gap-3">
-                        <label htmlFor="postalCode" className="font-semibold">Zip/Postal Code</label>
-                        <input type="text" name="shippingAddress.postalCode" id="postalCode" className="border border-gray-300 rounded-full p-3 w-full" placeholder="Enter postal code"
-                        />
-                    </div>
-
-                    {/* location */}
-                    <div className="flex flex-col text-start w-full gap-3">
-                        <label htmlFor="location" className="font-semibold">Location</label>
-                        <input type="text" name="shippingAddress.location" id="location" className="border border-gray-300 rounded-full p-3 flex-1 w-full"
-                            placeholder="Paste location url"
-                        />
-                    </div>
-
+                    ))}
+                    <button type="button" className="underline hover:text-[#52600A]" onClick={addShippingAddress}>+ Add more shipping address</button>
                     <button
-                        type="button"
+                        type="submit"
                         className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8]`}
-                        onClick={() => router.push('/Factory/ProductLot/CheckDetails')}
+                        onClick={() => {
+                            const formDataWithShipping = { ...productLotForm, shippingAddresses };
+                            localStorage.setItem("productLotForm", JSON.stringify(formDataWithShipping));
+                            console.log("Navigating with data:", formDataWithShipping); // Debugging line
+                            router.push('/Factory/ProductLot/CheckDetails');
+                        }}
                     >
                         Next
                     </button>
