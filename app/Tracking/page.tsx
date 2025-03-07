@@ -3,6 +3,11 @@ import Link from "next/link";
 const TrackingPage = () => {
     return (
         <div className="flex flex-col w-full h-full min-h-screen pt-24">
+            <div className="flex w-full h-20 justify-center items-center">
+                <h1 className="text-5xl text-center font-bold">
+                    Tracking Product Details
+                </h1>
+            </div>
             <div className="flex w-full h-full justify-center items-center gap-10 px-4 md:px-0 relative">
                 <img src="/images/TracingBg_0.png" alt="" className="w-full" />
                 <img src="/images/TrackingRoute3NoBg.png" alt="image_background" className="absolute top-0 w-full" />
