@@ -109,7 +109,8 @@ const AddProductLot = () => {
             quantity: 0,
             quantityUnit: "Ton"
         },
-        selectMilkTank: {
+        selectMilkTank: {},
+        Quality: {
             temp: 0,
             tempUnit: "Celcius",
             pH: 0,
@@ -130,23 +131,6 @@ const AddProductLot = () => {
                 lumpy: false,
                 separation: false
             }
-        },
-        Quality: {
-            calories: 0,
-            totalFat: 0,
-            colestoral: 0,
-            sodium: 0,
-            potassium: 0,
-            totalCarbohydrates: 0,
-            fiber: 0,
-            sugar: 0,
-            vitaminC: 0,
-            calcium: 0,
-            iron: 0,
-            vitaminD: 0,
-            vitaminB6: 0,
-            vitaminB12: 0,
-            magnesium: 0
         },
         nutrition: {
             calories: 0,
@@ -213,88 +197,79 @@ const AddProductLot = () => {
         }]);
     };
 
-    const handleShippingAddressChange = (index: number, event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value } = event.target;
-        const updatedAddresses = [...shippingAddresses];
-        updatedAddresses[index] = { ...updatedAddresses[index], [name]: value };
-        setShippingAddresses(updatedAddresses);
-
-        // อัปเดต province, district และ subdistrict
-        if (name === "province") {
-            setSelectedProvince(value);
-        } else if (name === "district") {
-            setSelectedDistrict(value);
-        } else if (name === "subDistrict") {
-            setSelectedSubDistrict(value);
-        }
-    };
-
-    const [showAbnormalInfo, setShowAbnormalInfo] = useState(false);
-    const [showBacteriaInfo, setShowBacteriaInfo] = useState(false);
-    const [showContaminantInfo, setShowContaminantInfo] = useState(false);
-
     const handleFormDataChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, type, value, checked } = event.target;
         const keys = name.split(".");
 
         setFormData((prevData) => {
-            const updatedData = { ...prevData }; // Clone ข้อมูลเดิม
+            const updatedData = { ...prevData }; // Clone object หลัก
             let temp: any = updatedData;
 
-            for (let i = 0; i < keys.length - 1; i++) {
-                temp = temp[keys[i]];
-            }
+            // ใช้ reduce เพื่อสร้าง object ซ้อนกันให้ครบก่อนอัปเดตค่า
+            temp = keys.slice(0, -1).reduce((obj, key) => {
+                if (!obj[key]) obj[key] = {}; // ถ้า key ยังไม่มี ให้สร้าง object
+                return obj[key];
+            }, updatedData);
 
-            // ถ้าเป็น checkbox ให้ใช้ checked ถ้าไม่ใช่ให้ใช้ value
+            // กำหนดค่าล่าสุดที่ตำแหน่งสุดท้าย
             temp[keys[keys.length - 1]] = type === "checkbox" ? checked : value;
 
             return updatedData;
         });
-
-        // อัปเดต province, district และ subdistrict
-        if (name === "shippingAddress.province") {
-            setSelectedProvince(value);
-        } else if (name === "shippingAddress.district") {
-            setSelectedDistrict(value);
-        } else if (name === "shippingAddress.subDistrict") {
-            setSelectedSubDistrict(value);
-        }
     };
 
-    const handleAbnormalChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        // handleFormDataChange(event);
-        setShowAbnormalInfo(event.target.checked);
-    };
 
-    const handleBacteriaChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        // handleFormDataChange(event);
-        setShowBacteriaInfo(event.target.checked);
-    };
-
-    const handleContaminantChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        // handleFormDataChange(event);
-        setShowContaminantInfo(event.target.checked);
-    };
-
+    // ฟังก์ชันสำหรับอัปเดต checkbox ที่อยู่ใน object ซ้อนกัน
     const handleNestedCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, checked } = event.target;
 
         setFormData((prevData) => {
             const updatedData = { ...prevData };
-            let temp = updatedData.Quantity.abnormalType;
 
-            temp[name.split('.').pop()!] = checked;
+            // ตรวจสอบว่า `Quality.abnormalType` มีค่าอยู่แล้วหรือไม่
+            if (!updatedData.Quality) updatedData.Quality = {};
+            if (!updatedData.Quality.abnormalType) updatedData.Quality.abnormalType = {};
+
+            updatedData.Quality.abnormalType[name.split('.').pop()!] = checked;
 
             return updatedData;
         });
     };
 
+    const handleShippingAddressChange = (index: number, event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = event.target;
+
+        setShippingAddresses((prevAddresses) => {
+            return prevAddresses.map((address, i) =>
+                i === index ? { ...address, [name]: value } : address
+            );
+        });
+
+        // อัปเดตค่า province, district, subdistrict
+        if (name === "province") setSelectedProvince(value);
+        if (name === "district") setSelectedDistrict(value);
+        if (name === "subDistrict") setSelectedSubDistrict(value);
+    };
+
+    const [showAbnormalInfo, setShowAbnormalInfo] = useState(false);
+
+    const handleAbnormalChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData((prevData) => ({
+            ...prevData,
+            Quality: {
+                ...prevData.Quality,
+                abnormalChar: event.target.checked,
+            }
+        }));
+    
+        setShowAbnormalInfo(event.target.checked);
+    };
+    
 
     const saveToLocalStorage = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const formDataWithShipping = { ...productLotForm, shippingAddresses };
         localStorage.setItem("productLotForm", JSON.stringify(formDataWithShipping));
-        alert("Form saved to localStorage!");
         console.log("Saved data:", formDataWithShipping); // Debugging line
     };
 
@@ -422,6 +397,7 @@ const AddProductLot = () => {
                         <label htmlFor="productName" className="font-semibold">Product Name</label>
                         <input type="text" name="RecipientInfo.productName" id="productName"
                             placeholder="Enter product name" className="border rounded-full p-3 w-full"
+                            value={productLotForm.GeneralInfo.productName} onChange={handleFormDataChange}
                         />
                     </div>
                     {/* Category */}
@@ -429,21 +405,25 @@ const AddProductLot = () => {
                         <label htmlFor="category" className="font-semibold">Category</label>
                         <input type="text" id="category"
                             placeholder="Enter category" className="border rounded-full p-3 w-full"
-                            name="RecipientInfo.category" />
+                            name="RecipientInfo.category" value={productLotForm.GeneralInfo.category} onChange={handleFormDataChange}
+                        />
                     </div>
                     {/* Description */}
                     <div className="flex flex-col w-full items-start gap-3">
                         <label htmlFor="description" className="font-semibold">Description</label>
                         <input type="text" id="description" placeholder="Write description" className="border rounded-full p-3 w-full"
-                            name="RecipientInfo.description" />
+                            name="RecipientInfo.description" value={productLotForm.GeneralInfo.description} onChange={handleFormDataChange}
+                        />
                     </div>
                     {/* Quauntity per unit */}
                     <div className="flex flex-col w-full items-start gap-3">
                         <label htmlFor="quantity" className="font-semibold">Quantity per unit</label>
                         <div className="flex gap-3 w-full items-center">
                             <input type="number" name="RecipientInfo.quantity" className="border rounded-full w-5/6 p-3" placeholder="0.00" step={0.01}
+                                value={productLotForm.GeneralInfo.quantity} onChange={handleFormDataChange}
                             />
                             <select name="Quantity.quantityUnit" id="Unit" className="border rounded-full p-3 w-1/6 font-semibold text-center"
+                                value={productLotForm.GeneralInfo.quantityUnit} onChange={handleFormDataChange}
                             >
                                 <option value="liter">Liter</option>
                                 <option value="milliliter">Milliliter</option>
@@ -467,7 +447,9 @@ const AddProductLot = () => {
                 {/* Select Milk Tank */}
                 <div id="section2" className={`flex flex-col items-center w-full h-full text-xl gap-8 mt-20 ${visibleSection >= 2 ? '' : 'hidden'}`}>
                     <h1 className="text-5xl font-bold">Select Milk Tank</h1>
-                    <select name="milkTank" id="milkTank" className="border rounded-full p-3 w-1/2 text-center">
+                    <select name="milkTank" id="milkTank" className="border rounded-full p-3 w-1/2 text-center"
+                        value={productLotForm.selectMilkTank} onChange={handleFormDataChange}
+                    >
                         <option value="T1">Milk Tank 1</option>
                     </select>
                     <div className="flex flex-col justify-center items-center w-1/2 h-fit gap-5 bg-white text-slate-500 shadow-xl border rounded-2xl p-5">
@@ -509,29 +491,169 @@ const AddProductLot = () => {
                 {/* Quality */}
                 <div id="section3" className={`flex flex-col items-center w-full h-full text-xl gap-8 mt-20 ${visibleSection >= 3 ? '' : 'hidden'}`}>
                     <h1 className="text-5xl font-bold">Quality</h1>
-                    {/* Grade */}
-                    <div className="flex flex-col w-full items-start gap-3">
-                        <label htmlFor="grade" className="font-semibold">Grade</label>
-                        <input type="text" name="Quality.grade" id="grade" className="p-3 border rounded-full w-full" placeholder="Enter grade"
-                        />
+                    {/* Quantity + temperature */}
+                    <div className="flex w-full items-start gap-3">
+                        {/* Quantity */}
+                        <div className="flex flex-col w-1/2 items-start gap-3">
+                            <label htmlFor="quantity" className="font-semibold">Quantity</label>
+                            <div className="flex gap-3 w-full">
+                                <input type="number" name="Quality.quantity" id="quantity"
+                                    className="border rounded-full p-3 w-4/5" placeholder="0.00" step="0.01"
+                                    value={productLotForm?.Quality?.quantity} onChange={handleFormDataChange} />
+                                <select name="Quality.quantityUnit" id="quantityUnit" className="border rounded-full p-3 w-1/5 font-semibold"
+                                    value={productLotForm?.Quality?.quantityUnit} onChange={handleFormDataChange}>
+                                    <option value="Ton">Ton</option>
+                                    <option value="Liter">Liter</option>
+                                    <option value="Ml">Milliliter</option>
+                                    <option value="Oz">Ounce</option>
+                                    <option value="CC">cc</option>
+                                    <option value="Gallon">Gallon</option>
+                                </select>
+                            </div>
+                        </div>
+                        {/* Temperature */}
+                        <div className="flex flex-col w-1/2 items-start gap-3">
+                            <label htmlFor="temp" className="font-semibold">Temperature</label>
+                            <div className="flex w-full items-start gap-3">
+                                <input type="number" name="Quality.temp" id="temp" className="p-3 rounded-full border w-4/5" placeholder="0.00" step="0.01"
+                                    value={productLotForm?.Quality?.temp} onChange={handleFormDataChange} />
+                                <select name="Quality.tempUnit" id="tempUnit" className="border rounded-full p-3 w-1/5 font-semibold"
+                                    value={productLotForm?.Quality?.tempUnit} onChange={handleFormDataChange}>
+                                    <option value="Celcius">°C</option>
+                                    <option value="Farenheit">°F</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                    {/* Inspection Date */}
+                    {/* pH of Milk */}
                     <div className="flex flex-col w-full items-start gap-3">
-                        <label htmlFor="inspectionDate" className="font-semibold">Inspection Date</label>
-                        <input type="date" name="Quality.inspectionDate" id="inspectionDate" className="p-3 border rounded-full w-full"
-                        />
+                        <label htmlFor="pH" className="font-semibold">pH of Milk</label>
+                        <input type="number" name="Quality.pH" id="pH" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01"
+                            value={productLotForm?.Quality?.pH} onChange={handleFormDataChange} />
                     </div>
-                    {/* Inspector */}
-                    <div className="flex flex-col w-full items-start gap-3">
-                        <label htmlFor="inspector" className="font-semibold">Inspector</label>
-                        <input type="text" name="Quality.inspector" id="inspector" className="p-3 border rounded-full w-full" placeholder="Enter inspector name"
-                        />
+                    {/* Fat + Protein */}
+                    <div className="flex w-full items-start gap-3">
+                        {/* Fat */}
+                        <div className="flex flex-col w-1/2 items-start gap-3">
+                            <label htmlFor="fat" className="font-semibold">Fat (%)</label>
+                            <input type="number" name="Quality.fat" id="fat" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01"
+                                value={productLotForm?.Quality?.fat} onChange={handleFormDataChange} />
+                        </div>
+                        {/* Protein */}
+                        <div className="flex flex-col w-1/2 items-start gap-3">
+                            <label htmlFor="protein" className="font-semibold">Protein (%)</label>
+                            <input type="number" name="Quality.protein" id="protein" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01"
+                                value={productLotForm?.Quality?.protein} onChange={handleFormDataChange} />
+                        </div>
                     </div>
-                    {/* Comments */}
-                    <div className="flex flex-col w-full items-start gap-3">
-                        <label htmlFor="comments" className="font-semibold">Comments</label>
-                        <textarea name="Quality.comments" id="comments" className="p-3 border rounded-3xl w-full" placeholder="Enter comments"
-                        ></textarea>
+                    {/* bacteria testing */}
+                    <div className="flex flex-col w-full justify-center gap-3">
+                        <div className="flex w-full items-center gap-3">
+                            <input
+                                type="checkbox"
+                                name="Quality.bacteria"
+                                id="bacteria"
+                                className="w-5 h-5 appearance-none border border-gray-400 rounded-full checked:bg-[#D3D596] checked:border-[#305066]"
+                                onChange={handleFormDataChange}
+                                checked={productLotForm?.Quality?.bacteria}
+                            />
+                            <label htmlFor="bacteria" className="font-semibold">Bacteria Testing</label>
+                        </div>
+                        {productLotForm?.Quality?.bacteria && (
+                            <input
+                                type="text"
+                                name="Quality.bacteriaInfo"
+                                id="bacteriaInfo"
+                                className="border rounded-full p-3"
+                                placeholder="Please fill additional information"
+                                value={productLotForm?.Quality?.bacteriaInfo}
+                                onChange={handleFormDataChange}
+                            />
+                        )}
+                    </div>
+                    {/* Contaminants */}
+                    <div className="flex flex-col w-full justify-center gap-3">
+                        <div className="flex w-full items-center gap-3">
+                            <input
+                                type="checkbox"
+                                name="Quality.contaminants"
+                                id="Quality.contaminants"
+                                className="w-5 h-5 appearance-none border border-gray-400 rounded-full checked:bg-[#D3D596] checked:border-[#305066]"
+                                onChange={handleFormDataChange}
+                                checked={productLotForm?.Quality?.contaminants}
+                            />
+                            <label htmlFor="contaminants" className="font-semibold">Contaminants</label>
+                        </div>
+                        {productLotForm?.Quality?.contaminants && (
+                            <input
+                                type="text"
+                                name="Quality.contaminantInfo"
+                                id="Quality.contaminantInfo"
+                                className="border rounded-full p-3"
+                                placeholder="Please fill additional information"
+                                value={productLotForm?.Quality?.contaminantInfo}
+                                onChange={handleFormDataChange}
+                            />
+                        )}
+                    </div>
+                    {/* Abnormal Characteristic */}
+                    <div className="flex flex-col w-full justify-center items-start gap-3">
+                        <div className="flex w-full items-center gap-3">
+                            <input
+                                type="checkbox"
+                                name="Quality.abnormalChar"
+                                id="abnormalChar"
+                                className="w-5 h-5 appearance-none border border-gray-400 rounded-full checked:bg-[#D3D596] checked:border-[#305066]"
+                                onChange={handleAbnormalChange}
+                                checked={productLotForm?.Quality?.abnormalChar}
+                            />
+                            <label htmlFor="abnormalChar" className="font-semibold">Abnormal Characteristic</label>
+                        </div>
+                        {showAbnormalInfo && (
+                            <div className="flex flex-col w-full items-center gap-3 px-8">
+                                <div className="flex w-full items-center gap-3">
+                                    <input type="checkbox" name="Quality.abnormalType.smellBad" id="smellBad" className="border w-4 h-4"
+                                        checked={productLotForm?.Quality?.abnormalType?.smellBad} onChange={handleNestedCheckboxChange} />
+                                    <label htmlFor="smellBad" className="font-semibold">Smell Bad</label>
+                                </div>
+                                <div className="flex w-full items-center gap-3">
+                                    <input type="checkbox" name="Quality.abnormalType.smellNotFresh" id="smellNotFresh" className="border w-4 h-4"
+                                        checked={productLotForm?.Quality?.abnormalType?.smellNotFresh} onChange={handleNestedCheckboxChange} />
+                                    <label htmlFor="smellNotFresh" className="font-semibold">Smell not fresh</label>
+                                </div>
+                                <div className="flex w-full items-center gap-3">
+                                    <input type="checkbox" name="Quality.abnormalType.abnormalColor" id="abnormalColor" className="border w-4 h-4"
+                                        checked={productLotForm?.Quality?.abnormalType?.abnormalColor} onChange={handleNestedCheckboxChange} />
+                                    <label htmlFor="abnormalColor" className="font-semibold">Abnormal Color</label>
+                                    <p className="text-gray-500">ex. yellow or green</p>
+                                </div>
+                                <div className="flex w-full items-center gap-3">
+                                    <input type="checkbox" name="Quality.abnormalType.sour" id="sour" className="border w-4 h-4"
+                                        checked={productLotForm?.Quality?.abnormalType?.sour} onChange={handleNestedCheckboxChange} />
+                                    <label htmlFor="sour" className="font-semibold">Sour taste</label>
+                                </div>
+                                <div className="flex w-full items-center gap-3">
+                                    <input type="checkbox" name="Quality.abnormalType.bitter" id="bitter" className="border w-4 h-4"
+                                        checked={productLotForm?.Quality?.abnormalType?.bitter} onChange={handleNestedCheckboxChange} />
+                                    <label htmlFor="bitter" className="font-semibold">Bitter taste</label>
+                                </div>
+                                <div className="flex w-full items-center gap-3">
+                                    <input type="checkbox" name="Quality.abnormalType.cloudy" id="cloudy" className="border w-4 h-4"
+                                        checked={productLotForm?.Quality?.abnormalType?.cloudy} onChange={handleNestedCheckboxChange} />
+                                    <label htmlFor="cloudy" className="font-semibold">Cloudy Appearance</label>
+                                </div>
+                                <div className="flex w-full items-center gap-3">
+                                    <input type="checkbox" name="Quality.abnormalType.lumpy" id="lumpy" className="border w-4 h-4"
+                                        checked={productLotForm?.Quality?.abnormalType?.lumpy} onChange={handleNestedCheckboxChange} />
+                                    <label htmlFor="lumpy" className="font-semibold">Lumpy Appearance</label>
+                                </div>
+                                <div className="flex w-full items-center gap-3">
+                                    <input type="checkbox" name="Quality.abnormalType.separation" id="separation" className="border w-4 h-4"
+                                        checked={productLotForm?.Quality?.abnormalType?.separation} onChange={handleNestedCheckboxChange} />
+                                    <label htmlFor="separation" className="font-semibold">Separation between water and fat</label>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <button
@@ -724,7 +846,7 @@ const AddProductLot = () => {
                                             id={`areaCode-${index}`}
                                             className="border border-gray-300 rounded-full p-3 w-auto text-center"
                                             value={address.areaCode} onChange={(e) => handleShippingAddressChange(index, e)}
-                                            
+
                                         >
                                             <option value="+66">+66</option>
                                         </select>

@@ -198,77 +198,7 @@ const CheckDetails = () => {
                         <div className="flex flex-col gap-4 md:gap-10 w-full h-fit bg-white border p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
                             <h1 className="text-xl md:text-3xl font-bold text-center text-black">Select Milk Tank</h1>
                             <div className="flex flex-col space-y-2 gap-3">
-                                <div className="flex justify-between">
-                                    <p className="font-semibold">Temperature:</p>
-                                    <p>{data.selectMilkTank.temp} {data.selectMilkTank.tempUnit}</p>
-                                </div>
-                                <div className="flex justify-between">
-                                    <p className="font-semibold">pH:</p>
-                                    <p>{data.selectMilkTank.pH}</p>
-                                </div>
-                                <div className="flex justify-between">
-                                    <p className="font-semibold">Fat:</p>
-                                    <p>{data.selectMilkTank.fat} %</p>
-                                </div>
-                                <div className="flex justify-between">
-                                    <p className="font-semibold">Protein:</p>
-                                    <p>{data.selectMilkTank.protein} %</p>
-                                </div>
-                                <div className="flex justify-between">
-                                    <p className="font-semibold">Bacteria:</p>
-                                    <p>{data.selectMilkTank.bacteria ? "Yes" : "No"}</p>
-                                </div>
-                                <div className="flex justify-between">
-                                    <p className="font-semibold">Bacteria Info:</p>
-                                    <p>{data.selectMilkTank.bacteriaInfo}</p>
-                                </div>
-                                <div className="flex justify-between">
-                                    <p className="font-semibold">Contaminants:</p>
-                                    <p>{data.selectMilkTank.contaminants ? "Yes" : "No"}</p>
-                                </div>
-                                <div className="flex justify-between">
-                                    <p className="font-semibold">Contaminant Info:</p>
-                                    <p>{data.selectMilkTank.contaminantInfo}</p>
-                                </div>
-                                <div className="flex justify-between">
-                                    <p className="font-semibold">Abnormal Characteristic:</p>
-                                    <p>{data.selectMilkTank.abnormalChar ? "Yes" : "No"}</p>
-                                </div>
-                                <div className="flex flex-col space-y-2 gap-3">
-                                    <p className="font-semibold">Abnormal Type:</p>
-                                    <div className="flex justify-between">
-                                        <p className="font-semibold">Smell Bad:</p>
-                                        <p>{data.selectMilkTank.abnormalType?.smellBad ? "Yes" : "No"}</p>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <p className="font-semibold">Smell Not Fresh:</p>
-                                        <p>{data.selectMilkTank.abnormalType?.smellNotFresh ? "Yes" : "No"}</p>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <p className="font-semibold">Abnormal Color:</p>
-                                        <p>{data.selectMilkTank.abnormalType?.abnormalColor ? "Yes" : "No"}</p>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <p className="font-semibold">Sour:</p>
-                                        <p>{data.selectMilkTank.abnormalType?.sour ? "Yes" : "No"}</p>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <p className="font-semibold">Bitter:</p>
-                                        <p>{data.selectMilkTank.abnormalType?.bitter ? "Yes" : "No"}</p>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <p className="font-semibold">Cloudy:</p>
-                                        <p>{data.selectMilkTank.abnormalType?.cloudy ? "Yes" : "No"}</p>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <p className="font-semibold">Lumpy:</p>
-                                        <p>{data.selectMilkTank.abnormalType?.lumpy ? "Yes" : "No"}</p>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <p className="font-semibold">Separation:</p>
-                                        <p>{data.selectMilkTank.abnormalType?.separation ? "Yes" : "No"}</p>
-                                    </div>
-                                </div>
+
                             </div>
                         </div>
 
@@ -277,20 +207,75 @@ const CheckDetails = () => {
                             <h1 className="text-xl md:text-3xl font-bold text-center text-black">Quality</h1>
                             <div className="flex flex-col space-y-2 gap-3">
                                 <div className="flex justify-between">
-                                    <p className="font-semibold">Grade:</p>
-                                    <p>{data.Quality.grade}</p>
+                                    <p className="font-semibold">Temperature:</p>
+                                    <p>{data.Quality.temp} {data.Quality.tempUnit}</p>
                                 </div>
                                 <div className="flex justify-between">
-                                    <p className="font-semibold">Inspection Date:</p>
-                                    <p>{data.Quality.inspectionDate}</p>
+                                    <p className="font-semibold">pH:</p>
+                                    <p>{data.Quality.pH}</p>
                                 </div>
                                 <div className="flex justify-between">
-                                    <p className="font-semibold">Inspector:</p>
-                                    <p>{data.Quality.inspector}</p>
+                                    <p className="font-semibold">Fat:</p>
+                                    <p>{data.Quality.fat} %</p>
                                 </div>
                                 <div className="flex justify-between">
-                                    <p className="font-semibold">Comments:</p>
-                                    <p>{data.Quality.comments}</p>
+                                    <p className="font-semibold">Protein:</p>
+                                    <p>{data.Quality.protein} %</p>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Bacteria:</p>
+                                    <p>{data.Quality.bacteria ? "Yes" : "No"}</p>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Bacteria Info:</p>
+                                    <p>{data.Quality.bacteriaInfo}</p>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Contaminants:</p>
+                                    <p>{data.Quality.contaminants ? "Yes" : "No"}</p>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Contaminant Info:</p>
+                                    <p>{data.Quality.contaminantInfo}</p>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Abnormal Characteristic:</p>
+                                    <p>{data.Quality.abnormalChar ? "Yes" : "No"}</p>
+                                </div>
+                                <div className="flex flex-col space-y-2 gap-3">
+                                    <p className="font-semibold">Abnormal Type:</p>
+                                    <div className="flex justify-between">
+                                        <p className="font-semibold">Smell Bad:</p>
+                                        <p>{data.Quality.abnormalType?.smellBad ? "Yes" : "No"}</p>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <p className="font-semibold">Smell Not Fresh:</p>
+                                        <p>{data.Quality.abnormalType?.smellNotFresh ? "Yes" : "No"}</p>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <p className="font-semibold">Abnormal Color:</p>
+                                        <p>{data.Quality.abnormalType?.abnormalColor ? "Yes" : "No"}</p>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <p className="font-semibold">Sour:</p>
+                                        <p>{data.Quality.abnormalType?.sour ? "Yes" : "No"}</p>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <p className="font-semibold">Bitter:</p>
+                                        <p>{data.Quality.abnormalType?.bitter ? "Yes" : "No"}</p>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <p className="font-semibold">Cloudy:</p>
+                                        <p>{data.Quality.abnormalType?.cloudy ? "Yes" : "No"}</p>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <p className="font-semibold">Lumpy:</p>
+                                        <p>{data.Quality.abnormalType?.lumpy ? "Yes" : "No"}</p>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <p className="font-semibold">Separation:</p>
+                                        <p>{data.Quality.abnormalType?.separation ? "Yes" : "No"}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>

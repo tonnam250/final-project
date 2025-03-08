@@ -139,7 +139,7 @@ const AddProduct = () => {
                 setFormData(JSON.parse(savedData));
             }
         }
-    }, []); 
+    }, []);
 
     // ✅ บันทึกข้อมูลลง localStorage ทุกครั้งที่ addProductForm เปลี่ยน
     useEffect(() => {
@@ -248,12 +248,12 @@ const AddProduct = () => {
                     <div className="flex flex-col w-1/3 h-full">
                         <div className="flex bg-gray-200 w-14 text-center text-gray-500 p-2 rounded-full mb-2">
                             <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="m23.5 17l-5 5l-3.5-3.5l1.5-1.5l2 2l3.5-3.5zM6 2a2 2 0 0 0-2 2v16c0 1.11.89 2 2 2h7.81c-.36-.62-.61-1.3-.73-2H6V4h7v5h5v3.08c.33-.05.67-.08 1-.08c.34 0 .67.03 1 .08V8l-6-6H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h4zm-2-2h4.1l.9-.9V16H8zm12.2-5c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1l-2.1-2.1l1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z" />
+                                <path fill="currentColor" d="M4 4a2 2 0 0 1 2-2h8a1 1 0 0 1 .707.293l5 5A1 1 0 0 1 20 8v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm13.586 4L14 4.414V8zM12 4H6v16h12V10h-5a1 1 0 0 1-1-1zm3.707 8.293a1 1 0 0 1 0 1.414l-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 1 1 1.414-1.414L11 15.586l3.293-3.293a1 1 0 0 1 1.414 0" />
                             </svg>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
                             <div className="bg-emerald-600 h-2 rounded-full w-0"></div>
-                        </div> 
+                        </div>
                         <p className="text-xl font-semibold text-gray-500">STEP 3</p>
                         <h1 className="text-3xl font-semibold mb-3 text-gray-500">Check Details</h1>
                         <div className="flex flex-wrap text-center w-fit items-center justify-center rounded-full p-1 px-2 mx-5 bg-gray-200 text-gray-500">
