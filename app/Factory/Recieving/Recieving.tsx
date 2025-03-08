@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface GeoData {
     id: number;
@@ -28,6 +28,10 @@ const Recieving = () => {
     const [selectedProvince, setSelectedProvince] = useState<string>("");
     const [selectedDistrict, setSelectedDistrict] = useState<string>("");
     const [selectedSubDistrict, setSelectedSubDistrict] = useState<string>("");
+    const searchParams = useSearchParams();
+    const tankId = searchParams.get("tankId");
+
+
 
     useEffect(() => {
         fetch("/data/geography.json")
@@ -56,6 +60,19 @@ const Recieving = () => {
             setSelectedSubDistrict("");
         }
     }, [selectedProvince]);
+
+    // ✅ เพิ่ม tankId เข้าไปใน recievedForm เมื่อโหลดข้อมูลจาก URL
+useEffect(() => {
+    if (tankId) {
+        setFormData((prevData) => ({
+            ...prevData,
+            tankId: tankId, // ✅ เพิ่ม tankId เข้าไปในฟอร์ม
+        }));
+    }
+}, [tankId]);
+
+    
+
 
     useEffect(() => {
         if (selectedDistrict) {
@@ -96,6 +113,7 @@ const Recieving = () => {
 
     // save form Data
     const [recievedForm, setFormData] = useState({
+        tankId: "", // ✅ Add tankId field here
         RecipientInfo: {
             personInCharge: "",
             location: "",
@@ -126,6 +144,7 @@ const Recieving = () => {
             }
         }
     });
+    
 
     // ✅ ควบคุมการแสดงผลของ abnormalType
     const [showAbnormalInfo, setShowAbnormalInfo] = useState(false);
@@ -160,9 +179,11 @@ const Recieving = () => {
                 temp = temp[keys[i]];
             }
 
-            // ถ้าเป็น checkbox ให้ใช้ checked ถ้าไม่ใช่ให้ใช้ value
-            temp[keys[keys.length - 1]] = type === "checkbox" ? checked : value;
+            // ตรวจสอบว่าฟิลด์ที่แก้ไขอยู่ใน numericFields หรือไม่
+            const numericFields = ["Quantity.quantity", "Quantity.temp", "Quantity.pH", "Quantity.fat", "Quantity.protein"];
+            const newValue = numericFields.includes(name) ? parseFloat(value) || 0 : value;
 
+            temp[keys[keys.length - 1]] = type === "checkbox" ? checked : newValue;
             // อัปเดต province, district และ subdistrict
             if (name === "RecipientInfo.province") {
                 setSelectedProvince(value);
@@ -470,8 +491,8 @@ const Recieving = () => {
                         <button
                             type="submit"
                             className="flex text-center self-end w-1/12 justify-center bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8]"
-                            onClick={() => router.push("/Factory/Recieving/CheckDetails")}
-                        >
+                            onClick={() => router.push(`/Factory/Recieving/CheckDetails?tankId=${tankId}`)}
+                            >
                             Next
                         </button>
                     </div>

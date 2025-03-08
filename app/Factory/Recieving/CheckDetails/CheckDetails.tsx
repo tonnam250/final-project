@@ -1,45 +1,94 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter,useSearchParams } from "next/navigation";
+import { updateMilkTankStatus } from "@/services/rawMilkFacService"; // ✅ เพิ่ม API ที่ต้องใช้
 
 const CheckDetails = () => {
     const [data, setData] = useState(null);
     const router = useRouter();
+    const [approved, setApproved] = useState<boolean | null>(null); // ✅ เพิ่ม State เก็บค่าที่ผู้ใช้เลือก
+    const [showShippingAddress, setShowShippingAddress] = useState<boolean>(false);
+    const shippingAddressRef = useRef<HTMLDivElement>(null);
+    const searchParams = useSearchParams(); // ✅ Get URL parameters
+    const tankId = searchParams.get("tankId");
+    const [stepStatus, setStepStatus] = useState({
+        step1: "completed",
+        step2: "completed",
+        step3: "in-progress",
+    });
 
     useEffect(() => {
         const storedData = localStorage.getItem("recievedForm");
+        const tankIdFromURL = searchParams.get("tankId"); // ✅ ดึง tankId จาก URL
+    
         if (storedData) {
-            setData(JSON.parse(storedData));
+            const parsedData = JSON.parse(storedData);
+            
+            // ✅ ถ้า tankId หาย ให้ใช้จาก URL
+            if (!parsedData.tankId && tankIdFromURL) {
+                parsedData.tankId = tankIdFromURL;
+            }
+    
+            setData(parsedData);
         }
     }, []);
+    
 
-    const handleSubmit = () => {
-        router.push("/Factory/Recieving/Details");
-        alert("Submitted Successfully!");
-        // localStorage.clear(); // Clear the form data in localStorage after submission
+    const handleSubmit = async () => {
+        if (approved === null) {
+            alert("กรุณาเลือกว่าจะรับหรือไม่รับนมดิบก่อนกด Submit!");
+            return;
+        }
+
+        if (!data) {
+            alert("No data found to submit!");
+            return;
+        }
+
+        try {
+            const tankId = data?.tankId || "";
+            const input = {
+                RecipientInfo: data.RecipientInfo,
+                Quantity: {
+                    ...data.Quantity,
+                    quantity: parseFloat(data.Quantity.quantity),
+                    temp: parseFloat(data.Quantity.temp),
+                    pH: parseFloat(data.Quantity.pH),
+                    fat: parseFloat(data.Quantity.fat),
+                    protein: parseFloat(data.Quantity.protein),
+                },
+            };
+            
+
+            const response = await updateMilkTankStatus(tankId, approved, input);
+
+            if (response) {
+                alert(approved ? "คุณรับนมดิบสำเร็จ!" : "คุณปฏิเสธนมดิบสำเร็จ!");
+                localStorage.removeItem("recievedForm"); // ✅ เคลียร์เฉพาะข้อมูลนี้
+                router.push("/Factory/Recieving/Details");
+            } else {
+                alert("เกิดข้อผิดพลาดในการส่งข้อมูล!");
+            }
+        } catch (error) {
+            console.error("❌ Error submitting data:", error);
+            alert("Error submitting data!");
+        }
     };
-
-    const [showShippingAddress, setShowShippingAddress] = useState<boolean>(false);
-    const shippingAddressRef = useRef<HTMLDivElement>(null);
-    const [stepStatus, setStepStatus] = useState({
-        step1: 'completed',
-        step2: 'completed',
-        step3: 'in-progress'
-    });
 
     const handleNextClick = () => {
         setShowShippingAddress(true);
         setStepStatus({
-            step1: 'completed',
-            step2: 'in-progress',
-            step3: 'not-started'
+            step1: "completed",
+            step2: "in-progress",
+            step3: "not-started",
         });
 
         setTimeout(() => {
             shippingAddressRef.current?.scrollIntoView({ behavior: "smooth" });
-        }, 100); // Delay to ensure the section is rendered
-    }
+        }, 100);
+    };
+
 
     return (
         <div className="flex flex-col justify-center items-center w-full pt-20 h-full min-h-screen">
@@ -187,8 +236,26 @@ const CheckDetails = () => {
                     </div>
                 </div>
             )}
+            {/* ✅ Selection buttons for accepting or rejecting raw milk */}
+            <div className="flex flex-col items-center gap-4 my-6">
+                <h2 className="text-xl font-semibold">Do you want to accept this tank?</h2>
+                <div className="flex gap-4">
+                    <button 
+                        className={`px-5 py-2 rounded-full font-semibold ${approved === true ? 'bg-green-500 text-white' : 'bg-gray-300'}`}
+                        onClick={() => setApproved(true)}
+                    >
+                        ✅ Accept Raw Milk
+                    </button>
+                    <button 
+                        className={`px-5 py-2 rounded-full font-semibold ${approved === false ? 'bg-red-500 text-white' : 'bg-gray-300'}`}
+                        onClick={() => setApproved(false)}
+                    >
+                        ❌ Reject Raw Milk
+                    </button>
+                </div>
+            </div>
             <button type="button" onClick={handleSubmit} className="text-xl bg-emerald-400 p-3 mb-5 self-end mx-14 rounded-3xl text-white font-semibold">Submit</button>
-        </div>
+            </div>
     );
 };
 export default CheckDetails;

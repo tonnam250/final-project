@@ -31,14 +31,53 @@ export const getFactoryRawMilkTanks = async (): Promise<any> => {
                 tankId: tank?.moreInfoLink?.split("=")[1]?.trim() || "", // ✅ ป้องกัน `split` แล้ว Error
                 personInCharge: tank?.personInCharge || "Unknown",
             },
-            status: tank?.status === 0 ? "Pending" : "Received",
+            status: tank?.status === 0 ? "Pending" : tank?.status === 1 ? "Received" : "Rejected", // ✅ รองรับ "Rejected"
             id: tank?.moreInfoLink?.split("=")[1]?.trim() || "", // ✅ ป้องกัน `split` แล้ว Error
         }));
+        
 
         console.log("✅ Formatted Factory Milk Tanks:", formattedData);
         return formattedData;
     } catch (error) {
         console.error("❌ Error fetching factory raw milk tanks:", error);
         return [];
+    }
+};
+
+// ✅ อัปเดตสถานะของแท็งก์นมดิบ (Approve/Reject)
+export const updateMilkTankStatus = async (
+    tankId: string,
+    approved: boolean,
+    input: any
+): Promise<any> => {
+    try {
+        const requestBody = {
+            tankId,
+            approved,
+            input
+        };
+
+        console.log("📡 Sending Update Request:", requestBody);
+
+        const response = await fetch(API_URL + "update-status", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify(requestBody),
+        });
+
+        if (!response.ok) {
+            console.error("❌ Failed to update milk tank status, Status:", response.status);
+            throw new Error("Failed to update milk tank status");
+        }
+
+        const data = await response.json();
+        console.log("✅ Milk Tank Status Updated:", data);
+        return data;
+    } catch (error) {
+        console.error("❌ Error updating milk tank status:", error);
+        return null;
     }
 };
