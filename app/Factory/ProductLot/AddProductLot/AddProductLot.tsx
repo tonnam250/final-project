@@ -261,10 +261,10 @@ const AddProductLot = () => {
                 abnormalChar: event.target.checked,
             }
         }));
-    
+
         setShowAbnormalInfo(event.target.checked);
     };
-    
+
 
     const saveToLocalStorage = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -846,7 +846,6 @@ const AddProductLot = () => {
                                             id={`areaCode-${index}`}
                                             className="border border-gray-300 rounded-full p-3 w-auto text-center"
                                             value={address.areaCode} onChange={(e) => handleShippingAddressChange(index, e)}
-
                                         >
                                             <option value="+66">+66</option>
                                         </select>
@@ -859,7 +858,6 @@ const AddProductLot = () => {
                                         className="border border-gray-300 rounded-full p-3 flex-1 w-10/12"
                                         placeholder="Enter your phone number"
                                         value={address.phoneNumber} onChange={(e) => handleShippingAddressChange(index, e)}
-                                        required
                                     />
                                 </div>
                             </div>
