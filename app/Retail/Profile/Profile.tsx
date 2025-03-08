@@ -11,6 +11,7 @@ const Profile = () => {
     const [email, setEmail] = useState("user@gmail.com");
     const [phone, setPhone] = useState("+1234567890");
     const [showPassword, setShowPassword] = useState(false);
+    const router = useRouter();
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
