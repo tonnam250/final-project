@@ -320,14 +320,14 @@ const Recieving = () => {
                         <h1 className="text-5xl font-bold">Product Detail</h1>
                         <div className="flex w-full items-center gap-3">
                             <div className="flex flex-col w-1/2 items-start gap-3">
-                                <label htmlFor="Deliver" className="font-semibold">Deliver Time</label>
+                                <label htmlFor="Deliver" className="font-semibold">Pickup Time</label>
                                 <input type="datetime-local" name="ProductDetail.deliverTime" id="Deliver" className="border rounded-full p-3 w-full"
-                                    value={LogisRecieve.ProductDetail.deliverTime} onChange={handleLogisRecieveChange} />
+                                    value={LogisRecieve.ProductDetail.recieveTime} onChange={handleLogisRecieveChange} />
                             </div>
                             <div className="flex flex-col w-1/2 items-start gap-3">
-                                <label htmlFor="Recieve" className="font-semibold">Pickup Time</label>
+                                <label htmlFor="Recieve" className="font-semibold">Deliver Time</label>
                                 <input type="datetime-local" name="ProductDetail.recieveTime" id="Recieve" className="border rounded-full p-3 w-full"
-                                    value={LogisRecieve.ProductDetail.recieveTime} onChange={handleLogisRecieveChange} />
+                                    value={LogisRecieve.ProductDetail.deliverTime} onChange={handleLogisRecieveChange} />
                             </div>
                         </div>
                         {/* Quantity + temperature */}

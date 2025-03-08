@@ -188,7 +188,7 @@ const CheckDetails = () => {
                                     <p>{data.GeneralInfo.description}</p>
                                 </div>
                                 <div className="flex justify-between">
-                                    <p className="font-semibold">Quantity:</p>
+                                    <p className="font-semibold">Quantity Per Unit:</p>
                                     <p>{data.GeneralInfo.quantity} {data.GeneralInfo.quantityUnit}</p>
                                 </div>
                             </div>

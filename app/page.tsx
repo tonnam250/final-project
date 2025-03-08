@@ -102,17 +102,19 @@ const page = async () => {
       {/* Get to know supply chain section */}
       <div className="flex flex-col w-full h-full min-h-screen items-center bg-white px-10" id="details">
         <h1 className="text-5xl font-bold text-[#3d405B]">Get to Know Supply Chain Management</h1>
-        <div className="flex flex-col w-full md:w-2/5 h-full justify-center mt-10 self-start p-8 gap-5">
-          <h1 className="text-4xl text-start font-semibold">Organic Dairy</h1>
-          <p className="pl-5 text-2xl text-gray-500"><b>Our comprehensive organic dairy supply chain management application with blockchain is</b> designed to revolutionize the way dairy products are sources, processed, and delivered.
-            With a focus on substainability and transparency, our platform ensures that every step of the dairy supply chain is optimized for effieciency and quality.
-            From farm to table, our innovative solution brings together farmers, processors, distributors, and retailers in seamless ecosystem.</p>
-        </div>
-        <div className="flex flex-col w-full md:w-2/5 h-full justify-center text-start text-white bg-[#3D405B] p-10 gap-5 self-start m-8 rounded-3xl">
-          <h1 className="text-4xl text-start font-semibold">Blockchain Integration</h1>
-          <p className="pl-5 text-2xl"><b>The integration of blockchain technology ensures the security and traceability of dairy products through the supply chain. </b>
-            By leveraging bloackchain, we provide immutable records of every transaction and movement, offering unparalleled trust and accountability in the industry.
-            This technology not only enhances food safety but also enables consumers to make informed choices about the dairy products they purchase.</p>
+        <div className="flex w-full h-full justify-center items-center">
+          <div className="flex flex-col w-full md:w-2/5 h-full justify-center mt-10 self-start p-8 gap-5">
+            <h1 className="text-4xl text-start font-semibold">Organic Dairy</h1>
+            <p className="pl-5 text-2xl text-gray-500"><b>Our comprehensive organic dairy supply chain management application with blockchain is</b> designed to revolutionize the way dairy products are sources, processed, and delivered.
+              With a focus on substainability and transparency, our platform ensures that every step of the dairy supply chain is optimized for effieciency and quality.
+              From farm to table, our innovative solution brings together farmers, processors, distributors, and retailers in seamless ecosystem.</p>
+          </div>
+          <div className="flex flex-col w-full md:w-2/5 h-full justify-center text-start text-white bg-[#3D405B] p-10 gap-5 self-start m-8 rounded-3xl">
+            <h1 className="text-4xl text-start font-semibold">Blockchain Integration</h1>
+            <p className="pl-5 text-2xl"><b>The integration of blockchain technology ensures the security and traceability of dairy products through the supply chain. </b>
+              By leveraging bloackchain, we provide immutable records of every transaction and movement, offering unparalleled trust and accountability in the industry.
+              This technology not only enhances food safety but also enables consumers to make informed choices about the dairy products they purchase.</p>
+          </div>
         </div>
       </div>
       {/* end supply chain section */}

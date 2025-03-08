@@ -491,28 +491,10 @@ const AddProductLot = () => {
                 {/* Quality */}
                 <div id="section3" className={`flex flex-col items-center w-full h-full text-xl gap-8 mt-20 ${visibleSection >= 3 ? '' : 'hidden'}`}>
                     <h1 className="text-5xl font-bold">Quality</h1>
-                    {/* Quantity + temperature */}
+                    {/* Temperature */}
                     <div className="flex w-full items-start gap-3">
-                        {/* Quantity */}
-                        <div className="flex flex-col w-1/2 items-start gap-3">
-                            <label htmlFor="quantity" className="font-semibold">Quantity</label>
-                            <div className="flex gap-3 w-full">
-                                <input type="number" name="Quality.quantity" id="quantity"
-                                    className="border rounded-full p-3 w-4/5" placeholder="0.00" step="0.01"
-                                    value={productLotForm?.Quality?.quantity} onChange={handleFormDataChange} />
-                                <select name="Quality.quantityUnit" id="quantityUnit" className="border rounded-full p-3 w-1/5 font-semibold"
-                                    value={productLotForm?.Quality?.quantityUnit} onChange={handleFormDataChange}>
-                                    <option value="Ton">Ton</option>
-                                    <option value="Liter">Liter</option>
-                                    <option value="Ml">Milliliter</option>
-                                    <option value="Oz">Ounce</option>
-                                    <option value="CC">cc</option>
-                                    <option value="Gallon">Gallon</option>
-                                </select>
-                            </div>
-                        </div>
                         {/* Temperature */}
-                        <div className="flex flex-col w-1/2 items-start gap-3">
+                        <div className="flex flex-col w-full items-start gap-3">
                             <label htmlFor="temp" className="font-semibold">Temperature</label>
                             <div className="flex w-full items-start gap-3">
                                 <input type="number" name="Quality.temp" id="temp" className="p-3 rounded-full border w-4/5" placeholder="0.00" step="0.01"

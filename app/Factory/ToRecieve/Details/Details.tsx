@@ -8,7 +8,7 @@ const Details = () => {
     const router = useRouter();
 
     useEffect(() => {
-        const storedData = localStorage.getItem("recievedForm");
+        const storedData = localStorage.getItem("formData");
         if (storedData) {
             setData(JSON.parse(storedData));
         }
@@ -44,67 +44,60 @@ const Details = () => {
         <div className="flex flex-col justify-center items-center w-full h-full min-h-screen pt-20">
             <h1 className="text-5xl font-bold mt-10">To Recieve Details</h1>
             {data && (
-                <div className="flex flex-col md:flex-row justify-between gap-10 w-full p-4 md:p-14">
-                    {/* Recipient Info */}
-                    <div className="flex flex-col gap-4 md:gap-10 w-full h-fit md:w-1/2 bg-white border p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
-                        <h1 className="text-xl md:text-3xl font-bold text-center">Recipient Info</h1>
-                        <div className="flex flex-col space-y-2 gap-3 text-gray-500">
+                <div className="flex flex-col md:flex-row justify-between gap-10 w-full p-4 md:p-14 text-gray-500">
+                    {/* Milk tank info */}
+                    <div className="flex flex-col gap-4 md:gap-10 w-full md:w-1/2 bg-white p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
+                        <h1 className="text-xl md:text-3xl font-bold text-center text-black">Milk Tank Info</h1>
+                        <div className="flex flex-col space-y-2 gap-3">
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Farm Name:</p>
+                                <p>{data.milkTankInfo.farmName}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Tank ID:</p>
+                                <p>{data.milkTankInfo.milkTankNo}</p>
+                            </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Person in charge:</p>
-                                <p>{data.RecipientInfo.personInCharge}</p>
+                                <p>{data.milkTankInfo.personInCharge}</p>
                             </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Location:</p>
-                                <p>{data.RecipientInfo.location}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Pick Up Time:</p>
-                                <p>{data.RecipientInfo.pickUpTime}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Quantity Info */}
-                    <div className="flex flex-col gap-4 md:gap-10 w-full md:w-1/2 border bg-white p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
-                        <h1 className="text-xl md:text-3xl font-bold text-center">Quality Info</h1>
-                        <div className="flex flex-col space-y-2 gap-3 text-gray-500">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Quantity:</p>
-                                <p>{data.Quantity.quantity} {data.Quantity.quantityUnit}</p>
+                                <p>{data.milkTankInfo.quantity} {data.milkTankInfo.quantityUnit}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Temperature:</p>
-                                <p>{data.Quantity.temp} {data.Quantity.tempUnit}</p>
+                                <p>{data.milkTankInfo.temp} {data.milkTankInfo.tempUnit}</p>
                             </div>
                             <div className="flex justify-between">
-                                <p className="font-semibold">pH:</p>
-                                <p>{data.Quantity.pH}</p>
+                                <p className="font-semibold">ph:</p>
+                                <p>{data.milkTankInfo.pH}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Fat:</p>
-                                <p>{data.Quantity.fat} %</p>
+                                <p>{data.milkTankInfo.fat}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Protein:</p>
-                                <p>{data.Quantity.protein} %</p>
+                                <p>{data.milkTankInfo.protein}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Bacteria:</p>
                                 <div className="flex flex-col gap-2">
-                                    <p>{data.Quantity.bacteria === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.bacteriaInfo}</p>
+                                    <p>{data.milkTankInfo.bacteria === true ? "True" : "False"}</p>
+                                    <p>{data.milkTankInfo.bacteriaInfo}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Contaminants:</p>
                                 <div className="flex flex-col gap-2">
-                                    <p>{data.Quantity.contaminants === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.contaminantInfo}</p>
+                                    <p>{data.milkTankInfo.contaminants === true ? "True" : "False"}</p>
+                                    <p>{data.milkTankInfo.contaminantInfo}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between">
                                 <div className="flex flex-col gap-3">
-                                    <p className="font-semibold">Abnormal Characteristic:</p>
+                                    <p className="font-semibold">Abnormal characteristic:</p>
                                     <div className="flex flex-col gap-3">
                                         <p className="font-semibold">Smell Bad:</p>
                                         <p className="font-semibold">Smell Not Fresh:</p>
@@ -116,22 +109,93 @@ const Details = () => {
                                         <p className="font-semibold">Separation of milk and water:</p>
                                     </div>
                                 </div>
-                                <div className="flex flex-col gap-3 text-gray-500">
-                                    <p>{data.Quantity.abnormalChar === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.smellBad === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.smellNotFresh === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.abnormalColor === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.sour === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.bitter === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.cloudy === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.lumpy === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.separation === true ? "True" : "False"}</p>
+                                <div className="flex flex-col gap-3">
+                                    <p>{data.milkTankInfo.abnormalChar === true ? "True" : "False"}</p>
+                                    <p>{data.milkTankInfo.abnormalType.smellBad === true ? "True" : "False"}</p>
+                                    <p>{data.milkTankInfo.abnormalType.smellNotFresh === true ? "True" : "False"}</p>
+                                    <p>{data.milkTankInfo.abnormalType.abnormalColor === true ? "True" : "False"}</p>
+                                    <p>{data.milkTankInfo.abnormalType.sour === true ? "True" : "False"}</p>
+                                    <p>{data.milkTankInfo.abnormalType.bitter === true ? "True" : "False"}</p>
+                                    <p>{data.milkTankInfo.abnormalType.cloudy === true ? "True" : "False"}</p>
+                                    <p>{data.milkTankInfo.abnormalType.lumpy === true ? "True" : "False"}</p>
+                                    <p>{data.milkTankInfo.abnormalType.separation === true ? "True" : "False"}</p>
                                 </div>
+                            </div>
+                            {/* <div className="flex justify-between">
+                                <p className="font-semibold">Added By:</p>
+                                <p></p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Added On:</p>
+                                <p></p>
+                            </div> */}
+                        </div>
+                    </div>
+
+                    {/* Shipping Address */}
+                    <div className="flex flex-col gap-4 md:gap-10 w-full md:w-1/2 bg-white p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
+                        <h1 className="text-xl md:text-3xl font-bold text-center text-black">Shipping Address</h1>
+                        <div className="flex flex-col space-y-2 gap-3">
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Company Name:</p>
+                                <p>{data.shippingAddress.companyName}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">First Name:</p>
+                                <p>{data.shippingAddress.firstName}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Last Name:</p>
+                                <p>{data.shippingAddress.lastName}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Email:</p>
+                                <p>{data.shippingAddress.email}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Address:</p>
+                                <p>{data.shippingAddress.address}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Phone:</p>
+                                <div className="flex gap-2">
+                                    <p>{data.shippingAddress.areaCode}</p>
+                                    <p>{data.shippingAddress.phoneNumber}</p>
+                                </div>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Address:</p>
+                                <p>{data.shippingAddress.address}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Province:</p>
+                                <p>{data.shippingAddress.province}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">District:</p>
+                                <p>{data.shippingAddress.district}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Sub-district:</p>
+                                <p>{data.shippingAddress.subDistrict}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Postal Code:</p>
+                                <p>{data.shippingAddress.postalCode}</p>
+                            </div>
+                            <div className="flex justify-between">
+                                <p className="font-semibold">Location URL:</p>
+                                <p className="w-1/2 whitespace-normal break-all">{data.shippingAddress.location}</p>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
+
+            {/* Qrcode generate section: Require API */}
+            <div className="flex">
+                <h1 className="text-6xl">Qrcode Generate Section</h1>
+            </div>
         </div>
     );
 };
