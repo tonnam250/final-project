@@ -237,35 +237,35 @@ const CheckDetails = () => {
                                 <div className="flex flex-col space-y-2 gap-3">
                                     <p className="font-semibold">Abnormal Type:</p>
                                     <div className="flex justify-between">
-                                        <p>Smell Bad:</p>
+                                        <p className="font-semibold">Smell Bad:</p>
                                         <p>{data.selectMilkTank.abnormalType?.smellBad ? "Yes" : "No"}</p>
                                     </div>
                                     <div className="flex justify-between">
-                                        <p>Smell Not Fresh:</p>
+                                        <p className="font-semibold">Smell Not Fresh:</p>
                                         <p>{data.selectMilkTank.abnormalType?.smellNotFresh ? "Yes" : "No"}</p>
                                     </div>
                                     <div className="flex justify-between">
-                                        <p>Abnormal Color:</p>
+                                        <p className="font-semibold">Abnormal Color:</p>
                                         <p>{data.selectMilkTank.abnormalType?.abnormalColor ? "Yes" : "No"}</p>
                                     </div>
                                     <div className="flex justify-between">
-                                        <p>Sour:</p>
+                                        <p className="font-semibold">Sour:</p>
                                         <p>{data.selectMilkTank.abnormalType?.sour ? "Yes" : "No"}</p>
                                     </div>
                                     <div className="flex justify-between">
-                                        <p>Bitter:</p>
+                                        <p className="font-semibold">Bitter:</p>
                                         <p>{data.selectMilkTank.abnormalType?.bitter ? "Yes" : "No"}</p>
                                     </div>
                                     <div className="flex justify-between">
-                                        <p>Cloudy:</p>
+                                        <p className="font-semibold">Cloudy:</p>
                                         <p>{data.selectMilkTank.abnormalType?.cloudy ? "Yes" : "No"}</p>
                                     </div>
                                     <div className="flex justify-between">
-                                        <p>Lumpy:</p>
+                                        <p className="font-semibold">Lumpy:</p>
                                         <p>{data.selectMilkTank.abnormalType?.lumpy ? "Yes" : "No"}</p>
                                     </div>
                                     <div className="flex justify-between">
-                                        <p>Separation:</p>
+                                        <p className="font-semibold">Separation:</p>
                                         <p>{data.selectMilkTank.abnormalType?.separation ? "Yes" : "No"}</p>
                                     </div>
                                 </div>

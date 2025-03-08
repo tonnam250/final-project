@@ -9,7 +9,7 @@ const CheckProductDetails = () => {
     const [data, setData] = useState(null);
 
     useEffect(() => {
-        const storedData = localStorage.getItem("recievedForm");
+        const storedData = localStorage.getItem("addProductForm");
         if (storedData) {
             setData(JSON.parse(storedData));
         }
@@ -44,7 +44,7 @@ const CheckProductDetails = () => {
     };
 
     return (
-        <div className="flex flex-col w-full h-full min-h-screen items-center justify-center pt-24 bg-gray-100 text-gray-500">
+        <div className="flex flex-col w-full h-full min-h-screen items-center justify-center pt-24 bg-gray-100">
             {/* Detail Status */}
             <div className="flex items-center w-full h-full p-10">
                 <div className="flex border shadow-xl w-full h-full p-5 rounded-3xl gap-8">
@@ -58,15 +58,15 @@ const CheckProductDetails = () => {
                         <div className="w-full bg-gray-200 rounded-full h-2">
                             <div className={`h-2 rounded-full ${stepStatus.step1 === 'completed' ? 'bg-emerald-500 w-full' : 'bg-yellow-400 w-1/5'}`}></div>
                         </div>
-                        <p className="text-xl font-semibold">STEP 1</p>
-                        <h1 className="text-3xl font-semibold mb-3">General Info</h1>
-                        <div className={`flex flex-wrap text-center w-fit items-center justify-center rounded-full p-1 px-2 mx-5 ${stepStatus.step1 === 'completed' ? 'bg-emerald-500 text-white' : 'bg-yellow-200 text-amber-500'}`}>
+                        <p className="text-xl font-semibold text-black">STEP 1</p>
+                        <h1 className="text-3xl font-semibold mb-3 text-black">General Info</h1>
+                        <div className={`flex flex-wrap text-center w-fit items-center justify-center rounded-full p-1 px-2 mx-5 ${stepStatus.step1 === 'completed' ? 'bg-emerald-500 text-white' : 'bg-yellow-200 text-black'}`}>
                             <p className="text-lg font-semibold">{stepStatus.step1 === 'completed' ? 'Completed' : 'In Progress'}</p>
                         </div>
                     </div>
                     {/* Second Step */}
                     <div className="flex flex-col w-1/3 h-full">
-                        <div className={`flex w-14 text-center p-2 rounded-full mb-2 ${stepStatus.step2 === 'completed' ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                        <div className={`flex w-14 text-center p-2 rounded-full mb-2 ${stepStatus.step2 === 'completed' ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-black'}`}>
                             <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10" viewBox="0 0 32 32">
                                 <path fill="currentColor" d="M0 6v2h19v15h-6.156c-.446-1.719-1.992-3-3.844-3s-3.398 1.281-3.844 3H4v-5H2v7h3.156c.446 1.719 1.992 3 3.844 3s3.398-1.281 3.844-3h8.312c.446 1.719 1.992 3 3.844 3s3.398-1.281 3.844-3H32v-8.156l-.063-.157l-2-6L29.72 10H21V6zm1 4v2h9v-2zm20 2h7.281L30 17.125V23h-1.156c-.446-1.719-1.992-3-3.844-3s-3.398 1.281-3.844 3H21zM2 14v2h6v-2zm7 8c1.117 0 2 .883 2 2s-.883 2-2 2s-2-.883-2-2s.883-2 2-2m16 0c1.117 0 2 .883 2 2s-.883 2-2 2s-2-.883-2-2s.883-2 2-2" />
                             </svg>
@@ -74,15 +74,15 @@ const CheckProductDetails = () => {
                         <div className="w-full bg-gray-200 rounded-full h-2">
                             <div className={`h-2 rounded-full ${stepStatus.step2 === 'completed' ? 'bg-emerald-500 w-full' : 'bg-gray-200 w-0'}`}></div>
                         </div>
-                        <p className={`text-xl font-semibold ${stepStatus.step2 === 'completed' ? 'text-emerald-500' : 'text-gray-500'}`}>STEP 2</p>
-                        <h1 className={`text-3xl font-semibold mb-3 ${stepStatus.step2 === 'completed' ? 'text-emerald-500' : 'text-gray-500'}`}>Nutrition</h1>
-                        <div className={`flex flex-wrap text-center w-fit items-center justify-center rounded-full mx-5 p-1 px-2 ${stepStatus.step2 === 'completed' ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                        <p className={`text-xl font-semibold text-black`}>STEP 2</p>
+                        <h1 className={`text-3xl font-semibold mb-3 text-black`}>Nutrition</h1>
+                        <div className={`flex flex-wrap text-center w-fit items-center justify-center rounded-full mx-5 p-1 px-2 ${stepStatus.step2 === 'completed' ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-black'}`}>
                             <p className="text-lg font-semibold">{stepStatus.step2 === 'completed' ? 'Completed' : 'Not finished'}</p>
                         </div>
                     </div>
                     {/* Third Step */}
                     <div className="flex flex-col w-1/3 h-full">
-                        <div className={`flex w-14 text-center p-2 rounded-full mb-2 ${stepStatus.step3 === 'in-progress' ? 'bg-yellow-200 text-amber-500' : 'bg-gray-200 text-gray-500'}`}>
+                        <div className={`flex w-14 text-center p-2 rounded-full mb-2 ${stepStatus.step3 === 'in-progress' ? 'bg-yellow-200 text-amber-500' : 'bg-gray-200 text-black'}`}>
                             <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10" viewBox="0 0 24 24">
                                 <path fill="currentColor" d="m23.5 17l-5 5l-3.5-3.5l1.5-1.5l2 2l3.5-3.5zM6 2a2 2 0 0 0-2 2v16c0 1.11.89 2 2 2h7.81c-.36-.62-.61-1.3-.73-2H6V4h7v5h5v3.08c.33-.05.67-.08 1-.08c.34 0 .67.03 1 .08V8l-6-6M8 12v2h8v-2m-8 4v2h5v-2Z" />
                             </svg>
@@ -90,9 +90,9 @@ const CheckProductDetails = () => {
                         <div className="w-full bg-gray-200 rounded-full h-2">
                             <div className={`h-2 rounded-full ${stepStatus.step3 === 'in-progress' ? 'bg-yellow-400 w-1/5' : 'bg-gray-200 w-0'}`}></div>
                         </div>
-                        <p className={`text-xl font-semibold ${stepStatus.step3 === 'in-progress' ? 'text-amber-500' : 'text-gray-500'}`}>STEP 3</p>
-                        <h1 className={`text-3xl font-semibold mb-3 ${stepStatus.step3 === 'in-progress' ? 'text-amber-500' : 'text-gray-500'}`}>Check Details</h1>
-                        <div className={`flex flex-wrap text-center w-fit items-center justify-center rounded-full mx-5 p-1 px-2 ${stepStatus.step3 === 'in-progress' ? 'bg-yellow-200 text-amber-500' : 'bg-gray-200 text-gray-500'}`}>
+                        <p className={`text-xl font-semibold text-black`}>STEP 3</p>
+                        <h1 className={`text-3xl font-semibold mb-3 text-black`}>Check Details</h1>
+                        <div className={`flex flex-wrap text-center w-fit items-center justify-center rounded-full mx-5 p-1 px-2 ${stepStatus.step3 === 'in-progress' ? 'bg-yellow-200 text-amber-500' : 'bg-gray-200 text-black'}`}>
                             <p className="text-lg font-semibold">{stepStatus.step3 === 'in-progress' ? 'In Progress' : 'Not finished'}</p>
                         </div>
                     </div>

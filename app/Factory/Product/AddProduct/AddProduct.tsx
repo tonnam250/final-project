@@ -124,22 +124,7 @@ const AddProduct = () => {
             vitaminD: 0,
             vitaminB6: 0,
             vitaminB12: 0,
-            magnesium: 0,
-            bacteria: false,
-            bacteriaInfo: "",
-            contaminants: false,
-            contaminantInfo: "",
-            abnormalChar: false,
-            abnormalType: {
-                smellBad: false,
-                smellNotFresh: false,
-                abnormalColor: false,
-                sour: false,
-                bitter: false,
-                cloudy: false,
-                lumpy: false,
-                separation: false
-            }
+            magnesium: 0
         }
     });
 
@@ -149,7 +134,7 @@ const AddProduct = () => {
     // ✅ โหลดข้อมูลจาก localStorage เมื่อหน้าเว็บโหลด
     useEffect(() => {
         if (typeof window !== "undefined") {
-            const savedData = localStorage.getItem("recievedForm");
+            const savedData = localStorage.getItem("addProductForm");
             if (savedData) {
                 setFormData(JSON.parse(savedData));
             }

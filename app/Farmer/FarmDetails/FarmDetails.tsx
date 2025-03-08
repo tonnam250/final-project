@@ -56,14 +56,14 @@ const FarmDetails = () => {
                                 <p>{data.milkTankInfo.protein}</p>
                             </div>
                             <div className="flex justify-between">
-                                <p className="font-semibold">bacteria:</p>
+                                <p className="font-semibold">Bacteria:</p>
                                 <div className="flex flex-col gap-2">
                                     <p>{data.milkTankInfo.bacteria === true ? "True" : "False"}</p>
                                     <p>{data.milkTankInfo.bacteriaInfo}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between">
-                                <p className="font-semibold">contaminants:</p>
+                                <p className="font-semibold">Contaminants:</p>
                                 <div className="flex flex-col gap-2">
                                     <p>{data.milkTankInfo.contaminants === true ? "True" : "False"}</p>
                                     <p>{data.milkTankInfo.contaminantInfo}</p>
@@ -71,7 +71,7 @@ const FarmDetails = () => {
                             </div>
                             <div className="flex justify-between">
                                 <div className="flex flex-col gap-3">
-                                    <p className="font-semibold">abnormal characteristic:</p>
+                                    <p className="font-semibold">Abnormal characteristic:</p>
                                     <div className="flex flex-col gap-3">
                                         <p className="font-semibold">Smell Bad:</p>
                                         <p className="font-semibold">Smell Not Fresh:</p>
@@ -146,7 +146,7 @@ const FarmDetails = () => {
                                 <p>{data.shippingAddress.province}</p>
                             </div>
                             <div className="flex justify-between">
-                                <p className="font-semibold">district:</p>
+                                <p className="font-semibold">District:</p>
                                 <p>{data.shippingAddress.district}</p>
                             </div>
                             <div className="flex justify-between">

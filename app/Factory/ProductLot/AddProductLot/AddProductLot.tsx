@@ -724,7 +724,7 @@ const AddProductLot = () => {
                                             id={`areaCode-${index}`}
                                             className="border border-gray-300 rounded-full p-3 w-auto text-center"
                                             value={address.areaCode} onChange={(e) => handleShippingAddressChange(index, e)}
-                                            required
+                                            
                                         >
                                             <option value="+66">+66</option>
                                         </select>

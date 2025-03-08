@@ -42,13 +42,13 @@ const Details = () => {
 
     return (
         <div className="flex flex-col justify-center items-center w-full h-full min-h-screen pt-20">
-            <h1 className="text-5xl font-bold mt-10">Delivered Detail</h1>
+            <h1 className="text-5xl font-bold mt-10">To Recieve Details</h1>
             {data && (
                 <div className="flex flex-col md:flex-row justify-between gap-10 w-full p-4 md:p-14">
                     {/* Recipient Info */}
                     <div className="flex flex-col gap-4 md:gap-10 w-full h-fit md:w-1/2 bg-white border p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
                         <h1 className="text-xl md:text-3xl font-bold text-center">Recipient Info</h1>
-                        <div className="flex flex-col space-y-2 gap-3">
+                        <div className="flex flex-col space-y-2 gap-3 text-gray-500">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Person in charge:</p>
                                 <p>{data.RecipientInfo.personInCharge}</p>
@@ -67,7 +67,7 @@ const Details = () => {
                     {/* Quantity Info */}
                     <div className="flex flex-col gap-4 md:gap-10 w-full md:w-1/2 border bg-white p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
                         <h1 className="text-xl md:text-3xl font-bold text-center">Quality Info</h1>
-                        <div className="flex flex-col space-y-2 gap-3">
+                        <div className="flex flex-col space-y-2 gap-3 text-gray-500">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Quantity:</p>
                                 <p>{data.Quantity.quantity} {data.Quantity.quantityUnit}</p>
@@ -116,7 +116,7 @@ const Details = () => {
                                         <p className="font-semibold">Separation of milk and water:</p>
                                     </div>
                                 </div>
-                                <div className="flex flex-col gap-3">
+                                <div className="flex flex-col gap-3 text-gray-500">
                                     <p>{data.Quantity.abnormalChar === true ? "True" : "False"}</p>
                                     <p>{data.Quantity.abnormalType.smellBad === true ? "True" : "False"}</p>
                                     <p>{data.Quantity.abnormalType.smellNotFresh === true ? "True" : "False"}</p>
