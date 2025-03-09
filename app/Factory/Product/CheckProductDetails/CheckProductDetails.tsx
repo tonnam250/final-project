@@ -1,46 +1,68 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
+import { createProduct } from "@/services/productService"; // ✅ Import API Service
 
 const CheckProductDetails = () => {
-
     const router = useRouter();
-
-    const [data, setData] = useState(null);
+    const [data, setData] = useState<any>(null);
 
     useEffect(() => {
-        const storedData = localStorage.getItem("recievedForm");
+        const storedData = localStorage.getItem("addProductForm"); // ✅ เปลี่ยนจาก recievedForm → addProductForm
         if (storedData) {
-            setData(JSON.parse(storedData));
+            try {
+                setData(JSON.parse(storedData));
+            } catch (error) {
+                console.error("Error parsing stored data:", error);
+                setData(null);
+            }
         }
     }, []);
+    
 
-    // Step status update function
-    const [showShippingAddress, setShowShippingAddress] = useState<boolean>(false);
+    // ✅ จัดการ Step Status ของหน้า UI
     const shippingAddressRef = useRef<HTMLDivElement>(null);
+    const [showShippingAddress, setShowShippingAddress] = useState(false);
     const [stepStatus, setStepStatus] = useState({
-        step1: 'completed',
-        step2: 'completed',
-        step3: 'in-progress'
+        step1: "completed",
+        step2: "completed",
+        step3: "in-progress",
     });
 
     const handleNextClick = () => {
         setShowShippingAddress(true);
         setStepStatus({
-            step1: 'completed',
-            step2: 'in-progress',
-            step3: 'not-started'
+            step1: "completed",
+            step2: "in-progress",
+            step3: "not-started",
         });
 
         setTimeout(() => {
             shippingAddressRef.current?.scrollIntoView({ behavior: "smooth" });
-        }, 100); // Delay to ensure the section is rendered
+        }, 100);
     };
-    // end step status update function
 
-    const handleSubmit = () => {
-        alert("Form saved successfully!");
-        router.push('/Factory/Product/Details');
+    // ✅ ฟังก์ชัน Submit เพื่อสร้าง Product บน Blockchain
+    const handleSubmit = async () => {
+        if (!data) {
+            alert("No data available to submit.");
+            return;
+        }
+
+        try {
+            // ✅ ส่งข้อมูลไป Backend ผ่าน Service
+            const response = await createProduct(data);
+
+            if (response.success) {
+                alert("Product Created Successfully!");
+                router.push(`/Factory/Product/Details?productId=${response.productId}`);
+            } else {
+                alert(`Error: ${response.message}`);
+            }
+        } catch (error) {
+            console.error("Error creating product:", error);
+            alert("Failed to create product. Please try again.");
+        }
     };
 
     return (

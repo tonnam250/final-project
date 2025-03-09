@@ -68,10 +68,9 @@ export const getFarmRawMilkTanks = async (): Promise<any> => {
                 tankId: tank.moreInfoLink.split("=")[1].trim(), // ✅ ใช้ trim() เพื่อลบ `\u0000`
                 personInCharge: tank.personInCharge,
             },
-            status: tank.status === 0 ? "Pending" : "Received",
+            status: tank.status === 0 ? "Pending" : tank.status === 1 ? "Received" : "Rejected", // ✅ เพิ่มเงื่อนไขสำหรับ `Rejected`
             id: tank.moreInfoLink.split("=")[1].trim(), // ✅ ใช้ trim() เพื่อลบ `\u0000`
         }));
-        
 
         console.log("✅ Formatted Milk Tanks:", formattedData);
         return formattedData;
@@ -80,6 +79,7 @@ export const getFarmRawMilkTanks = async (): Promise<any> => {
         return [];
     }
 };
+
 
 // ✅ ฟังก์ชันดึงรายละเอียดแท็งก์นมดิบตาม Tank ID
 export const getMilkTankDetails = async (tankId: string): Promise<any> => {

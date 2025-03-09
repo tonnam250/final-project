@@ -66,7 +66,7 @@ const CheckDetails = () => {
             if (response) {
                 alert(approved ? "คุณรับนมดิบสำเร็จ!" : "คุณปฏิเสธนมดิบสำเร็จ!");
                 localStorage.removeItem("recievedForm"); // ✅ เคลียร์เฉพาะข้อมูลนี้
-                router.push("/Factory/Recieving/Details");
+                router.push(`/Factory/FactoryDetails?id=${tankId}`);
             } else {
                 alert("เกิดข้อผิดพลาดในการส่งข้อมูล!");
             }

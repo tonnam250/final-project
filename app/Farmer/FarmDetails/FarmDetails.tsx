@@ -40,48 +40,48 @@ const FarmDetails = () => {
                         <div className="flex flex-col space-y-2 gap-3">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Farm Name:</p>
-                                <p>{data.milkTankInfo.farmName}</p>
-                            </div>
+                                <p>{data.farmRepo?.rawMilkData?.farmName || "N/A"}</p>
+                                </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Tank ID:</p>
-                                <p>{data.milkTankInfo.milkTankNo}</p>
+                                <p>{tankId || "N/A"}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Person in charge:</p>
-                                <p>{data.milkTankInfo.personInCharge}</p>
+                                <p>{data.farmRepo?.rawMilkData?.personInCharge}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Quantity:</p>
-                                <p>{data.milkTankInfo.quantity} {data.milkTankInfo.quantityUnit}</p>
+                                <p>{data.farmRepo?.rawMilkData?.quantity} {data.farmRepo?.rawMilkData?.quantityUnit}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Temperature:</p>
-                                <p>{data.milkTankInfo.temp} {data.milkTankInfo.tempUnit}</p>
+                                <p>{data.farmRepo?.rawMilkData?.temperature} {data.farmRepo?.rawMilkData?.tempUnit}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">ph:</p>
-                                <p>{data.milkTankInfo.pH}</p>
+                                <p>{data.farmRepo?.rawMilkData?.pH}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Fat:</p>
-                                <p>{data.milkTankInfo.fat}</p>
+                                <p>{data.farmRepo?.rawMilkData?.fat}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Protein:</p>
-                                <p>{data.milkTankInfo.protein}</p>
+                                <p>{data.farmRepo?.rawMilkData?.protein}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">bacteria:</p>
                                 <div className="flex flex-col gap-2">
-                                    <p>{data.milkTankInfo.bacteria === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.bacteriaInfo}</p>
+                                    <p>{data.farmRepo?.rawMilkData?.bacteria === true ? "True" : "False"}</p>
+                                    <p>{data.farmRepo?.rawMilkData?.bacteriaInfo}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">contaminants:</p>
                                 <div className="flex flex-col gap-2">
-                                    <p>{data.milkTankInfo.contaminants === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.contaminantInfo}</p>
+                                    <p>{data.farmRepo?.rawMilkData?.contaminants === true ? "True" : "False"}</p>
+                                    <p>{data.farmRepo?.rawMilkData?.contaminantInfo}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between">
@@ -99,16 +99,17 @@ const FarmDetails = () => {
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-3">
-                                    <p>{data.milkTankInfo.abnormalChar === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.abnormalType.smellBad === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.abnormalType.smellNotFresh === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.abnormalType.abnormalColor === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.abnormalType.sour === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.abnormalType.bitter === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.abnormalType.cloudy === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.abnormalType.lumpy === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.abnormalType.separation === true ? "True" : "False"}</p>
+                                    <p>{data.farmRepo?.rawMilkData?.abnormalChar ? "True" : "False"}</p>
+                                    <p>{data.farmRepo?.rawMilkData?.abnormalType?.smellBad ? "True" : "False"}</p>
+                                    <p>{data.farmRepo?.rawMilkData?.abnormalType?.smellNotFresh ? "True" : "False"}</p>
+                                    <p>{data.farmRepo?.rawMilkData?.abnormalType?.abnormalColor ? "True" : "False"}</p>
+                                    <p>{data.farmRepo?.rawMilkData?.abnormalType?.sour ? "True" : "False"}</p>
+                                    <p>{data.farmRepo?.rawMilkData?.abnormalType?.bitter ? "True" : "False"}</p>
+                                    <p>{data.farmRepo?.rawMilkData?.abnormalType?.cloudy ? "True" : "False"}</p>
+                                    <p>{data.farmRepo?.rawMilkData?.abnormalType?.lumpy ? "True" : "False"}</p>
+                                    <p>{data.farmRepo?.rawMilkData?.abnormalType?.separation ? "True" : "False"}</p>
                                 </div>
+
                             </div>
                             {/* <div className="flex justify-between">
                                 <p className="font-semibold">Added By:</p>
@@ -124,60 +125,61 @@ const FarmDetails = () => {
                     {/* Shipping Address */}
                     <div className="flex flex-col gap-4 md:gap-10 w-full md:w-1/2 bg-white p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
                         <h1 className="text-xl md:text-3xl font-bold text-center text-black">Shipping Address</h1>
-                        <div className="flex flex-col space-y-2 gap-3">
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Company Name:</p>
-                                <p>{data.shippingAddress.companyName}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">First Name:</p>
-                                <p>{data.shippingAddress.firstName}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Last Name:</p>
-                                <p>{data.shippingAddress.lastName}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Email:</p>
-                                <p>{data.shippingAddress.email}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Address:</p>
-                                <p>{data.shippingAddress.address}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Phone:</p>
-                                <div className="flex gap-2">
-                                    <p>{data.shippingAddress.areaCode}</p>
-                                    <p>{data.shippingAddress.phoneNumber}</p>
+                        {data.farmRepo?.rawMilkData?.shippingAddress ? (
+                            <div className="flex flex-col space-y-2 gap-3">
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Company Name:</p>
+                                    <p>{data.farmRepo?.rawMilkData?.shippingAddress?.companyName || "N/A"}</p>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">First Name:</p>
+                                    <p>{data.farmRepo?.rawMilkData?.shippingAddress?.firstName || "N/A"}</p>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Last Name:</p>
+                                    <p>{data.farmRepo?.rawMilkData?.shippingAddress?.lastName || "N/A"}</p>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Email:</p>
+                                    <p>{data.farmRepo?.rawMilkData?.shippingAddress?.email || "N/A"}</p>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Address:</p>
+                                    <p>{data.farmRepo?.rawMilkData?.shippingAddress?.address || "N/A"}</p>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Phone:</p>
+                                    <div className="flex gap-2">
+                                        <p>{data.farmRepo?.rawMilkData?.shippingAddress?.areaCode || "N/A"}</p>
+                                        <p>{data.farmRepo?.rawMilkData?.shippingAddress?.phoneNumber || "N/A"}</p>
+                                    </div>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Province:</p>
+                                    <p>{data.farmRepo?.rawMilkData?.shippingAddress?.province || "N/A"}</p>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">District:</p>
+                                    <p>{data.farmRepo?.rawMilkData?.shippingAddress?.district || "N/A"}</p>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Sub-district:</p>
+                                    <p>{data.farmRepo?.rawMilkData?.shippingAddress?.subDistrict || "N/A"}</p>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Postal Code:</p>
+                                    <p>{data.farmRepo?.rawMilkData?.shippingAddress?.postalCode || "N/A"}</p>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Location URL:</p>
+                                    <p className="w-1/2 whitespace-normal break-all">{data.farmRepo?.rawMilkData?.shippingAddress?.location || "N/A"}</p>
                                 </div>
                             </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Address:</p>
-                                <p>{data.shippingAddress.address}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Province:</p>
-                                <p>{data.shippingAddress.province}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">district:</p>
-                                <p>{data.shippingAddress.district}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Sub-district:</p>
-                                <p>{data.shippingAddress.subDistrict}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Postal Code:</p>
-                                <p>{data.shippingAddress.postalCode}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Location URL:</p>
-                                <p className="w-1/2 whitespace-normal break-all">{data.shippingAddress.location}</p>
-                            </div>
-                        </div>
+                        ) : (
+                            <p className="text-center text-gray-500">No shipping address available.</p>
+                        )}
                     </div>
+
                 </div>
             )}
 

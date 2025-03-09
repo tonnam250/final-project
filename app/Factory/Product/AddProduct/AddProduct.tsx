@@ -169,15 +169,20 @@ const AddProduct = () => {
         const keys = name.split(".");
 
         setFormData((prevData) => {
-            const updatedData = { ...prevData }; // Clone ข้อมูลเดิม
+            const updatedData = { ...prevData };
             let temp: any = updatedData;
-
+        
             for (let i = 0; i < keys.length - 1; i++) {
+                if (!temp[keys[i]]) {
+                    temp[keys[i]] = {}; // ✅ ถ้า object ไม่มี ให้สร้างใหม่
+                }
                 temp = temp[keys[i]];
             }
-
-            // ถ้าเป็น checkbox ให้ใช้ checked ถ้าไม่ใช่ให้ใช้ value
-            temp[keys[keys.length - 1]] = type === "checkbox" ? checked : value;
+        
+            // ✅ ตรวจสอบว่ามีค่าก่อนใช้งาน
+            if (temp) {
+                temp[keys[keys.length - 1]] = type === "checkbox" ? checked : value;
+            }
 
             // อัปเดต province, district และ subdistrict
             if (name === "GeneralInfo.province") {

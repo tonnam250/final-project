@@ -1,16 +1,32 @@
 "use client";
 
+"use client";
+
 import { useEffect, useState } from "react";
+import { useSearchParams } from 'next/navigation';
+import { getMilkTankDetails } from "@/services/rawMilkService"; // ✅ ดึงข้อมูลจาก API
 
 const FactoryDetails = () => {
+    const searchParams = useSearchParams();
+    const tankId = searchParams.get("id"); // ✅ ดึง tankId จาก URL
+
     const [data, setData] = useState(null);
 
     useEffect(() => {
-        const storedData = localStorage.getItem("recievedForm");
-        if (storedData) {
-            setData(JSON.parse(storedData));
-        }
-    }, []);
+        const fetchData = async () => {
+            if (tankId) {
+                try {
+                    const milkTankData = await getMilkTankDetails(tankId); // ✅ เรียก API ดึงข้อมูล
+                    setData(milkTankData.factoryRepo?.rawMilkData || null); // ✅ ใช้เฉพาะ `factoryRepo.rawMilkData`
+                } catch (error) {
+                    console.error("❌ Error fetching milk tank details:", error);
+                }
+            }
+        };
+
+        fetchData();
+    }, [tankId]); // ✅ โหลดข้อมูลใหม่เมื่อ tankId เปลี่ยน
+
 
     return (
         <div className="flex flex-col w-full h-full min-h-screen items-center justify-center pt-24 bg-gray-100 text-gray-500">
@@ -23,15 +39,15 @@ const FactoryDetails = () => {
                         <div className="flex flex-col space-y-2 gap-3">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Person in charge:</p>
-                                <p>{data.RecipientInfo.personInCharge}</p>
+                                <p>{data.recipientInfo?.personInCharge}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Location:</p>
-                                <p>{data.RecipientInfo.location}</p>
+                                <p>{data.recipientInfo?.location}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Pick Up Time:</p>
-                                <p>{data.RecipientInfo.pickUpTime}</p>
+                                <p>{data.recipientInfo?.pickUpTime}</p>
                             </div>
                         </div>
                     </div>
@@ -42,36 +58,36 @@ const FactoryDetails = () => {
                         <div className="flex flex-col space-y-2 gap-3">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Quantity:</p>
-                                <p>{data.Quantity.quantity} {data.Quantity.quantityUnit}</p>
+                                <p>{data.quantity} {data.quantityUnit}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Temperature:</p>
-                                <p>{data.Quantity.temp} {data.Quantity.tempUnit}</p>
+                                <p>{data.temperature} {data.tempUnit}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">pH:</p>
-                                <p>{data.Quantity.pH}</p>
+                                <p>{data.pH}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Fat:</p>
-                                <p>{data.Quantity.fat} %</p>
+                                <p>{data.fat} %</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Protein:</p>
-                                <p>{data.Quantity.protein} %</p>
+                                <p>{data.protein} %</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Bacteria:</p>
                                 <div className="flex flex-col gap-2">
-                                    <p>{data.Quantity.bacteria === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.bacteriaInfo}</p>
+                                    <p>{data.bacteria === true ? "True" : "False"}</p>
+                                    <p>{data.bacteriaInfo}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Contaminants:</p>
                                 <div className="flex flex-col gap-2">
-                                    <p>{data.Quantity.contaminants === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.contaminantInfo}</p>
+                                    <p>{data.contaminants === true ? "True" : "False"}</p>
+                                    <p>{data.contaminantInfo}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between">
@@ -89,15 +105,15 @@ const FactoryDetails = () => {
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-3">
-                                    <p>{data.Quantity.abnormalChar === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.smellBad === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.smellNotFresh === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.abnormalColor === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.sour === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.bitter === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.cloudy === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.lumpy === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.separation === true ? "True" : "False"}</p>
+                                    <p>{data.abnormalChar === true ? "True" : "False"}</p>
+                                    <p>{data.abnormalType.smellBad === true ? "True" : "False"}</p>
+                                    <p>{data.abnormalType.smellNotFresh === true ? "True" : "False"}</p>
+                                    <p>{data.abnormalType.abnormalColor === true ? "True" : "False"}</p>
+                                    <p>{data.abnormalType.sour === true ? "True" : "False"}</p>
+                                    <p>{data.abnormalType.bitter === true ? "True" : "False"}</p>
+                                    <p>{data.abnormalType.cloudy === true ? "True" : "False"}</p>
+                                    <p>{data.abnormalType.lumpy === true ? "True" : "False"}</p>
+                                    <p>{data.abnormalType.separation === true ? "True" : "False"}</p>
                                 </div>
                             </div>
                         </div>
