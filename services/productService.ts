@@ -36,3 +36,40 @@ export const createProduct = async (data: any): Promise<{
         };
     }
 };
+
+export const fetchFactoryProducts = async (searchQuery = ""): Promise<any> => {
+    try {
+        let url = `${API_URL}list`;
+        if (searchQuery) {
+            url += `?search=${encodeURIComponent(searchQuery)}`;
+        }
+
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include", // ✅ ส่งคุกกี้ไปด้วย
+            cache: "no-store", // ✅ ป้องกัน Next.js แคชข้อมูล
+        });
+
+        if (!response.ok) {
+            console.error(`❌ Failed to fetch factory products, Status: ${response.status}`);
+            throw new Error("Failed to fetch factory products");
+        }
+
+        const data = await response.json();
+        console.log("📡 API Response:", JSON.stringify(data, null, 2)); // ✅ แสดงข้อมูลที่ API ส่งมา
+
+        // ✅ ตรวจสอบว่า API ตอบกลับเป็นอาร์เรย์หรือไม่
+        if (!Array.isArray(data)) {
+            console.error("❌ Invalid API response format:", data);
+            return [];
+        }
+
+        return data;
+    } catch (error) {
+        console.error("❌ Error fetching factory products:", error);
+        return [];
+    }
+};

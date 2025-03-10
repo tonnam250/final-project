@@ -1,9 +1,33 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { fetchFactoryProducts } from "@/services/productService";
 
-const Page = async () => {
+const Page = () => {
+    const [products, setProducts] = useState<any[]>([]);
+    const [token, setToken] = useState<string | null>(null);
 
-    const res = await fetch('http://localhost:3000/data/productData.json');
-    const data = await res.json();
+    useEffect(() => {
+        // ✅ ดึง Token จาก Cookie
+        const tokenFromCookie = document.cookie
+            .split("; ")
+            .find(row => row.startsWith("token="))
+            ?.split("=")[1] || null;
+
+        setToken(tokenFromCookie);
+
+        const fetchData = async () => {
+            try {
+                const data = await fetchFactoryProducts();
+                setProducts(data);
+            } catch (error) {
+                console.error("❌ Error fetching factory products:", error);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     return (
         <div className="flex flex-col items-center min-h-screen pt-20 bg-slate-100">
@@ -24,14 +48,14 @@ const Page = async () => {
 
                 {/* Product item */}
                 <div className="flex flex-col justify-center items-center w-full h-full my-10 gap-8">
-                    {data.map((item: { name: string, category: string }, index: number) => (
+                    {products.map((item: { productId: string, productName: string, category: string }, index: number) => (
                         <div key={index} className="flex flex-col justify-center items-center w-full md:w-1/3 h-40 gap-5 bg-white text-slate-500 shadow-xl border rounded-2xl p-5">
                             <div className="flex flex-col md:flex-row justify-between items-center w-full h-1/2">
-                                <span className="text-xl md:text-2xl font-semibold">Product Name: <p className="font-normal inline">{item.name}</p></span>
+                                <span className="text-xl md:text-2xl font-semibold">Product Name: <p className="font-normal inline">{item.productName}</p></span>
                             </div>
                             <div className="flex flex-col md:flex-row justify-between items-center w-full h-1/2">
                                 <span className="text-xl md:text-2xl font-semibold">Category: <p className="inline font-normal">{item.category}</p></span>
-                                <Link href={`/Factory/Product/Details`} className="text-lg md:text-xl underline italic cursor-pointer mt-2 md:mt-0">More info</Link>
+                                <Link href={`/Factory/Product/Details/${item.productId}`} className="text-lg md:text-xl underline italic cursor-pointer mt-2 md:mt-0">More info</Link>
                             </div>
                         </div>
                     ))}
@@ -40,5 +64,6 @@ const Page = async () => {
             {/* end Product Item */}
         </div>
     );
+
 }
 export default Page;
