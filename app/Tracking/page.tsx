@@ -5,7 +5,7 @@ const TrackingPage = () => {
         <div className="flex flex-col w-full h-full min-h-screen pt-24">
             <div className="flex w-full h-20 justify-center items-center">
                 <h1 className="text-5xl text-center font-bold">
-                    Tracking Product Details
+                    Tracking Your Journey
                 </h1>
             </div>
             <div className="flex w-full h-full justify-center items-center gap-10 px-4 md:px-0 relative">
