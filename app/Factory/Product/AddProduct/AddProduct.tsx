@@ -104,7 +104,7 @@ const AddProduct = () => {
         },
         Nutrition: {
             quantity: 0,
-            quantityUnit: "Ton",
+            quantityUnit: "ton",
             temp: 0,
             tempUnit: "Celcius",
             pH: 0,

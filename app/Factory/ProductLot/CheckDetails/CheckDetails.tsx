@@ -197,10 +197,22 @@ const CheckDetails = () => {
                         {/* Select Milk Tank */}
                         <div className="flex flex-col gap-4 md:gap-10 w-full h-fit bg-white border p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
                             <h1 className="text-xl md:text-3xl font-bold text-center text-black">Select Milk Tank</h1>
-                            <div className="flex flex-col space-y-2 gap-3">
-
-                            </div>
+                            
+                            {/* ✅ ตรวจสอบว่ามีค่าใน tanks ก่อน render */}
+                            {data?.selectMilkTank?.tanks && data.selectMilkTank.tanks.length > 0 ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                    {data.selectMilkTank.tanks.map((tank: string, index: number) => (
+                                        <div key={index} className="p-4 border rounded-xl shadow-md text-center bg-gray-100">
+                                            <p className="font-semibold text-black">{tank}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-center text-gray-500">No milk tanks selected</p>
+                            )}
                         </div>
+
+
 
                         {/* Quality */}
                         <div className="flex flex-col gap-4 md:gap-10 w-full h-fit bg-white border p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
@@ -343,6 +355,22 @@ const CheckDetails = () => {
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Magnesium:</p>
                                     <p>{data.nutrition.magnesium} %</p>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">pH Level:</p>
+                                    <p>{data.nutrition.pH}</p>
+                                </div>
+                                    <div className="flex justify-between">
+                                    <p className="font-semibold">Fat:</p>
+                                    <p>{data.nutrition.fat} %</p>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Protein:</p>
+                                    <p>{data.nutrition.protein} %</p>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Temperature:</p>
+                                    <p>{data.nutrition.temp} {data.nutrition.tempUnit}</p>
                                 </div>
                             </div>
                         </div>

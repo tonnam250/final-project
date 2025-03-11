@@ -153,6 +153,7 @@ export const fetchRetailers = async (searchQuery = ""): Promise<any[]> => {
         return [];
     }
 };
+
 export const fetchRetailerByID = async (retailerID: string): Promise<any> => {
     try {
         const response = await fetch(`http://127.0.0.1:8080/api/v1/retailers/${retailerID}`, {
@@ -176,5 +177,31 @@ export const fetchRetailerByID = async (retailerID: string): Promise<any> => {
     } catch (error) {
         console.error("❌ Error fetching retailer details:", error);
         return null;
+    }
+};
+
+export const fetchRetailerUsernames = async (retailerID: string): Promise<any[]> => {
+    try {
+        const response = await fetch(`${API_URL}/usernames?retailer_id=${retailerID}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+            cache: "no-store",
+        });
+
+        if (!response.ok) {
+            console.error(`❌ Failed to fetch retailer usernames, Status: ${response.status}`);
+            throw new Error("Failed to fetch retailer usernames");
+        }
+
+        const data = await response.json();
+        console.log("📡 Retailer Usernames API Response:", JSON.stringify(data, null, 2));
+
+        return Array.isArray(data) ? data : [];
+    } catch (error) {
+        console.error("❌ Error fetching retailer usernames:", error);
+        return [];
     }
 };
