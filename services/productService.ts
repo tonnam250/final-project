@@ -49,8 +49,8 @@ export const fetchFactoryProducts = async (searchQuery = ""): Promise<any> => {
             headers: {
                 "Content-Type": "application/json",
             },
-            credentials: "include", // ✅ ส่งคุกกี้ไปด้วย
-            cache: "no-store", // ✅ ป้องกัน Next.js แคชข้อมูล
+            credentials: "include",
+            cache: "no-store",
         });
 
         if (!response.ok) {
@@ -59,17 +59,43 @@ export const fetchFactoryProducts = async (searchQuery = ""): Promise<any> => {
         }
 
         const data = await response.json();
-        console.log("📡 API Response:", JSON.stringify(data, null, 2)); // ✅ แสดงข้อมูลที่ API ส่งมา
+        console.log("📡 API Response:", JSON.stringify(data, null, 2));
 
-        // ✅ ตรวจสอบว่า API ตอบกลับเป็นอาร์เรย์หรือไม่
-        if (!Array.isArray(data)) {
+        // ✅ ตรวจสอบว่ามี `displayedProducts` และเป็นอาร์เรย์
+        if (!data.displayedProducts || !Array.isArray(data.displayedProducts)) {
             console.error("❌ Invalid API response format:", data);
             return [];
         }
 
-        return data;
+        return data.displayedProducts; // ✅ ส่งเฉพาะ Array กลับไป
     } catch (error) {
         console.error("❌ Error fetching factory products:", error);
         return [];
+    }
+};
+
+export const fetchProductDetails = async (productId: string): Promise<any> => {
+    try {
+        const response = await fetch(`${API_URL}${productId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+            cache: "no-store",
+        });
+
+        if (!response.ok) {
+            console.error(`❌ Failed to fetch product details, Status: ${response.status}`);
+            throw new Error("Failed to fetch product details");
+        }
+
+        const data = await response.json();
+        console.log("📡 API Response:", JSON.stringify(data, null, 2));
+
+        return data; // ✅ ส่งข้อมูลให้ Frontend ใช้ตรงๆ
+    } catch (error) {
+        console.error("❌ Error fetching product details:", error);
+        return null;
     }
 };

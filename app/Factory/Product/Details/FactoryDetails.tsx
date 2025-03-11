@@ -1,18 +1,36 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { fetchProductDetails } from "@/services/productService"; // ✅ Import Service
+import { useSearchParams } from "next/navigation";
 
 const FactoryDetails = () => {
+    const searchParams = useSearchParams();
+    const productId = searchParams.get("productId");
+
+    console.log("📌 Extracted productId from URL:", productId); // ✅ Debug log
+
     const [data, setData] = useState<any>(null);
 
     useEffect(() => {
-        const storedData = localStorage.getItem("addProdFacForm");
-        if (storedData) {
-            setData(JSON.parse(storedData));
+        if (!productId) {
+            console.error("❌ productId is missing!");
+            return;
         }
-    }, []);
+
+        const getProductDetails = async () => {
+            console.log("📡 Fetching product details for:", productId); // ✅ Debug log
+            const productData = await fetchProductDetails(productId);
+            if (productData) {
+                setData(productData);
+            }
+        };
+
+        getProductDetails(); // ✅ เรียก API ดึงรายละเอียดสินค้า
+    }, [productId]);
 
     return (
+
         <div className="flex flex-col w-full h-full min-h-screen items-center justify-center pt-24 bg-gray-100 text-gray-500">
             {data ? (
                 <div className="flex flex-col md:flex-row justify-between gap-10 w-full p-4 md:p-14">
