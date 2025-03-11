@@ -1,36 +1,20 @@
 "use client";
 
-"use client";
-
 import { useEffect, useState } from "react";
-import { useSearchParams } from 'next/navigation';
-import { getMilkTankDetails } from "@/services/rawMilkService"; // ✅ ดึงข้อมูลจาก API
 
-const FactoryDetails = () => {
-    const searchParams = useSearchParams();
-    const tankId = searchParams.get("id"); // ✅ ดึง tankId จาก URL
-
+const Details = () => {
     const [data, setData] = useState(null);
 
     useEffect(() => {
-        const fetchData = async () => {
-            if (tankId) {
-                try {
-                    const milkTankData = await getMilkTankDetails(tankId); // ✅ เรียก API ดึงข้อมูล
-                    setData(milkTankData.factoryRepo?.rawMilkData || null); // ✅ ใช้เฉพาะ `factoryRepo.rawMilkData`
-                } catch (error) {
-                    console.error("❌ Error fetching milk tank details:", error);
-                }
-            }
-        };
-
-        fetchData();
-    }, [tankId]); // ✅ โหลดข้อมูลใหม่เมื่อ tankId เปลี่ยน
-
+        const storedData = localStorage.getItem("recievedForm");
+        if (storedData) {
+            setData(JSON.parse(storedData));
+        }
+    }, []);
 
     return (
         <div className="flex flex-col w-full h-full min-h-screen items-center justify-center pt-24 bg-gray-100 text-gray-500">
-            <h1 className="text-5xl font-bold text-black">Recieved Details</h1>
+            <h1 className="text-5xl text-black font-bold">Delivered Order Details</h1>
             {data && (
                 <div className="flex flex-col md:flex-row justify-between gap-10 w-full p-4 md:p-14">
                     {/* Recipient Info */}
@@ -39,55 +23,55 @@ const FactoryDetails = () => {
                         <div className="flex flex-col space-y-2 gap-3">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Person in charge:</p>
-                                <p>{data.recipientInfo?.personInCharge}</p>
+                                <p>{data.RecipientInfo.personInCharge}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Location:</p>
-                                <p>{data.recipientInfo?.location}</p>
+                                <p>{data.RecipientInfo.location}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Pick Up Time:</p>
-                                <p>{data.recipientInfo?.pickUpTime}</p>
+                                <p>{data.RecipientInfo.pickUpTime}</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Quantity Info */}
                     <div className="flex flex-col gap-4 md:gap-10 w-full md:w-1/2 border bg-white p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
-                        <h1 className="text-xl md:text-3xl font-bold text-center text-black">Quality Info</h1>
+                        <h1 className="text-xl md:text-3xl font-bold text-center text-black">Quantity Info</h1>
                         <div className="flex flex-col space-y-2 gap-3">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Quantity:</p>
-                                <p>{data.quantity} {data.quantityUnit}</p>
+                                <p>{data.Quantity.quantity} {data.Quantity.quantityUnit}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Temperature:</p>
-                                <p>{data.temperature} {data.tempUnit}</p>
+                                <p>{data.Quantity.temp} {data.Quantity.tempUnit}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">pH:</p>
-                                <p>{data.pH}</p>
+                                <p>{data.Quantity.pH}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Fat:</p>
-                                <p>{data.fat} %</p>
+                                <p>{data.Quantity.fat} %</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Protein:</p>
-                                <p>{data.protein} %</p>
+                                <p>{data.Quantity.protein} %</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Bacteria:</p>
                                 <div className="flex flex-col gap-2">
-                                    <p>{data.bacteria === true ? "True" : "False"}</p>
-                                    <p>{data.bacteriaInfo}</p>
+                                    <p>{data.Quantity.bacteria === true ? "True" : "False"}</p>
+                                    <p>{data.Quantity.bacteriaInfo}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Contaminants:</p>
                                 <div className="flex flex-col gap-2">
-                                    <p>{data.contaminants === true ? "True" : "False"}</p>
-                                    <p>{data.contaminantInfo}</p>
+                                    <p>{data.Quantity.contaminants === true ? "True" : "False"}</p>
+                                    <p>{data.Quantity.contaminantInfo}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between">
@@ -105,15 +89,15 @@ const FactoryDetails = () => {
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-3">
-                                    <p>{data.abnormalChar === true ? "True" : "False"}</p>
-                                    <p>{data.abnormalType.smellBad === true ? "True" : "False"}</p>
-                                    <p>{data.abnormalType.smellNotFresh === true ? "True" : "False"}</p>
-                                    <p>{data.abnormalType.abnormalColor === true ? "True" : "False"}</p>
-                                    <p>{data.abnormalType.sour === true ? "True" : "False"}</p>
-                                    <p>{data.abnormalType.bitter === true ? "True" : "False"}</p>
-                                    <p>{data.abnormalType.cloudy === true ? "True" : "False"}</p>
-                                    <p>{data.abnormalType.lumpy === true ? "True" : "False"}</p>
-                                    <p>{data.abnormalType.separation === true ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalChar === true ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalType.smellBad === true ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalType.smellNotFresh === true ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalType.abnormalColor === true ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalType.sour === true ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalType.bitter === true ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalType.cloudy === true ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalType.lumpy === true ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalType.separation === true ? "True" : "False"}</p>
                                 </div>
                             </div>
                         </div>
@@ -124,4 +108,4 @@ const FactoryDetails = () => {
     );
 }
 
-export default FactoryDetails;
+export default Details;

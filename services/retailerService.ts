@@ -122,3 +122,59 @@ export const createRetailer = async (retailerData: any): Promise<any | null> => 
         return null;
     }
 };
+
+export const fetchRetailers = async (searchQuery = ""): Promise<any[]> => {
+    try {
+        let url = `${API_URL}/list`;
+        if (searchQuery) {
+            url += `?search=${encodeURIComponent(searchQuery)}`;
+        }
+
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+            cache: "no-store",
+        });
+
+        if (!response.ok) {
+            console.error(`❌ Failed to fetch retailers, Status: ${response.status}`);
+            throw new Error("Failed to fetch retailers");
+        }
+
+        const data = await response.json();
+        console.log("📡 API Response:", JSON.stringify(data, null, 2));
+
+        return Array.isArray(data) ? data : [];
+    } catch (error) {
+        console.error("❌ Error fetching retailers:", error);
+        return [];
+    }
+};
+export const fetchRetailerByID = async (retailerID: string): Promise<any> => {
+    try {
+        const response = await fetch(`http://127.0.0.1:8080/api/v1/retailers/${retailerID}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+            cache: "no-store",
+        });
+
+        if (!response.ok) {
+            console.error(`❌ Failed to fetch retailer details, Status: ${response.status}`);
+            throw new Error("Failed to fetch retailer details");
+        }
+
+        const data = await response.json();
+        console.log("📡 Retailer API Response:", JSON.stringify(data, null, 2));
+
+        return data; // ✅ ส่งข้อมูลที่ได้กลับไป
+    } catch (error) {
+        console.error("❌ Error fetching retailer details:", error);
+        return null;
+    }
+};

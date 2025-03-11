@@ -44,7 +44,7 @@ const SelectRole = () => {
 
                         <Link href={'/Retail/GeneralInfo'} className="flex flex-col gap-2 w-full md:w-1/2 h-auto justify-center items-center text-center text-lg bg-white border shadow-xl rounded-3xl p-5 hover:-translate-y-4 hover:duration-300">
                             <div className="flex justify-center items-center w-20 h-20 rounded-full overflow-hidden">
-                                <img src="/images/factoryAvatar.png" alt="retail avatar" />
+                                <img src="/images/RetailerAvatar.jpg" alt="retail avatar" />
                             </div>
                             <label className="text-[#3D405B] font-bold text-2xl">Retailer</label>
                             <p className="text-[#3D405B] font-semibold text-xl">Recieve products and verify accuracy before selling to customers</p>

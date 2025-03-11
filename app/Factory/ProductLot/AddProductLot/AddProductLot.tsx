@@ -3,6 +3,11 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import GeneralInfo from "@/app/Logistic/GeneralInfo/GeneralInfo";
+import { fetchFactoryProducts, fetchProductDetails } from "@/services/productService";
+import { fetchRetailers, fetchRetailerByID} from "@/services/retailerService";
+import { getFactoryRawMilkTanks } from "@/services/rawMilkFacService";
+
+
 
 interface GeoData {
     id: number;
@@ -28,7 +33,175 @@ const AddProductLot = () => {
     const [selectedProvince, setSelectedProvince] = useState<string>("");
     const [selectedDistrict, setSelectedDistrict] = useState<string>("");
     const [selectedSubDistrict, setSelectedSubDistrict] = useState<string>("");
+    const [products, setProducts] = useState<any[]>([]);
+    const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
+    const [showDropdown, setShowDropdown] = useState<boolean>(false);
+    const [milkTanks, setMilkTanks] = useState<any[]>([]);
+    const [selectedMilkTanks, setSelectedMilkTanks] = useState<string[]>([]);
 
+    const [retailers, setRetailers] = useState<any[]>([]);
+    const [filteredRetailers, setFilteredRetailers] = useState<any[]>([]);
+    const [showRetailerDropdown, setShowRetailerDropdown] = useState<boolean>(false);
+
+//ชิปปิ้งแอดเดรส//
+const fetchRetailersData = async (searchQuery: string) => {
+    try {
+        const data = await fetchRetailers(searchQuery);
+        setRetailers(data);
+        setFilteredRetailers(data);
+    } catch (error) {
+        console.error("❌ Error fetching retailers:", error);
+    }
+};
+
+const handleRetailerSearch = async (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
+    const searchText = event.target.value.trim(); // ✅ ตัดช่องว่างซ้ายขวาออก
+    handleShippingAddressChange(index, event); // ✅ บันทึกค่าใน Local Storage
+
+    if (searchText.length < 2) {
+        setFilteredRetailers([]);
+        setShowRetailerDropdown(false);
+        return;
+    }
+
+    try {
+        const data = await fetchRetailers(searchText);
+        console.log("📡 Filtered Retailers from API:", JSON.stringify(data, null, 2)); // ✅ ตรวจสอบว่าข้อมูลถูกต้อง
+
+        if (!Array.isArray(data) || data.length === 0) {
+            setFilteredRetailers([]);
+            setShowRetailerDropdown(false);
+            return;
+        }
+
+        setFilteredRetailers(data);
+        setShowRetailerDropdown(true);
+    } catch (error) {
+        console.error("❌ Error fetching retailers:", error);
+    }
+};
+
+
+const handleSelectRetailer = (index: number, retailer: any) => {
+    setFormData(prev => {
+        const newShippingAddresses = prev.shippingAddresses.map((address, i) =>
+            i === index
+                ? {
+                      ...address,
+                      retailerId: retailer.retailer_id || address.retailerId, // ✅ ป้องกัน retailerId หาย
+                      companyName: retailer.company_name,
+                      email: retailer.email,
+                      phoneNumber: retailer.telephone,
+                      address: retailer.address,
+                      province: retailer.province,
+                      district: retailer.district,
+                      subDistrict: retailer.subdistrict,
+                      postalCode: retailer.post_code,
+                      location: retailer.location_link,
+                  }
+                : address
+        );
+
+        console.log("✅ Updated retailerId:", retailer.retailer_id);
+        console.log("📌 New shippingAddresses:", JSON.stringify(newShippingAddresses, null, 2));
+
+        return { ...prev, shippingAddresses: newShippingAddresses };
+    });
+
+    setShowRetailerDropdown(false);
+};
+
+
+//จบชิปปิ้ง///    
+//ช่องนม///
+    useEffect(() => {
+        const fetchMilkTanks = async () => {
+            try {
+                const response = await getFactoryRawMilkTanks("selection"); // ✅ ต้องระบุ "selection"
+                
+                if (response) {
+                    console.log("✅ Filtered Milk Tanks:", response); // Debugging
+                    setMilkTanks(response);
+                }
+            } catch (error) {
+                console.error("❌ Error fetching milk tanks:", error);
+            }
+        };
+    
+        fetchMilkTanks();
+    }, []);
+    
+    
+
+    const handleMilkTankSelection = (tankId: string) => {
+        setFormData((prevData) => {
+            const updatedTanks = prevData.selectMilkTank.tanks.includes(tankId)
+                ? prevData.selectMilkTank.tanks.filter(id => id !== tankId) // ✅ ถ้าเลือกซ้ำให้เอาออก
+                : [...prevData.selectMilkTank.tanks, tankId]; // ✅ ถ้ายังไม่เลือกให้เพิ่มเข้าไป
+    
+            return {
+                ...prevData,
+                selectMilkTank: { ...prevData.selectMilkTank, tanks: updatedTanks }
+            };
+        });
+    };
+
+//จบนม///
+
+///ช่องโปรดัก////
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const data = await fetchFactoryProducts();
+                setProducts(data);
+            } catch (error) {
+                console.error("❌ Error fetching factory products:", error);
+            }
+        };
+        fetchProducts();
+    }, []);
+    
+    
+    const handleProductSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const searchText = event.target.value;
+        setFormData(prev => ({
+            ...prev,
+            GeneralInfo: {
+                ...prev.GeneralInfo,
+                productName: searchText
+            }
+        }));
+    
+        if (!searchText) {
+            setFilteredProducts([]);
+            setShowDropdown(false);
+            return;
+        }
+    
+        const filtered = products.filter((product) =>
+            product.productName.toLowerCase().includes(searchText.toLowerCase())
+        );
+        setFilteredProducts(filtered);
+        setShowDropdown(filtered.length > 0);
+    };
+
+    const handleSelectProduct = (product: any) => {
+        setFormData(prev => ({
+            ...prev,
+            GeneralInfo: {
+                ...prev.GeneralInfo,
+                productName: product.productName,
+                productId: product.productId,
+                category: product.category,
+                description: "Auto-filled description" // สมมติว่าคุณมีค่าจาก API
+            }
+        }));
+        setShowDropdown(false);
+    };
+
+    
+    
+/////จบช่องโปรดัก///
     useEffect(() => {
         fetch("/data/geography.json")
             .then((res) => res.json())
@@ -103,6 +276,7 @@ const AddProductLot = () => {
     // save form Data
     const [productLotForm, setFormData] = useState({
         GeneralInfo: {
+            productId: "",  
             productName: "",
             category: "",
             description: "",
@@ -110,6 +284,9 @@ const AddProductLot = () => {
             quantityUnit: "Ton"
         },
         selectMilkTank: {
+            tanks: []
+        },
+        Quality: {
             temp: 0,
             tempUnit: "Celcius",
             pH: 0,
@@ -131,23 +308,6 @@ const AddProductLot = () => {
                 separation: false
             }
         },
-        Quality: {
-            calories: 0,
-            totalFat: 0,
-            colestoral: 0,
-            sodium: 0,
-            potassium: 0,
-            totalCarbohydrates: 0,
-            fiber: 0,
-            sugar: 0,
-            vitaminC: 0,
-            calcium: 0,
-            iron: 0,
-            vitaminD: 0,
-            vitaminB6: 0,
-            vitaminB12: 0,
-            magnesium: 0
-        },
         nutrition: {
             calories: 0,
             totalFat: 0,
@@ -165,7 +325,9 @@ const AddProductLot = () => {
             vitaminB12: 0,
             magnesium: 0
         },
-        shippingAddress: {
+        // เปลี่ยนจาก shippingAddress เป็น shippingAddresses เป็น array ของ object
+        shippingAddresses: [{
+            retailerId: "", 
             companyName: "",
             firstName: "",
             lastName: "",
@@ -178,127 +340,177 @@ const AddProductLot = () => {
             subDistrict: "",
             postalCode: "",
             location: ""
-        }
+        }]
     });
+    
 
-    const [shippingAddresses, setShippingAddresses] = useState([{
-        companyName: "",
-        firstName: "",
-        lastName: "",
-        email: "",
-        areaCode: "+66",
-        phoneNumber: "",
-        address: "",
-        province: "",
-        district: "",
-        subDistrict: "",
-        postalCode: "",
-        location: ""
-    }]);
-
+    useEffect(() => {
+        const selectedProductId = productLotForm.GeneralInfo.productId; // ✅ ดึง productId จาก form
+    
+        if (!selectedProductId) return; // ✅ ถ้าไม่มีค่าให้หยุดทำงาน
+    
+        const fetchDetails = async () => {
+            const productData = await fetchProductDetails(selectedProductId);
+            if (productData) {
+                setFormData((prevData) => ({
+                    ...prevData,
+                    GeneralInfo: {
+                        ...prevData.GeneralInfo,
+                        description: productData.GeneralInfo.description,
+                        quantity: productData.GeneralInfo.quantity,
+                        quantityUnit: productData.Nutrition.quantityUnit  // ✅ ดึงจาก Nutrition
+                    }
+                }));
+            }
+        };
+        fetchDetails();
+    }, [productLotForm.GeneralInfo.productId]); // ✅ ใช้ productId จาก state
+     
+    useEffect(() => {
+        setFormData(prev => {
+            const updatedAddresses = [...prev.shippingAddresses];
+    
+            updatedAddresses.forEach(async (address, index) => {
+                if (!address.retailerId) return;
+    
+                try {
+                    const retailerData = await fetchRetailerByID(address.retailerId);
+                    if (retailerData) {
+                        updatedAddresses[index] = {
+                            ...updatedAddresses[index],
+                            companyName: retailerData.company_name,
+                            email: retailerData.email,
+                            phoneNumber: retailerData.telephone,
+                            address: retailerData.address,
+                            province: retailerData.province,
+                            district: retailerData.district,
+                            subDistrict: retailerData.subdistrict,
+                            postalCode: retailerData.post_code,
+                            location: retailerData.location_link,
+                        };
+                    }
+                } catch (error) {
+                    console.error(`❌ Error fetching retailer ${address.retailerId}:`, error);
+                }
+            });
+    
+            console.log("📡 Updated shippingAddresses:", updatedAddresses);
+            return { ...prev, shippingAddresses: updatedAddresses };
+        });
+    }, [productLotForm.shippingAddresses.map(addr => addr.retailerId).join(",")]); // ✅ ติดตามการเปลี่ยนแปลงของ retailerId
+    
+    
     const addShippingAddress = () => {
-        setShippingAddresses([...shippingAddresses, {
-            companyName: "",
-            firstName: "",
-            lastName: "",
-            email: "",
-            areaCode: "+66",
-            phoneNumber: "",
-            address: "",
-            province: "",
-            district: "",
-            subDistrict: "",
-            postalCode: "",
-            location: ""
-        }]);
+        console.log("📌 Before Add:", productLotForm.shippingAddresses);
+    
+        setFormData(prev => {
+            const updatedShippingAddresses = [
+                ...prev.shippingAddresses,
+                {
+                    retailerId: "", 
+                    companyName: "",
+                    firstName: "",
+                    lastName: "",
+                    email: "",
+                    areaCode: "+66",
+                    phoneNumber: "",
+                    address: "",
+                    province: "",
+                    district: "",
+                    subDistrict: "",
+                    postalCode: "",
+                    location: ""
+                }
+            ];
+            
+            console.log("✅ After Add:", updatedShippingAddresses);
+    
+            return { ...prev, shippingAddresses: updatedShippingAddresses };
+        });
     };
-
-    const handleShippingAddressChange = (index: number, event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value } = event.target;
-        const updatedAddresses = [...shippingAddresses];
-        updatedAddresses[index] = { ...updatedAddresses[index], [name]: value };
-        setShippingAddresses(updatedAddresses);
-
-        // อัปเดต province, district และ subdistrict
-        if (name === "province") {
-            setSelectedProvince(value);
-        } else if (name === "district") {
-            setSelectedDistrict(value);
-        } else if (name === "subDistrict") {
-            setSelectedSubDistrict(value);
-        }
-    };
-
-    const [showAbnormalInfo, setShowAbnormalInfo] = useState(false);
-    const [showBacteriaInfo, setShowBacteriaInfo] = useState(false);
-    const [showContaminantInfo, setShowContaminantInfo] = useState(false);
+    
+    
 
     const handleFormDataChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, type, value, checked } = event.target;
         const keys = name.split(".");
 
         setFormData((prevData) => {
-            const updatedData = { ...prevData }; // Clone ข้อมูลเดิม
+            const updatedData = { ...prevData }; // Clone object หลัก
             let temp: any = updatedData;
 
-            for (let i = 0; i < keys.length - 1; i++) {
-                temp = temp[keys[i]];
-            }
+            // ใช้ reduce เพื่อสร้าง object ซ้อนกันให้ครบก่อนอัปเดตค่า
+            temp = keys.slice(0, -1).reduce((obj, key) => {
+                if (!obj[key]) obj[key] = {}; // ถ้า key ยังไม่มี ให้สร้าง object
+                return obj[key];
+            }, updatedData);
 
-            // ถ้าเป็น checkbox ให้ใช้ checked ถ้าไม่ใช่ให้ใช้ value
+            // กำหนดค่าล่าสุดที่ตำแหน่งสุดท้าย
             temp[keys[keys.length - 1]] = type === "checkbox" ? checked : value;
 
             return updatedData;
         });
-
-        // อัปเดต province, district และ subdistrict
-        if (name === "shippingAddress.province") {
-            setSelectedProvince(value);
-        } else if (name === "shippingAddress.district") {
-            setSelectedDistrict(value);
-        } else if (name === "shippingAddress.subDistrict") {
-            setSelectedSubDistrict(value);
-        }
     };
 
-    const handleAbnormalChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        // handleFormDataChange(event);
-        setShowAbnormalInfo(event.target.checked);
-    };
 
-    const handleBacteriaChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        // handleFormDataChange(event);
-        setShowBacteriaInfo(event.target.checked);
-    };
-
-    const handleContaminantChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        // handleFormDataChange(event);
-        setShowContaminantInfo(event.target.checked);
-    };
-
+    // ฟังก์ชันสำหรับอัปเดต checkbox ที่อยู่ใน object ซ้อนกัน
     const handleNestedCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, checked } = event.target;
 
         setFormData((prevData) => {
             const updatedData = { ...prevData };
-            let temp = updatedData.Quantity.abnormalType;
 
-            temp[name.split('.').pop()!] = checked;
+            // ตรวจสอบว่า `Quality.abnormalType` มีค่าอยู่แล้วหรือไม่
+            if (!updatedData.Quality) updatedData.Quality = {};
+            if (!updatedData.Quality.abnormalType) updatedData.Quality.abnormalType = {};
+
+            updatedData.Quality.abnormalType[name.split('.').pop()!] = checked;
 
             return updatedData;
         });
     };
 
+    const handleShippingAddressChange = (index: number, event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = event.target;
+        setFormData(prev => {
+            const newShippingAddresses = [...prev.shippingAddresses];
+            newShippingAddresses[index] = { ...newShippingAddresses[index], [name]: value };
+            return { ...prev, shippingAddresses: newShippingAddresses };
+        });
+    
+        // หากมีการเปลี่ยน province, district, หรือ subDistrict ให้จัดการแยกเพิ่มเติม
+        if (name === "province") setSelectedProvince(value);
+        if (name === "district") setSelectedDistrict(value);
+        if (name === "subDistrict") setSelectedSubDistrict(value);
+    };
+    
+
+    const [showAbnormalInfo, setShowAbnormalInfo] = useState(false);
+
+    const handleAbnormalChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData((prevData) => ({
+            ...prevData,
+            Quality: {
+                ...prevData.Quality,
+                abnormalChar: event.target.checked,
+            }
+        }));
+
+        setShowAbnormalInfo(event.target.checked);
+    };
+
+    
 
     const saveToLocalStorage = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const formDataWithShipping = { ...productLotForm, shippingAddresses };
+        const formDataWithShipping = { ...productLotForm,  selectMilkTank: { ...productLotForm.selectMilkTank } };
         localStorage.setItem("productLotForm", JSON.stringify(formDataWithShipping));
-        alert("Form saved to localStorage!");
         console.log("Saved data:", formDataWithShipping); // Debugging line
     };
+    
 
     const router = useRouter();
+
 
     return (
         <div className="flex flex-col w-full h-full min-h-screen items-center justify-center pt-20">
@@ -420,37 +632,60 @@ const AddProductLot = () => {
                     {/* Product name */}
                     <div className="flex flex-col w-full items-start gap-3">
                         <label htmlFor="productName" className="font-semibold">Product Name</label>
-                        <input type="text" name="RecipientInfo.productName" id="productName"
-                            placeholder="Enter product name" className="border rounded-full p-3 w-full"
+                        <input
+                            type="text"
+                            name="GeneralInfo.productName"
+                            id="productName"
+                            placeholder="Enter product name"
+                            className="border rounded-full p-3 w-full"
+                            value={productLotForm.GeneralInfo.productName}
+                            onChange={handleProductSearch} // ✅ ใช้ handleProductSearch ที่เรียก handleFormDataChange
                         />
+                        {showDropdown && (
+                            <ul className="absolute w-full bg-white border rounded-md shadow-lg max-h-40 overflow-y-auto">
+                                {filteredProducts.map((product) => (
+                                    <li
+                                        key={product.productId}
+                                        className="p-2 cursor-pointer hover:bg-gray-100"
+                                        onClick={() => handleSelectProduct(product)}
+                                    >
+                                        {product.productName}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
                     </div>
                     {/* Category */}
                     <div className="flex flex-col w-full items-start gap-3">
                         <label htmlFor="category" className="font-semibold">Category</label>
                         <input type="text" id="category"
                             placeholder="Enter category" className="border rounded-full p-3 w-full"
-                            name="RecipientInfo.category" />
+                            name="RecipientInfo.category" value={productLotForm.GeneralInfo.category} onChange={handleFormDataChange}
+                        />
                     </div>
                     {/* Description */}
                     <div className="flex flex-col w-full items-start gap-3">
                         <label htmlFor="description" className="font-semibold">Description</label>
                         <input type="text" id="description" placeholder="Write description" className="border rounded-full p-3 w-full"
-                            name="RecipientInfo.description" />
+                            name="RecipientInfo.description" value={productLotForm.GeneralInfo.description} onChange={handleFormDataChange}
+                        />
                     </div>
                     {/* Quauntity per unit */}
                     <div className="flex flex-col w-full items-start gap-3">
                         <label htmlFor="quantity" className="font-semibold">Quantity per unit</label>
                         <div className="flex gap-3 w-full items-center">
                             <input type="number" name="RecipientInfo.quantity" className="border rounded-full w-5/6 p-3" placeholder="0.00" step={0.01}
+                                value={productLotForm.GeneralInfo.quantity} onChange={handleFormDataChange}
                             />
-                            <select name="Quantity.quantityUnit" id="Unit" className="border rounded-full p-3 w-1/6 font-semibold text-center"
+                            <select name="GeneralInfo.quantityUnit" id="Unit" className="border rounded-full p-3 w-1/6 font-semibold text-center"
+                                value={productLotForm.GeneralInfo.quantityUnit} onChange={handleFormDataChange}
                             >
-                                <option value="liter">Liter</option>
-                                <option value="milliliter">Milliliter</option>
-                                <option value="gallon">Gallon</option>
-                                <option value="cc">cc</option>
-                                <option value="ton">Ton</option>
-                                <option value="ounce">Ounce</option>
+                                <option value="Liter">Liter</option>
+                                <option value="Milliliter">Milliliter</option>
+                                <option value="Gallon">Gallon</option>
+                                <option value="CC">cc</option>
+                                <option value="Ton">Ton</option>
+                                <option value="Ounce">Ounce</option>
                             </select>
                         </div>
                     </div>
@@ -464,74 +699,219 @@ const AddProductLot = () => {
                     </button>
                 </div>
 
-                {/* Select Milk Tank */}
-                <div id="section2" className={`flex flex-col items-center w-full h-full text-xl gap-8 mt-20 ${visibleSection >= 2 ? '' : 'hidden'}`}>
-                    <h1 className="text-5xl font-bold">Select Milk Tank</h1>
-                    <select name="milkTank" id="milkTank" className="border rounded-full p-3 w-1/2 text-center">
-                        <option value="T1">Milk Tank 1</option>
-                    </select>
-                    <div className="flex flex-col justify-center items-center w-1/2 h-fit gap-5 bg-white text-slate-500 shadow-xl border rounded-2xl p-5">
-                        <div className="flex flex-col md:flex-row justify-between items-center w-full h-1/2">
-                            <span className="text-xl md:text-2xl font-semibold">Milk Tank No: <p className="font-normal inline">Milk Tank 1</p></span>
-                            <span className="text-xl md:text-2xl font-semibold">Quantity: <p className="font-normal inline">5 Liters</p></span>
-                        </div>
-                        <div className="flex flex-col md:flex-row justify-between items-center w-full h-1/2">
-                            <span className="text-xl md:text-2xl font-semibold">Farm Name: <p className="inline font-normal">Farm 1</p></span>
-                            <span className="text-xl md:text-2xl font-semibold">Temperature: <p className="inline font-normal">15 °C</p></span>
-                        </div>
-                        <div className="flex flex-col justify-center items-start w-full">
-                            <span className="text-xl md:text-2xl font-semibold">Location: <p className="inline font-normal">IT KMITL</p></span>
-                        </div>
-                    </div>
-                    <div className="flex flex-col justify-center items-center w-1/2 h-fit gap-5 bg-white text-slate-500 shadow-xl border rounded-2xl p-5">
-                        <div className="flex flex-col md:flex-row justify-between items-center w-full h-1/2">
-                            <span className="text-xl md:text-2xl font-semibold">Milk Tank No: <p className="font-normal inline">Milk Tank 1</p></span>
-                            <span className="text-xl md:text-2xl font-semibold">Quantity: <p className="font-normal inline">5 Liters</p></span>
-                        </div>
-                        <div className="flex flex-col md:flex-row justify-between items-center w-full h-1/2">
-                            <span className="text-xl md:text-2xl font-semibold">Farm Name: <p className="inline font-normal">Farm 1</p></span>
-                            <span className="text-xl md:text-2xl font-semibold">Temperature: <p className="inline font-normal">15 °C</p></span>
-                        </div>
-                        <div className="flex flex-col justify-center items-start w-full">
-                            <span className="text-xl md:text-2xl font-semibold">Location: <p className="inline font-normal">IT KMITL</p></span>
-                        </div>
-                    </div>
+                {/* Select Milk Tank Section */}
+{/* Select Milk Tank */}
+<div id="section2" className={`flex flex-col items-center w-full h-full text-xl gap-8 mt-20 ${visibleSection >= 2 ? '' : 'hidden'}`}>
+    <h1 className="text-5xl font-bold">Select Milk Tank</h1>
 
-                    <button
-                        type="button"
-                        className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8] ${stepStatus.step2 === 'completed' ? 'hidden' : ''}`}
-                        onClick={() => handleNextClick(2)}
-                    >
-                        Next
-                    </button>
-                </div>
+    {/* ✅ Drop-down เลือกแท็งก์ */}
+    <select 
+        name="milkTank" 
+        id="milkTank" 
+        className="border rounded-full p-3 w-1/2 text-center"
+        value="" 
+        onChange={(e) => handleMilkTankSelection(e.target.value)}
+    >
+        <option value="">Select a Milk Tank</option>
+        {milkTanks.map((tank) => (
+            <option key={tank.tankId} value={tank.tankId}>
+                {tank.tankId} ({tank.quantity})
+            </option>
+        ))}
+    </select>
+
+    {/* ✅ แสดงแท็งก์นมแบบกล่องคลิกได้ */}
+    {milkTanks.map((tank) => (
+        <div 
+            key={tank.tankId}
+            onClick={() => handleMilkTankSelection(tank.tankId)} 
+            className={`cursor-pointer flex flex-col justify-center items-center w-1/2 h-fit gap-5 p-5 border rounded-2xl shadow-xl 
+                ${productLotForm.selectMilkTank.tanks.includes(tank.tankId) ? "bg-[#C2CC8D] text-[#52600A] border-[#52600A]" : "bg-white text-slate-500"}`}
+        >
+            <div className="flex flex-col md:flex-row justify-between items-center w-full">
+                <span className="text-xl md:text-2xl font-semibold">Milk Tank No: 
+                    <p className="font-normal inline">{tank.tankId}</p>
+                </span>
+                <span className="text-xl md:text-2xl font-semibold">Quantity: 
+                    <p className="font-normal inline">{tank.quantity}</p>
+                </span>
+            </div>
+            <div className="flex flex-col md:flex-row justify-between items-center w-full">
+                <span className="text-xl md:text-2xl font-semibold">Farm Name: 
+                    <p className="inline font-normal">{tank.farmName}</p>
+                </span>
+                <span className="text-xl md:text-2xl font-semibold">Temperature: 
+                    <p className="inline font-normal">{tank.temperature}</p>
+                </span>
+            </div>
+            <div className="flex flex-col justify-center items-start w-full">
+                <span className="text-xl md:text-2xl font-semibold">Location: 
+                    <p className="inline font-normal">{tank.location}</p>
+                </span>
+            </div>
+        </div>
+    ))}
+
+    {/* ✅ ปุ่ม Next */}
+    <button
+        type="button"
+        className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8] ${stepStatus.step2 === 'completed' ? 'hidden' : ''}`}
+        onClick={() => handleNextClick(2)}
+    >
+        Next
+    </button>
+</div>
+
+
 
                 {/* Quality */}
                 <div id="section3" className={`flex flex-col items-center w-full h-full text-xl gap-8 mt-20 ${visibleSection >= 3 ? '' : 'hidden'}`}>
                     <h1 className="text-5xl font-bold">Quality</h1>
-                    {/* Grade */}
-                    <div className="flex flex-col w-full items-start gap-3">
-                        <label htmlFor="grade" className="font-semibold">Grade</label>
-                        <input type="text" name="Quality.grade" id="grade" className="p-3 border rounded-full w-full" placeholder="Enter grade"
-                        />
+                    {/* Temperature */}
+                    <div className="flex w-full items-start gap-3">
+                        {/* Temperature */}
+                        <div className="flex flex-col w-full items-start gap-3">
+                            <label htmlFor="temp" className="font-semibold">Temperature</label>
+                            <div className="flex w-full items-start gap-3">
+                                <input type="number" name="Quality.temp" id="temp" className="p-3 rounded-full border w-4/5" placeholder="0.00" step="0.01"
+                                    value={productLotForm?.Quality?.temp} onChange={handleFormDataChange} />
+                                <select name="Quality.tempUnit" id="tempUnit" className="border rounded-full p-3 w-1/5 font-semibold"
+                                    value={productLotForm?.Quality?.tempUnit} onChange={handleFormDataChange}>
+                                    <option value="Celcius">°C</option>
+                                    <option value="Farenheit">°F</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                    {/* Inspection Date */}
+                    {/* pH of Milk */}
                     <div className="flex flex-col w-full items-start gap-3">
-                        <label htmlFor="inspectionDate" className="font-semibold">Inspection Date</label>
-                        <input type="date" name="Quality.inspectionDate" id="inspectionDate" className="p-3 border rounded-full w-full"
-                        />
+                        <label htmlFor="pH" className="font-semibold">pH of Milk</label>
+                        <input type="number" name="Quality.pH" id="pH" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01"
+                            value={productLotForm?.Quality?.pH} onChange={handleFormDataChange} />
                     </div>
-                    {/* Inspector */}
-                    <div className="flex flex-col w-full items-start gap-3">
-                        <label htmlFor="inspector" className="font-semibold">Inspector</label>
-                        <input type="text" name="Quality.inspector" id="inspector" className="p-3 border rounded-full w-full" placeholder="Enter inspector name"
-                        />
+                    {/* Fat + Protein */}
+                    <div className="flex w-full items-start gap-3">
+                        {/* Fat */}
+                        <div className="flex flex-col w-1/2 items-start gap-3">
+                            <label htmlFor="fat" className="font-semibold">Fat (%)</label>
+                            <input type="number" name="Quality.fat" id="fat" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01"
+                                value={productLotForm?.Quality?.fat} onChange={handleFormDataChange} />
+                        </div>
+                        {/* Protein */}
+                        <div className="flex flex-col w-1/2 items-start gap-3">
+                            <label htmlFor="protein" className="font-semibold">Protein (%)</label>
+                            <input type="number" name="Quality.protein" id="protein" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01"
+                                value={productLotForm?.Quality?.protein} onChange={handleFormDataChange} />
+                        </div>
                     </div>
-                    {/* Comments */}
-                    <div className="flex flex-col w-full items-start gap-3">
-                        <label htmlFor="comments" className="font-semibold">Comments</label>
-                        <textarea name="Quality.comments" id="comments" className="p-3 border rounded-3xl w-full" placeholder="Enter comments"
-                        ></textarea>
+                    {/* bacteria testing */}
+                    <div className="flex flex-col w-full justify-center gap-3">
+                        <div className="flex w-full items-center gap-3">
+                            <input
+                                type="checkbox"
+                                name="Quality.bacteria"
+                                id="bacteria"
+                                className="w-5 h-5 appearance-none border border-gray-400 rounded-full checked:bg-[#D3D596] checked:border-[#305066]"
+                                onChange={handleFormDataChange}
+                                checked={productLotForm?.Quality?.bacteria}
+                            />
+                            <label htmlFor="bacteria" className="font-semibold">Bacteria Testing</label>
+                        </div>
+                        {productLotForm?.Quality?.bacteria && (
+                            <input
+                                type="text"
+                                name="Quality.bacteriaInfo"
+                                id="bacteriaInfo"
+                                className="border rounded-full p-3"
+                                placeholder="Please fill additional information"
+                                value={productLotForm?.Quality?.bacteriaInfo}
+                                onChange={handleFormDataChange}
+                            />
+                        )}
+                    </div>
+                    {/* Contaminants */}
+                    <div className="flex flex-col w-full justify-center gap-3">
+                        <div className="flex w-full items-center gap-3">
+                            <input
+                                type="checkbox"
+                                name="Quality.contaminants"
+                                id="Quality.contaminants"
+                                className="w-5 h-5 appearance-none border border-gray-400 rounded-full checked:bg-[#D3D596] checked:border-[#305066]"
+                                onChange={handleFormDataChange}
+                                checked={productLotForm?.Quality?.contaminants}
+                            />
+                            <label htmlFor="contaminants" className="font-semibold">Contaminants</label>
+                        </div>
+                        {productLotForm?.Quality?.contaminants && (
+                            <input
+                                type="text"
+                                name="Quality.contaminantInfo"
+                                id="Quality.contaminantInfo"
+                                className="border rounded-full p-3"
+                                placeholder="Please fill additional information"
+                                value={productLotForm?.Quality?.contaminantInfo}
+                                onChange={handleFormDataChange}
+                            />
+                        )}
+                    </div>
+                    {/* Abnormal Characteristic */}
+                    <div className="flex flex-col w-full justify-center items-start gap-3">
+                        <div className="flex w-full items-center gap-3">
+                            <input
+                                type="checkbox"
+                                name="Quality.abnormalChar"
+                                id="abnormalChar"
+                                className="w-5 h-5 appearance-none border border-gray-400 rounded-full checked:bg-[#D3D596] checked:border-[#305066]"
+                                onChange={handleAbnormalChange}
+                                checked={productLotForm?.Quality?.abnormalChar}
+                            />
+                            <label htmlFor="abnormalChar" className="font-semibold">Abnormal Characteristic</label>
+                        </div>
+                        {showAbnormalInfo && (
+                            <div className="flex flex-col w-full items-center gap-3 px-8">
+                                <div className="flex w-full items-center gap-3">
+                                    <input type="checkbox" name="Quality.abnormalType.smellBad" id="smellBad" className="border w-4 h-4"
+                                        checked={productLotForm?.Quality?.abnormalType?.smellBad} onChange={handleNestedCheckboxChange} />
+                                    <label htmlFor="smellBad" className="font-semibold">Smell Bad</label>
+                                </div>
+                                <div className="flex w-full items-center gap-3">
+                                    <input type="checkbox" name="Quality.abnormalType.smellNotFresh" id="smellNotFresh" className="border w-4 h-4"
+                                        checked={productLotForm?.Quality?.abnormalType?.smellNotFresh} onChange={handleNestedCheckboxChange} />
+                                    <label htmlFor="smellNotFresh" className="font-semibold">Smell not fresh</label>
+                                </div>
+                                <div className="flex w-full items-center gap-3">
+                                    <input type="checkbox" name="Quality.abnormalType.abnormalColor" id="abnormalColor" className="border w-4 h-4"
+                                        checked={productLotForm?.Quality?.abnormalType?.abnormalColor} onChange={handleNestedCheckboxChange} />
+                                    <label htmlFor="abnormalColor" className="font-semibold">Abnormal Color</label>
+                                    <p className="text-gray-500">ex. yellow or green</p>
+                                </div>
+                                <div className="flex w-full items-center gap-3">
+                                    <input type="checkbox" name="Quality.abnormalType.sour" id="sour" className="border w-4 h-4"
+                                        checked={productLotForm?.Quality?.abnormalType?.sour} onChange={handleNestedCheckboxChange} />
+                                    <label htmlFor="sour" className="font-semibold">Sour taste</label>
+                                </div>
+                                <div className="flex w-full items-center gap-3">
+                                    <input type="checkbox" name="Quality.abnormalType.bitter" id="bitter" className="border w-4 h-4"
+                                        checked={productLotForm?.Quality?.abnormalType?.bitter} onChange={handleNestedCheckboxChange} />
+                                    <label htmlFor="bitter" className="font-semibold">Bitter taste</label>
+                                </div>
+                                <div className="flex w-full items-center gap-3">
+                                    <input type="checkbox" name="Quality.abnormalType.cloudy" id="cloudy" className="border w-4 h-4"
+                                        checked={productLotForm?.Quality?.abnormalType?.cloudy} onChange={handleNestedCheckboxChange} />
+                                    <label htmlFor="cloudy" className="font-semibold">Cloudy Appearance</label>
+                                </div>
+                                <div className="flex w-full items-center gap-3">
+                                    <input type="checkbox" name="Quality.abnormalType.lumpy" id="lumpy" className="border w-4 h-4"
+                                        checked={productLotForm?.Quality?.abnormalType?.lumpy} onChange={handleNestedCheckboxChange} />
+                                    <label htmlFor="lumpy" className="font-semibold">Lumpy Appearance</label>
+                                </div>
+                                <div className="flex w-full items-center gap-3">
+                                    <input type="checkbox" name="Quality.abnormalType.separation" id="separation" className="border w-4 h-4"
+                                        checked={productLotForm?.Quality?.abnormalType?.separation} onChange={handleNestedCheckboxChange} />
+                                    <label htmlFor="separation" className="font-semibold">Separation between water and fat</label>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <button
@@ -685,13 +1065,28 @@ const AddProductLot = () => {
                 {/* Shipping Address section */}
                 <div id="section5" ref={shippingAddressRef} className={`flex flex-col items-center w-full h-full text-xl gap-8 mt-20 ${visibleSection >= 5 ? '' : 'hidden'}`}>
                     <h1 className="text-5xl font-bold">Shipping Address</h1>
-                    {shippingAddresses.map((address, index) => (
+                    {productLotForm.shippingAddresses.length > 0 && productLotForm.shippingAddresses.map((address, index) => (
                         <div key={index} className="flex flex-col w-full gap-8 mt-10">
                             {/* Company Name */}
                             <div className="flex flex-col w-full gap-5">
                                 <label htmlFor={`companyName-${index}`} className="font-semibold">Company Name</label>
                                 <input type="text" name="companyName" id={`companyName-${index}`} className="border p-3 rounded-full" placeholder="Enter your company name"
-                                    value={address.companyName} onChange={(e) => handleShippingAddressChange(index, e)} />
+                                    value={address.companyName}  onChange={(e) => handleRetailerSearch(index, e)} />
+
+                                {/* ✅ Dropdown แสดงรายการ */}
+    {showRetailerDropdown && (
+        <ul className="absolute w-full bg-white border rounded-md shadow-lg max-h-40 overflow-y-auto">
+            {filteredRetailers.map((retailer) => (
+                <li
+                    key={retailer.retailer_id}
+                    className="p-2 cursor-pointer hover:bg-gray-100"
+                    onClick={() => handleSelectRetailer(index, retailer)}
+                >
+                    {retailer.company_name}
+                </li>
+            ))}
+        </ul>
+    )}
                             </div>
                             {/* First name + Last name */}
                             <div className="flex items-center w-full gap-5">
@@ -724,7 +1119,6 @@ const AddProductLot = () => {
                                             id={`areaCode-${index}`}
                                             className="border border-gray-300 rounded-full p-3 w-auto text-center"
                                             value={address.areaCode} onChange={(e) => handleShippingAddressChange(index, e)}
-                                            required
                                         >
                                             <option value="+66">+66</option>
                                         </select>
@@ -737,7 +1131,6 @@ const AddProductLot = () => {
                                         className="border border-gray-300 rounded-full p-3 flex-1 w-10/12"
                                         placeholder="Enter your phone number"
                                         value={address.phoneNumber} onChange={(e) => handleShippingAddressChange(index, e)}
-                                        required
                                     />
                                 </div>
                             </div>
@@ -806,7 +1199,7 @@ const AddProductLot = () => {
                         type="submit"
                         className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8]`}
                         onClick={() => {
-                            const formDataWithShipping = { ...productLotForm, shippingAddresses };
+                            const formDataWithShipping = { ...productLotForm };
                             localStorage.setItem("productLotForm", JSON.stringify(formDataWithShipping));
                             console.log("Navigating with data:", formDataWithShipping); // Debugging line
                             router.push('/Factory/ProductLot/CheckDetails');

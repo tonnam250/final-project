@@ -222,7 +222,6 @@ const FarmCreateRM = () => {
     const saveToLocalStorage = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         localStorage.setItem("formData", JSON.stringify(formData));
-        alert("Information Save!");
         console.log(formData);
     };
     // end save form Data
@@ -533,7 +532,6 @@ const FarmCreateRM = () => {
                                     name="shippingAddress.phoneNumber"
                                     className="border border-gray-300 rounded-full p-3 flex-1 w-10/12"
                                     placeholder="Enter your phone number"
-                                    required
                                     value={formData.shippingAddress.phoneNumber}
                                     onChange={handleFormDataChange}
                                 />

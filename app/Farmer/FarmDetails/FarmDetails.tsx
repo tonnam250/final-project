@@ -71,14 +71,14 @@ const FarmDetails = () => {
                                 <p>{data.farmRepo?.rawMilkData?.protein}</p>
                             </div>
                             <div className="flex justify-between">
-                                <p className="font-semibold">bacteria:</p>
+                                <p className="font-semibold">Bacteria:</p>
                                 <div className="flex flex-col gap-2">
                                     <p>{data.farmRepo?.rawMilkData?.bacteria === true ? "True" : "False"}</p>
                                     <p>{data.farmRepo?.rawMilkData?.bacteriaInfo}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between">
-                                <p className="font-semibold">contaminants:</p>
+                                <p className="font-semibold">Contaminants:</p>
                                 <div className="flex flex-col gap-2">
                                     <p>{data.farmRepo?.rawMilkData?.contaminants === true ? "True" : "False"}</p>
                                     <p>{data.farmRepo?.rawMilkData?.contaminantInfo}</p>
@@ -86,7 +86,7 @@ const FarmDetails = () => {
                             </div>
                             <div className="flex justify-between">
                                 <div className="flex flex-col gap-3">
-                                    <p className="font-semibold">abnormal characteristic:</p>
+                                    <p className="font-semibold">Abnormal characteristic:</p>
                                     <div className="flex flex-col gap-3">
                                         <p className="font-semibold">Smell Bad:</p>
                                         <p className="font-semibold">Smell Not Fresh:</p>

@@ -1,14 +1,14 @@
 const API_URL = "http://127.0.0.1:8080/api/v1/factory/milk/";
 
-export const getFactoryRawMilkTanks = async (): Promise<any> => {
+export const getFactoryRawMilkTanks = async (mode: "list" | "selection" = "list"): Promise<any> => {
     try {
         const response = await fetch(API_URL + "list", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
             },
-            credentials: "include", // ✅ ส่ง Cookie (เฉพาะ Client Component เท่านั้น)
-            cache: "no-store", // ✅ ป้องกัน Next.js แคชข้อมูลใน Server Component
+            credentials: "include",
+            cache: "no-store",
         });
 
         if (!response.ok) {
@@ -19,30 +19,40 @@ export const getFactoryRawMilkTanks = async (): Promise<any> => {
         const data = await response.json();
         console.log("📡 API Response:", data);
 
-        // ✅ ตรวจสอบโครงสร้าง API Response
         if (!data || typeof data !== "object" || !Array.isArray(data.displayedMilkTanks)) {
             console.error("❌ Invalid API response format:", data);
             return [];
         }
 
-        // ✅ แปลงข้อมูลให้ตรงกับ `RecieveRM.tsx`
-        const formattedData = data.displayedMilkTanks.map((tank: any) => ({
-            milkTankInfo: {
-                tankId: tank?.moreInfoLink?.split("=")[1]?.trim() || "", // ✅ ป้องกัน `split` แล้ว Error
-                personInCharge: tank?.personInCharge || "Unknown",
-            },
-            status: tank?.status === 0 ? "Pending" : tank?.status === 1 ? "Received" : "Rejected", // ✅ รองรับ "Rejected"
-            id: tank?.moreInfoLink?.split("=")[1]?.trim() || "", // ✅ ป้องกัน `split` แล้ว Error
-        }));
-        
+        // ✅ ถ้า `mode` เป็น "list" ให้ใช้โครงสร้างเดิมของ RecieveRM.tsx
+        if (mode === "list") {
+            return data.displayedMilkTanks.map((tank: any) => ({
+                milkTankInfo: {
+                    tankId: tank?.moreInfoLink?.split("=")[1]?.trim() || "",
+                    personInCharge: tank?.personInCharge || "Unknown",
+                },
+                status: tank?.status === 0 ? "Pending" : tank?.status === 1 ? "Received" : "Rejected",
+                id: tank?.moreInfoLink?.split("=")[1]?.trim() || "",
+            }));
+        }
 
-        console.log("✅ Formatted Factory Milk Tanks:", formattedData);
-        return formattedData;
+        // ✅ ถ้า `mode` เป็น "selection" ให้ใช้โครงสร้างใหม่สำหรับการเลือกแท็งก์
+        return data.displayedMilkTanks
+            .filter((tank: any) => tank.status === 1) // ✅ กรองเฉพาะแท็งก์ที่ `status === "Received"`
+            .map((tank: any) => ({
+                tankId: tank?.moreInfoLink?.split("=")[1]?.trim() || "",
+                quantity: tank?.quantity || "Unknown",
+                temperature: tank?.temperature || "Unknown",
+                farmName: tank?.farmName || "Unknown",
+                location: tank?.location || "Unknown",
+            }));
+
     } catch (error) {
         console.error("❌ Error fetching factory raw milk tanks:", error);
         return [];
     }
 };
+
 
 // ✅ อัปเดตสถานะของแท็งก์นมดิบ (Approve/Reject)
 export const updateMilkTankStatus = async (

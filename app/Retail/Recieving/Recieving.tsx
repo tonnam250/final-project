@@ -103,7 +103,7 @@ const Recieving = () => {
         },
         Quantity: {
             quantity: 0,
-            quantityUnit: "Ton",
+            quantityUnit: "Crate",
             temp: 0,
             tempUnit: "Celcius",
             pH: 0,
@@ -306,19 +306,15 @@ const Recieving = () => {
                         <div className="flex w-full items-start gap-3">
                             {/* Quantity */}
                             <div className="flex flex-col w-1/2 items-start gap-3">
-                                <label htmlFor="quantity" className="font-semibold">Qualiity</label>
+                                <label htmlFor="quantity" className="font-semibold">Quantity Per Unit</label>
                                 <div className="flex gap-3 w-full">
                                     <input type="number" name="Quantity.quantity" id="quantity"
                                         className="border rounded-full p-3 w-4/5" placeholder="0.00" step="0.01"
                                         value={recievedForm.Quantity.quantity} onChange={handleFormDataChange} />
                                     <select name="Quantity.quantityUnit" id="quantityUnit" className="border rounded-full p-3 w-1/5 font-semibold"
                                         value={recievedForm.Quantity.quantityUnit} onChange={handleFormDataChange}>
-                                        <option value="Ton">Ton</option>
-                                        <option value="Liter">Liter</option>
-                                        <option value="Ml">Milliliter</option>
-                                        <option value="Oz">Ounce</option>
-                                        <option value="CC">cc</option>
-                                        <option value="Gallon">Gallon</option>
+                                        <option value="Ton">Crate</option>
+                                        <option value="Liter">Box</option>
                                     </select>
                                 </div>
                             </div>

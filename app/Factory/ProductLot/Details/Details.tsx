@@ -23,7 +23,7 @@ const CheckDetails = () => {
 
     return (
         <div className="flex flex-col w-full h-full min-h-screen items-center justify-center pt-24 bg-gray-100 text-black">
-            <h1 className="text-5xl font-bold mt-10 text-black">Product Lot Check Detail</h1>
+            <h1 className="text-5xl font-bold mt-10 text-black">Product Lot Detail</h1>
             {data && (
                 <div className="flex flex-col gap-10 w-full p-4 md:p-14">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -44,7 +44,7 @@ const CheckDetails = () => {
                                     <p>{data.GeneralInfo.description}</p>
                                 </div>
                                 <div className="flex justify-between">
-                                    <p className="font-semibold">Quantity:</p>
+                                    <p className="font-semibold">Quantity Per Unit:</p>
                                     <p>{data.GeneralInfo.quantity} {data.GeneralInfo.quantityUnit}</p>
                                 </div>
                             </div>
@@ -280,6 +280,10 @@ const CheckDetails = () => {
                     </div>
                 </div>
             )}
+
+            <div className="flex justify-center items-center w-full h-full gap-5 mt-10 px-8">
+                <h1 className="text-5xl">QR code Section</h1>
+            </div>
         </div>
     );
 };

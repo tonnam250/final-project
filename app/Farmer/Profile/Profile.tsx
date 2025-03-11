@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { getUserInfo, updateUserInfo } from "../../../services/authService";
 
 const Profile = () => {
-    const [profileImage, setProfileImage] = useState("/images/profile2.jpg");
+    const [profileImage, setProfileImage] = useState("/images/ProfileDefault.jpg");
     const [isEditing, setIsEditing] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");

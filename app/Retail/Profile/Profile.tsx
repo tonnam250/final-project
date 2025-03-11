@@ -1,16 +1,17 @@
 import { getDisplayName } from 'next/dist/shared/lib/utils';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const Profile = () => {
-    const [profileImage, setProfileImage] = useState("/images/profile2.jpg");
+    const [profileImage, setProfileImage] = useState("/images/ProfileDefault.jpg");
     const [isEditing, setIsEditing] = useState(false);
-    const [displayName, setDisplayName] = useState("John Doe");
-    const [username, setUsername] = useState("johndoe");
+    const [username, setUsername] = useState("user");
     const [password, setPassword] = useState("12345");
-    const [role, setRole] = useState("Factory");
-    const [email, setEmail] = useState("jdoe@gmail.com");
+    const [role, setRole] = useState("Retail");
+    const [email, setEmail] = useState("user@gmail.com");
     const [phone, setPhone] = useState("+1234567890");
     const [showPassword, setShowPassword] = useState(false);
+    const router = useRouter();
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
@@ -28,6 +29,10 @@ const Profile = () => {
         setIsEditing(!isEditing);
     };
 
+    const handleSignOut = () => {
+        router.push('/');
+    };
+
     return (
         <div className="flex flex-col items-center min-h-screen pt-24 px-10 p-10 bg-slate-100">
             <div className='flex flex-col items-center gap-4 bg-white w-3/4 border rounded-3xl p-10 shadow-xl '>
@@ -37,7 +42,7 @@ const Profile = () => {
                         <div className="flex justify-center items-center overflow-hidden w-56 h-56 rounded-full">
                             <img src={profileImage} alt="Profile Picture" className="flex justify-center items-center rounded-full" />
                         </div>
-                        <label className="cursor-pointer bg-emerald-400 text-white py-2 px-4 rounded-full hover:bg-green-700">
+                        <label className="cursor-pointer bg-[#D23D2D] hover:bg-[#F8EECB] hover:text-[#D23D2D] text-white py-2 px-4 rounded-full">
                             <input type="file" className="hidden" onChange={handleImageChange} />
                             Choose Profile Image
                         </label>
@@ -117,16 +122,24 @@ const Profile = () => {
                         </div>
                     </div>
                 </div>
-                <button type="button" onClick={handleEditClick} className='bg-emerald-400 p-2 text-white rounded-full w-24 hover:bg-green-700 flex items-center justify-center gap-2'>
-                    {isEditing ? "Save" : (
-                        <>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="m14.06 9l.94.94L5.92 19H5v-.92zm3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83l3.75 3.75l1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94z" />
-                            </svg>
-                            Edit
-                        </>
-                    )}
-                </button>
+                <div className='flex items-center justify-center gap-4 w-full mt-10'>
+                    <button type="button" onClick={handleEditClick} className='bg-[#D23D2D] hover:bg-[#F8EECB] hover:text-[#D23D2D] p-2 text-white rounded-full w-24 flex items-center justify-center gap-2'>
+                        {isEditing ? "Save" : (
+                            <>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="m14.06 9l.94.94L5.92 19H5v-.92zm3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83l3.75 3.75l1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94z" />
+                                </svg>
+                                Edit
+                            </>
+                        )}
+                    </button>
+                    <button type='button' onClick={handleSignOut} className='flex text-center border-2 rounded-full border-red-500 p-1 px-2 text-red-500 w-fit gap-2 hover:bg-red-500 hover:text-white'>
+                        Sign out
+                        <svg xmlns="http://www.w3.org/2000/svg" className='h-7 w-7 inline' viewBox="0 0 24 24">
+                            <g fill="currentColor" fillRule="evenodd" clipRule="evenodd"><path d="M15.99 7.823a.75.75 0 0 1 1.061.021l3.49 3.637a.75.75 0 0 1 0 1.038l-3.49 3.637a.75.75 0 0 1-1.082-1.039l2.271-2.367h-6.967a.75.75 0 0 1 0-1.5h6.968l-2.272-2.367a.75.75 0 0 1 .022-1.06" /><path d="M3.25 4A.75.75 0 0 1 4 3.25h9.455a.75.75 0 0 1 .75.75v3a.75.75 0 1 1-1.5 0V4.75H4.75v14.5h7.954V17a.75.75 0 0 1 1.5 0v3a.75.75 0 0 1-.75.75H4a.75.75 0 0 1-.75-.75z" /></g>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
     );
