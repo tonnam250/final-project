@@ -88,7 +88,7 @@ const Recieving = () => {
         GeneralInfo: {
             recieveStatus: "", // moved here
             farmName: "",
-            milkTankNo: "",
+            productLot: "",
             personInCharge: ""
         },
         ProductDetail: {
@@ -322,16 +322,16 @@ const Recieving = () => {
                     </div>
                     {/* Farm Name */}
                     <div className="flex flex-col w-full items-start gap-3">
-                        <label htmlFor="farmName" className="font-semibold">Farm Name</label>
+                        <label htmlFor="farmName" className="font-semibold">Factory Name</label>
                         <input type="text" id="farmName"
                             placeholder="Enter your farm name" className="border rounded-full p-3 w-full"
                             name="GeneralInfo.farmName" value={LogisRecieve[0].GeneralInfo.farmName} onChange={(e) => handleLogisRecieveChange(e, 0)} />
                     </div>
                     {/* Milk tank no. */}
                     <div className="flex flex-col w-full items-start gap-3">
-                        <label htmlFor="milkTankNo" className="font-semibold">Milk Tank No.</label>
-                        <input type="text" id="milkTankNo" placeholder="Enter your milk tank number" className="border rounded-full p-3 w-full"
-                            name="GeneralInfo.milkTankNo" value={LogisRecieve[0].GeneralInfo.milkTankNo} onChange={(e) => handleLogisRecieveChange(e, 0)} />
+                        <label htmlFor="productLot" className="font-semibold">Product Lot:</label>
+                        <input type="text" id="productLot" placeholder="Enter your milk tank number" className="border rounded-full p-3 w-full"
+                            name="GeneralInfo.productLot" value={LogisRecieve[0].GeneralInfo.productLot} onChange={(e) => handleLogisRecieveChange(e, 0)} />
                     </div>
                     {/* Person in charge */}
                     <div className="flex flex-col w-full items-start gap-3">

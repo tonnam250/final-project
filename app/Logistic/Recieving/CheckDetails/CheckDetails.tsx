@@ -115,12 +115,12 @@ const CheckDetails = () => {
                         <h1 className="text-xl md:text-3xl font-bold text-center">General Info</h1>
                         <div className="flex flex-col space-y-2 gap-3">
                             <div className="flex justify-between">
-                                <p className="font-semibold">Farm Name:</p>
+                                <p className="font-semibold">Factory Name:</p>
                                 <p>{item.GeneralInfo.farmName}</p>
                             </div>
                             <div className="flex justify-between">
-                                <p className="font-semibold">Milk Tank No:</p>
-                                <p>{item.GeneralInfo.milkTankNo}</p>
+                                <p className="font-semibold">Product Lot:</p>
+                                <p>{item.GeneralInfo.productLot}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Person In Charge:</p>

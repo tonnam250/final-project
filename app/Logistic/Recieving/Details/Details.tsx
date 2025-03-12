@@ -36,12 +36,12 @@ const Details = () => {
                             <h1 className="text-xl md:text-3xl font-bold text-center">General Info</h1>
                             <div className="flex flex-col space-y-2 gap-3 text-gray-500">
                                 <div className="flex justify-between">
-                                    <p className="font-semibold">Farm Name:</p>
+                                    <p className="font-semibold">Factory Name:</p>
                                     <p>{data.GeneralInfo.farmName || ""}</p>
                                 </div>
                                 <div className="flex justify-between">
-                                    <p className="font-semibold">Milk Tank No:</p>
-                                    <p>{data.GeneralInfo.milkTankNo || ""}</p>
+                                    <p className="font-semibold">Product Lot:</p>
+                                    <p>{data.GeneralInfo.productLot || ""}</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Person In Charge:</p>
