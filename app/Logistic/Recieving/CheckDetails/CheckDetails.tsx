@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 const CheckDetails = () => {
-    const [data, setData] = useState<any>(null);
+    const [data, setData] = useState<any[]>([]);
     const router = useRouter();
 
     useEffect(() => {
@@ -40,6 +40,16 @@ const CheckDetails = () => {
             shippingAddressRef.current?.scrollIntoView({ behavior: "smooth" });
         }, 100); // Delay to ensure the section is rendered
     }
+
+    const formatDateTime = (dateTime: string) => {
+        const date = new Date(dateTime);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${year}/${month}/${day} ${hours}:${minutes}`;
+    };
 
     return (
         <div className="flex flex-col justify-center items-center w-full h-full min-h-screen pt-24">
@@ -98,90 +108,97 @@ const CheckDetails = () => {
             </div>
             {/* End Detail Status */}
 
-            {data && data.GeneralInfo && data.ProductDetail && (
-                <div className="flex flex-col md:flex-row justify-between gap-10 w-full p-4 md:p-14">
+            {data.length > 0 && data.map((item, index) => (
+                <div key={index} className="flex flex-col md:flex-row justify-between gap-10 w-full p-4 md:p-14">
                     {/* General Info */}
                     <div className="flex flex-col gap-4 md:gap-10 w-full h-fit md:w-1/2 bg-white border p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
                         <h1 className="text-xl md:text-3xl font-bold text-center">General Info</h1>
                         <div className="flex flex-col space-y-2 gap-3">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Farm Name:</p>
-                                <p>{data.GeneralInfo.farmName}</p>
+                                <p>{item.GeneralInfo.farmName}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Milk Tank No:</p>
-                                <p>{data.GeneralInfo.milkTankNo}</p>
+                                <p>{item.GeneralInfo.milkTankNo}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Person In Charge:</p>
-                                <p>{data.GeneralInfo.personInCharge}</p>
+                                <p>{item.GeneralInfo.personInCharge}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Recieve Status</p>
-                                <p>{data.GeneralInfo.recieveStatus}</p>
+                                <p>{item.GeneralInfo.recieveStatus}</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Product Detail */}
-                    {data.ProductDetail && (
+                    {item.ProductDetail && (
                         <div className="flex flex-col gap-4 md:gap-10 w-full md:w-1/2 border bg-white p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
                             <h1 className="text-xl md:text-3xl font-bold text-center">Product Detail</h1>
                             <div className="flex flex-col space-y-2 gap-3">
                                 <div className="flex justify-between">
+                                    <p className="font-semibold">Pickup Time:</p>
+                                    <p>{formatDateTime(item.ProductDetail.recieveTime)}</p>
+                                </div>
+                                <div className="flex justify-between">
+                                    <p className="font-semibold">Deliver Time:</p>
+                                    <p>{formatDateTime(item.ProductDetail.deliverTime)}</p>
+                                </div>
+                                <div className="flex justify-between">
                                     <p className="font-semibold">Quantity:</p>
-                                    <p>{data.ProductDetail.quantity} {data.ProductDetail.quantityUnit}</p>
+                                    <p>{item.ProductDetail.quantity} {item.ProductDetail.quantityUnit}</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Temperature:</p>
-                                    <p>{data.ProductDetail.temp} {data.ProductDetail.tempUnit}</p>
+                                    <p>{item.ProductDetail.temp} {item.ProductDetail.tempUnit}</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Company Name:</p>
-                                    <p>{data?.ProductDetail?.companyName}</p>
+                                    <p>{item?.ProductDetail?.companyName}</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Name:</p>
-                                    <p>{data?.ProductDetail?.firstName} {data?.ProductDetail?.lastName}</p>
+                                    <p>{item?.ProductDetail?.firstName} {item?.ProductDetail?.lastName}</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Email:</p>
-                                    <p>{data?.ProductDetail?.email}</p>
+                                    <p>{item?.ProductDetail?.email}</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Phone:</p>
-                                    <p>{data?.ProductDetail?.areaCode} {data?.ProductDetail?.phoneNumber}</p>
+                                    <p>{item?.ProductDetail?.areaCode} {item?.ProductDetail?.phoneNumber}</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Address:</p>
-                                    <p>{data?.ProductDetail?.address}</p>
+                                    <p>{item?.ProductDetail?.address}</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Province:</p>
-                                    <p>{data?.ProductDetail?.province}</p>
+                                    <p>{item?.ProductDetail?.province}</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">District:</p>
-                                    <p>{data?.ProductDetail?.district}</p>
+                                    <p>{item?.ProductDetail?.district}</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Sub-District:</p>
-                                    <p>{data?.ProductDetail?.subDistrict}</p>
+                                    <p>{item?.ProductDetail?.subDistrict}</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Zip Code:</p>
-                                    <p>{data?.ProductDetail?.postalCode}</p>
+                                    <p>{item?.ProductDetail?.postalCode}</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Location:</p>
-                                    <p>{data?.ProductDetail?.location}</p>
+                                    <p>{item?.ProductDetail?.location}</p>
                                 </div>
                             </div>
                         </div>
                     )}
                 </div>
-            )
-            }
+            ))}
             <button type="button" onClick={handleSubmit} className="text-xl bg-emerald-400 p-3 mb-5 self-end mx-14 rounded-3xl text-white font-semibold">Submit</button>
         </div >
     );
