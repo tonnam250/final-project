@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { createProductLot } from "@/services/productlotService";
+
 
 const CheckDetails = () => {
     const router = useRouter();
@@ -21,9 +23,33 @@ const CheckDetails = () => {
         }
     }, []);
 
-    const handleSubmit = () => {
-        alert("Form saved successfully!");
-        router.push('/Factory/ProductLot/Details');
+    const handleSubmit = async () => {
+        try {
+            // ✅ เตรียมข้อมูลสำหรับ API
+            const requestData = {
+                productId: data.GeneralInfo.productId,
+                grade: true,  // สมมติให้ Grade เป็น true (ปรับตามเงื่อนไขจริง)
+                milkTankIds: data.selectMilkTank.tanks || [],
+                qualityData: {
+                    quality: data.Quality,
+                    nutrition: data.nutrition,
+                },
+            };
+
+            console.log("📌 Sending data:", requestData); // Debugging log
+
+            // ✅ เรียก API
+            const response = await createProductLot(requestData);
+
+            if (response.success) {
+                alert("Product Lot Created Successfully!");
+                router.push('/Factory/ProductLot/Details');
+            } else {
+                alert(`Error: ${response.message}`);
+            }
+        } catch (error) {
+            alert("An unexpected error occurred.");
+        }
     };
 
     // Step status update function
@@ -54,7 +80,6 @@ const CheckDetails = () => {
             document.getElementById(`section${nextStep}`)?.scrollIntoView({ behavior: "smooth" });
         }, 100); // Delay to ensure the section is rendered
     };
-    // end step status update function
 
     return (
         <div className="flex flex-col w-full h-full min-h-screen items-center justify-center pt-24 bg-gray-100 text-black">
