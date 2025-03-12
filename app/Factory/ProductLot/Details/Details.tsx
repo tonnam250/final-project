@@ -1,9 +1,15 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { fetchProductLotDetails } from "@/services/productlotService"; // ✅ Import Service
 
 const CheckDetails = () => {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const lotId = searchParams.get("lotId"); // ✅ ดึง lotId จาก URL
+
+    console.log("📌 Extracted lotId from URL:", lotId); // ✅ Debug log
+
     const [data, setData] = useState({
         GeneralInfo: {},
         selectMilkTank: {},
@@ -13,13 +19,21 @@ const CheckDetails = () => {
     });
 
     useEffect(() => {
-        const storedData = localStorage.getItem("productLotForm");
-        if (storedData) {
-            const parsedData = JSON.parse(storedData);
-            console.log("Retrieved data:", parsedData); // Debugging line
-            setData(parsedData);
+        if (!lotId) {
+            console.error("❌ lotId is missing!");
+            return;
         }
-    }, []);
+
+        const getProductLotDetails = async () => {
+            console.log("📡 Fetching product lot details for:", lotId); // ✅ Debug log
+            const productLotData = await fetchProductLotDetails(lotId);
+            if (productLotData) {
+                setData(productLotData);
+            }
+        };
+
+        getProductLotDetails(); // ✅ เรียก API ดึงรายละเอียด Product Lot
+    }, [lotId]);
 
     return (
         <div className="flex flex-col w-full h-full min-h-screen items-center justify-center pt-24 bg-gray-100 text-black">
@@ -52,7 +66,8 @@ const CheckDetails = () => {
 
                         {/* Select Milk Tank */}
                         <div className="flex flex-col gap-4 md:gap-10 w-full h-fit bg-white border p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
-                            <h1 className="text-xl md:text-3xl font-bold text-center text-black">Select Milk Tank</h1>
+                            <h1 className="text-xl md:text-3xl font-bold text-center text-black">Raw Milk Quality
+                            </h1>
                             <div className="flex flex-col space-y-2 gap-3 text-gray-600">
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Temperature:</p>
@@ -124,6 +139,23 @@ const CheckDetails = () => {
                                         <p>Separation:</p>
                                         <p>{data.selectMilkTank.abnormalType?.separation ? "Yes" : "No"}</p>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                        {/* Milk Tanks List (เต็มแนวล่างของ Raw Milk Quality) */}
+                        <div className="flex flex-col gap-4 md:gap-10 w-full bg-white border p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl col-span-2">
+                            <h1 className="text-xl md:text-3xl font-bold text-center text-black">Milk Tanks List</h1>
+
+                            {/* Scrollable Container */}
+                            <div className="overflow-y-auto max-h-[400px] p-2 border rounded-lg">
+                                {/* Grid 3 คอลัมน์ */}
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    {data.selectMilkTank.tankIds.map((tankId: string, index: number) => (
+                                        <div key={index} className="p-4 bg-gray-100 border rounded-lg shadow-md">
+                                            <p className="font-semibold text-gray-700">Milk Tank ID:</p>
+                                            <p className="text-gray-600">{tankId}</p>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         </div>
