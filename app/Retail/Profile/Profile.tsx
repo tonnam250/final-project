@@ -1,6 +1,8 @@
 import { getDisplayName } from 'next/dist/shared/lib/utils';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { logout } from '@/services/authService'; // ✅ Import ฟังก์ชัน Logout
+
 
 const Profile = () => {
     const [profileImage, setProfileImage] = useState("/images/ProfileDefault.jpg");
@@ -29,9 +31,15 @@ const Profile = () => {
         setIsEditing(!isEditing);
     };
 
-    const handleSignOut = () => {
-        router.push('/');
-    };
+    const handleSignOut = async () => {
+            const success = await logout();
+            if (success) {
+                alert("Logout successful");
+                router.push('/'); // กลับไปหน้า Login
+            } else {
+                alert("Failed to logout");
+            }
+        };
 
     return (
         <div className="flex flex-col items-center min-h-screen pt-24 px-10 p-10 bg-slate-100">

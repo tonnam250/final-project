@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
 interface GeoData {
@@ -57,7 +57,7 @@ const Recieving = () => {
             setSubDistrictList([]);
             setSelectedSubDistrict("");
         }
-    }, [selectedProvince]);
+    }, [selectedProvince, geoData]);
 
     useEffect(() => {
         if (selectedDistrict) {
@@ -70,22 +70,21 @@ const Recieving = () => {
             setSubDistrictList(filteredSubDistricts);
             setSelectedSubDistrict("");
         }
-    }, [selectedDistrict]);
-    // end province fetching function
+    }, [selectedDistrict, geoData]);
 
     // Step status update function
     const [showShippingAddress, setShowShippingAddress] = useState<boolean>(false);
     const shippingAddressRef = useRef<HTMLDivElement>(null);
 
-    const handleNextClick = () => {
+    const handleNextClick = useCallback(() => {
         setShowShippingAddress(true);
         setTimeout(() => {
             shippingAddressRef.current?.scrollIntoView({ behavior: "smooth" });
-        }, 100); // Delay to ensure the section is rendered
-    }
+        }, 100);
+    }, []);
 
     // save form Data
-    const [LogisRecieve, setLogisRecieve] = useState({
+    const [LogisRecieve, setLogisRecieve] = useState([{
         GeneralInfo: {
             recieveStatus: "", // moved here
             farmName: "",
@@ -112,7 +111,7 @@ const Recieving = () => {
             postalCode: "",
             location: ""
         },
-    });
+    }]);
 
     // ✅ ควบคุมการแสดงผลของ abnormalType
     const [showAbnormalInfo, setShowAbnormalInfo] = useState(false);
@@ -123,23 +122,23 @@ const Recieving = () => {
             const savedData = localStorage.getItem("LogisRecieve");
             if (savedData) {
                 const parsedData = JSON.parse(savedData);
-                if (parsedData.GeneralInfo && parsedData.GeneralInfo.recieveStatus) {
+                if (parsedData[0].GeneralInfo && parsedData[0].GeneralInfo.recieveStatus) {
                     setLogisRecieve(parsedData);
                 } else {
                     // Move recieveStatus to GeneralInfo if it exists outside
                     const updatedData = {
                         ...parsedData,
                         GeneralInfo: {
-                            ...parsedData.GeneralInfo,
-                            recieveStatus: parsedData.recieveStatus || ""
+                            ...parsedData[0].GeneralInfo,
+                            recieveStatus: parsedData[0].recieveStatus || ""
                         }
                     };
-                    setLogisRecieve(updatedData);
-                    localStorage.setItem("LogisRecieve", JSON.stringify(updatedData));
+                    setLogisRecieve([updatedData]);
+                    localStorage.setItem("LogisRecieve", JSON.stringify([updatedData]));
                 }
             }
         }
-    }, []); 0
+    }, []);
 
     // ✅ บันทึกข้อมูลลง localStorage ทุกครั้งที่ LogisRecieve เปลี่ยน
     useEffect(() => {
@@ -149,22 +148,25 @@ const Recieving = () => {
     }, [LogisRecieve]);
 
     // ✅ ฟังก์ชัน handleLogisRecieveChange รองรับ text, select และ checkbox
-    const handleLogisRecieveChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const handleLogisRecieveChange = useCallback((event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, index: number) => {
         const { name, type, value, checked } = event.target;
         const keys = name.split(".");
 
         setLogisRecieve((prevData) => {
-            const updatedData = { ...prevData }; // Clone ข้อมูลเดิม
-            let temp = updatedData;
+            const updatedData = [...prevData]; // Clone the array
+            let temp = updatedData[index]; // Access the specific object in the array
 
             for (let i = 0; i < keys.length - 1; i++) {
+                if (!temp[keys[i]]) {
+                    temp[keys[i]] = {}; // Ensure the nested object exists
+                }
                 temp = temp[keys[i]];
             }
 
-            // ถ้าเป็น checkbox ให้ใช้ checked ถ้าไม่ใช่ให้ใช้ value
+            // If it's a checkbox, use checked, otherwise use value
             temp[keys[keys.length - 1]] = type === "checkbox" ? checked : value;
 
-            // อัปเดต province, district และ subdistrict
+            // Update province, district, and subdistrict
             if (name === "ProductDetail.province") {
                 setSelectedProvince(value);
             } else if (name === "ProductDetail.district") {
@@ -175,42 +177,76 @@ const Recieving = () => {
 
             return updatedData;
         });
-    };
+    }, []);
 
     // ✅ ฟังก์ชัน handleAbnormalChange → เช็ค abnormalChar และโชว์ abnormalType
     const handleAbnormalChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        handleLogisRecieveChange(event);
+        handleLogisRecieveChange(event, 0);
         setShowAbnormalInfo(event.target.checked);
     };
 
     // ✅ ฟังก์ช์น handleNestedCheckboxChange สำหรับ abnormalType
-    const handleNestedCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleNestedCheckboxChange = useCallback((event: React.ChangeEvent<HTMLInputElement>, index: number) => {
         const { name, checked } = event.target;
 
-        setLogisRecieve((prevData) => ({
-            ...prevData,
-            ProductDetail: {
-                ...prevData.ProductDetail,
+        setLogisRecieve((prevData) => {
+            const updatedData = [...prevData]; // Clone the array
+            const temp = updatedData[index];
+
+            temp.ProductDetail = {
+                ...temp.ProductDetail,
                 abnormalType: {
-                    ...prevData.ProductDetail.abnormalType,
+                    ...temp.ProductDetail.abnormalType,
                     [name.split('.').pop()!]: checked
                 }
-            }
-        }));
-    };
+            };
+
+            return updatedData;
+        });
+    }, []);
 
     // ✅ ฟังก์ช์น Submit → บันทึกข้อมูลลง localStorage
     const saveToLocalStorage = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        localStorage.setItem("LogisRecieve", JSON.stringify(LogisRecieve));
-        alert("Information Save!");
-        console.log(LogisRecieve);
+
+        if (typeof window !== "undefined") {
+            const savedData = localStorage.getItem("LogisRecieve");
+            let parsedData = savedData ? JSON.parse(savedData) : [];
+
+            // Check if the current recieveStatus already exists in the array
+            const currentStatus = LogisRecieve[0].GeneralInfo.recieveStatus;
+            const isStatusExist = parsedData.some(item => item.GeneralInfo.recieveStatus === currentStatus);
+
+            // If the current status doesn't exist, add the current LogisRecieve to the array
+            if (!isStatusExist) {
+                parsedData.push(LogisRecieve[0]);
+            }
+
+            localStorage.setItem("LogisRecieve", JSON.stringify(parsedData));
+            alert("Information Saved!");
+            console.log(parsedData);
+        }
     };
 
     const saveToLocalStorageAndNavigate = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
-        localStorage.setItem("LogisRecieve", JSON.stringify(LogisRecieve));
-        router.push('/Logistic/Recieving/CheckDetails');
+
+        if (typeof window !== "undefined") {
+            const savedData = localStorage.getItem("LogisRecieve");
+            let parsedData = savedData ? JSON.parse(savedData) : [];
+
+            // Check if the current recieveStatus already exists in the array
+            const currentStatus = LogisRecieve[0].GeneralInfo.recieveStatus;
+            const isStatusExist = parsedData.some(item => item.GeneralInfo.recieveStatus === currentStatus);
+
+            // If the current status doesn't exist, add the current LogisRecieve to the array
+            if (!isStatusExist) {
+                parsedData.push(LogisRecieve[0]);
+            }
+
+            localStorage.setItem("LogisRecieve", JSON.stringify(parsedData));
+            router.push('/Logistic/Recieving/CheckDetails');
+        }
     };
 
     return (
@@ -278,7 +314,7 @@ const Recieving = () => {
                     <div className="flex flex-col w-full items-start gap-3">
                         <label htmlFor="recieveStatus" className="font-semibold">Recieving Status</label>
                         <select name="GeneralInfo.recieveStatus" id="recieveStatus" className="border rounded-full p-3 w-fit"
-                            value={LogisRecieve.GeneralInfo.recieveStatus} onChange={handleLogisRecieveChange}>
+                            value={LogisRecieve[0].GeneralInfo.recieveStatus} onChange={(e) => handleLogisRecieveChange(e, 0)}>
                             <option value="Before">Before</option>
                             <option value="During">During</option>
                             <option value="After">After</option>
@@ -289,20 +325,20 @@ const Recieving = () => {
                         <label htmlFor="farmName" className="font-semibold">Farm Name</label>
                         <input type="text" id="farmName"
                             placeholder="Enter your farm name" className="border rounded-full p-3 w-full"
-                            name="GeneralInfo.farmName" value={LogisRecieve.GeneralInfo.farmName} onChange={handleLogisRecieveChange} />
+                            name="GeneralInfo.farmName" value={LogisRecieve[0].GeneralInfo.farmName} onChange={(e) => handleLogisRecieveChange(e, 0)} />
                     </div>
                     {/* Milk tank no. */}
                     <div className="flex flex-col w-full items-start gap-3">
                         <label htmlFor="milkTankNo" className="font-semibold">Milk Tank No.</label>
                         <input type="text" id="milkTankNo" placeholder="Enter your milk tank number" className="border rounded-full p-3 w-full"
-                            name="GeneralInfo.milkTankNo" value={LogisRecieve.GeneralInfo.milkTankNo} onChange={handleLogisRecieveChange} />
+                            name="GeneralInfo.milkTankNo" value={LogisRecieve[0].GeneralInfo.milkTankNo} onChange={(e) => handleLogisRecieveChange(e, 0)} />
                     </div>
                     {/* Person in charge */}
                     <div className="flex flex-col w-full items-start gap-3">
                         <label htmlFor="personInCharge" className="font-semibold">Person In Charge</label>
                         <input type="text" name="GeneralInfo.personInCharge" id="personInCharge"
                             placeholder="Enter name of person in charge" className="border rounded-full p-3 w-full"
-                            value={LogisRecieve.GeneralInfo.personInCharge} onChange={handleLogisRecieveChange} />
+                            value={LogisRecieve[0].GeneralInfo.personInCharge} onChange={(e) => handleLogisRecieveChange(e, 0)} />
                     </div>
 
                     <button
@@ -322,12 +358,12 @@ const Recieving = () => {
                             <div className="flex flex-col w-1/2 items-start gap-3">
                                 <label htmlFor="Deliver" className="font-semibold">Pickup Time</label>
                                 <input type="datetime-local" name="ProductDetail.deliverTime" id="Deliver" className="border rounded-full p-3 w-full"
-                                    value={LogisRecieve.ProductDetail.recieveTime} onChange={handleLogisRecieveChange} />
+                                    value={LogisRecieve[0]?.ProductDetail?.deliverTime || ""} onChange={(e) => handleLogisRecieveChange(e, 0)} />
                             </div>
                             <div className="flex flex-col w-1/2 items-start gap-3">
                                 <label htmlFor="Recieve" className="font-semibold">Deliver Time</label>
                                 <input type="datetime-local" name="ProductDetail.recieveTime" id="Recieve" className="border rounded-full p-3 w-full"
-                                    value={LogisRecieve.ProductDetail.deliverTime} onChange={handleLogisRecieveChange} />
+                                    value={LogisRecieve[0]?.ProductDetail?.recieveTime || ""} onChange={(e) => handleLogisRecieveChange(e, 0)} />
                             </div>
                         </div>
                         {/* Quantity + temperature */}
@@ -338,9 +374,9 @@ const Recieving = () => {
                                 <div className="flex gap-3 w-full">
                                     <input type="number" name="ProductDetail.quantity" id="quantity"
                                         className="border rounded-full p-3 w-4/5" placeholder="0.00" step="0.01"
-                                        value={LogisRecieve.ProductDetail.quantity} onChange={handleLogisRecieveChange} />
+                                        value={LogisRecieve[0]?.ProductDetail?.quantity || 0} onChange={(e) => handleLogisRecieveChange(e, 0)} />
                                     <select name="ProductDetail.quantityUnit" id="quantityUnit" className="border rounded-full p-3 w-1/5 font-semibold"
-                                        value={LogisRecieve.ProductDetail.quantityUnit} onChange={handleLogisRecieveChange}>
+                                        value={LogisRecieve[0]?.ProductDetail?.quantityUnit || "Ton"} onChange={(e) => handleLogisRecieveChange(e, 0)}>
                                         <option value="Ton">Ton</option>
                                         <option value="Liter">Liter</option>
                                         <option value="Ml">Milliliter</option>
@@ -355,40 +391,40 @@ const Recieving = () => {
                                 <label htmlFor="temp" className="font-semibold">Temperature</label>
                                 <div className="flex w-full items-start gap-3">
                                     <input type="number" name="ProductDetail.temp" id="temp" className="p-3 rounded-full border w-4/5" placeholder="0.00" step="0.01"
-                                        value={LogisRecieve.ProductDetail.temp} onChange={handleLogisRecieveChange} />
+                                        value={LogisRecieve[0]?.ProductDetail?.temp || 0} onChange={(e) => handleLogisRecieveChange(e, 0)} />
                                     <select name="ProductDetail.tempUnit" id="tempUnit" className="border rounded-full p-3 w-1/5 font-semibold"
-                                        value={LogisRecieve.ProductDetail.tempUnit} onChange={handleLogisRecieveChange}>
+                                        value={LogisRecieve[0]?.ProductDetail?.tempUnit || "Celcius"} onChange={(e) => handleLogisRecieveChange(e, 0)}>
                                         <option value="Celcius">°C</option>
                                         <option value="Farenheit">°F</option>
                                     </select>
                                 </div>
                             </div>
                         </div>
-                        
+
                         {/* Company Name */}
                         <div className="flex flex-col w-full gap-5 mt-10">
                             <label htmlFor="companyName" className="font-semibold">Company Name</label>
                             <input type="text" name="ProductDetail.companyName" id="companyName" className="border p-3 rounded-full" placeholder="Enter your company name"
-                                value={LogisRecieve.ProductDetail.companyName} onChange={handleLogisRecieveChange} />
+                                value={LogisRecieve[0]?.ProductDetail?.companyName || ""} onChange={(e) => handleLogisRecieveChange(e, 0)} />
                         </div>
                         {/* First name + Last name */}
                         <div className="flex items-center w-full gap-5">
                             <div className="flex flex-col w-1/2 gap-3">
                                 <label htmlFor="fName" className="font-semibold">First Name</label>
                                 <input type="text" name="ProductDetail.firstName" id="fName" className="border p-3 rounded-full" placeholder="Enter your first name"
-                                    value={LogisRecieve.ProductDetail.firstName} onChange={handleLogisRecieveChange} />
+                                    value={LogisRecieve[0]?.ProductDetail?.firstName || ""} onChange={(e) => handleLogisRecieveChange(e, 0)} />
                             </div>
                             <div className="flex flex-col w-1/2 gap-3">
                                 <label htmlFor="lName" className="font-semibold">Last Name</label>
                                 <input type="text" name="ProductDetail.lastName" id="lName" className="border p-3 rounded-full" placeholder="Enter your last name"
-                                    value={LogisRecieve.ProductDetail.lastName} onChange={handleLogisRecieveChange} />
+                                    value={LogisRecieve[0]?.ProductDetail?.lastName || ""} onChange={(e) => handleLogisRecieveChange(e, 0)} />
                             </div>
                         </div>
 
                         <div className="flex flex-col w-full gap-3">
                             <label htmlFor="email" className="font-semibold">Email</label>
                             <input type="text" name="ProductDetail.email" id="email" className="border p-3 rounded-full" placeholder="Enter your Email"
-                                value={LogisRecieve.ProductDetail.email} onChange={handleLogisRecieveChange} />
+                                value={LogisRecieve[0]?.ProductDetail?.email || ""} onChange={(e) => handleLogisRecieveChange(e, 0)} />
                         </div>
 
                         {/* Phone Number */}
@@ -404,8 +440,8 @@ const Recieving = () => {
                                         id="areaCode"
                                         className="border border-gray-300 rounded-full p-3 w-auto text-center"
                                         required
-                                        value={LogisRecieve.ProductDetail.areaCode}
-                                        onChange={handleLogisRecieveChange}
+                                        value={LogisRecieve[0]?.ProductDetail?.areaCode || "+66"}
+                                        onChange={(e) => handleLogisRecieveChange(e, 0)}
                                     >
                                         <option value="+66">+66</option>
                                     </select>
@@ -419,8 +455,8 @@ const Recieving = () => {
                                     className="border border-gray-300 rounded-full p-3 flex-1 w-10/12"
                                     placeholder="Enter your phone number"
                                     required
-                                    value={LogisRecieve.ProductDetail.phoneNumber}
-                                    onChange={handleLogisRecieveChange}
+                                    value={LogisRecieve[0]?.ProductDetail?.phoneNumber || ""}
+                                    onChange={(e) => handleLogisRecieveChange(e, 0)}
                                 />
                             </div>
                         </div>
@@ -429,14 +465,14 @@ const Recieving = () => {
                         <div className="flex flex-col text-start font-medium w-full h-40 gap-3">
                             <label htmlFor="address">Address</label>
                             <textarea name="ProductDetail.address" id="address" className="border border-gray-300 rounded-3xl p-3 flex-1 w-full"
-                                value={LogisRecieve.ProductDetail.address} onChange={handleLogisRecieveChange}></textarea>
+                                value={LogisRecieve[0]?.ProductDetail?.address || ""} onChange={(e) => handleLogisRecieveChange(e, 0)}></textarea>
                         </div>
 
                         {/* province */}
                         <div className="flex flex-col w-full text-start gap-3">
                             <label htmlFor="province" className="font-semibold" >Province</label>
                             <select name="ProductDetail.province" id="province" className="border border-gray-300 rounded-full p-3 text-center"
-                                value={selectedProvince} onChange={handleLogisRecieveChange}>
+                                value={selectedProvince} onChange={(e) => handleLogisRecieveChange(e, 0)}>
                                 <option value="">Select province</option>
                                 {provinceList.map((prov, index) => (
                                     <option key={index} value={prov}>
@@ -451,7 +487,7 @@ const Recieving = () => {
                             <div className="flex flex-col text-start w-6/12 gap-3">
                                 <label htmlFor="district" className="font-semibold">District</label>
                                 <select name="ProductDetail.district" id="district" className="border border-gray-300 rounded-full p-3 text-center"
-                                    value={selectedDistrict} onChange={handleLogisRecieveChange} disabled={!selectedProvince}>
+                                    value={selectedDistrict} onChange={(e) => handleLogisRecieveChange(e, 0)} disabled={!selectedProvince}>
                                     <option value="">Select district</option>
                                     {districtList.map((dist, index) => (
                                         <option key={index} value={dist}>
@@ -464,7 +500,7 @@ const Recieving = () => {
                             <div className="flex flex-col text-start w-6/12 gap-3">
                                 <label htmlFor="subDistrict" className="font-semibold">Sub-District</label>
                                 <select name="ProductDetail.subDistrict" id="subDistrict" className="border border-gray-300 rounded-full p-3 text-center"
-                                    value={selectedSubDistrict} onChange={handleLogisRecieveChange} disabled={!selectedDistrict}>
+                                    value={selectedSubDistrict} onChange={(e) => handleLogisRecieveChange(e, 0)} disabled={!selectedDistrict}>
                                     <option value="">Select sub-district</option>
                                     {subDistrictList.map((subDist, index) => (
                                         <option key={index} value={subDist}>
@@ -479,7 +515,7 @@ const Recieving = () => {
                         <div className="flex flex-col text-start w-full gap-3">
                             <label htmlFor="postalCode" className="font-semibold">Zip/Postal Code</label>
                             <input type="text" name="ProductDetail.postalCode" id="postalCode" className="border border-gray-300 rounded-full p-3 w-full" placeholder="Enter postal code"
-                                value={LogisRecieve.ProductDetail.postalCode} onChange={handleLogisRecieveChange} />
+                                value={LogisRecieve[0]?.ProductDetail?.postalCode || ""} onChange={(e) => handleLogisRecieveChange(e, 0)} />
                         </div>
 
                         {/* location */}
@@ -487,8 +523,8 @@ const Recieving = () => {
                             <label htmlFor="location" className="font-semibold">Location</label>
                             <input type="text" name="ProductDetail.location" id="location" className="border border-gray-300 rounded-full p-3 flex-1 w-full"
                                 placeholder="Paste location url"
-                                value={LogisRecieve.ProductDetail.location}
-                                onChange={handleLogisRecieveChange} />
+                                value={LogisRecieve[0]?.ProductDetail?.location || ""}
+                                onChange={(e) => handleLogisRecieveChange(e, 0)} />
                         </div>
 
                         <button
