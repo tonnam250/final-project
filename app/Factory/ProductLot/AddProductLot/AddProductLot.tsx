@@ -282,7 +282,7 @@ const AddProductLot = () => {
             temp = keys.slice(0, -1).reduce((obj, key) => {
                 if (!obj[key as keyof typeof obj]) obj[key as keyof typeof obj] = {}; // ถ้า key ยังไม่มี ให้สร้าง object
                 return obj[key as keyof typeof obj];
-            }, updatedData);
+            }, temp); // Use temp as the initial value
 
             // กำหนดค่าล่าสุดที่ตำแหน่งสุดท้าย
             temp[keys[keys.length - 1] as keyof typeof temp] = type === "checkbox" ? checked : value;
