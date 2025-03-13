@@ -18,10 +18,11 @@
         "name": "next"
       }
     ],
+    "baseUrl": ".",  // Ensure this is set to the root of your project
     "paths": {
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "next.config.js", "next.config.js"],
   "exclude": ["node_modules"]
 }
