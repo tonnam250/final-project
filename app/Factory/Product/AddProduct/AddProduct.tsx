@@ -124,7 +124,8 @@ const AddProduct = () => {
             vitaminD: 0,
             vitaminB6: 0,
             vitaminB12: 0,
-            magnesium: 0
+            magnesium: 0,
+            abnormalType: {} // Add this line
         }
     });
 
@@ -190,7 +191,7 @@ const AddProduct = () => {
 
         setFormData((prevData) => {
             const updatedData = { ...prevData };
-            let temp = updatedData.Quantity.abnormalType;
+            let temp = updatedData.Nutrition.abnormalType;
 
             temp[name.split('.').pop()!] = checked;
 
