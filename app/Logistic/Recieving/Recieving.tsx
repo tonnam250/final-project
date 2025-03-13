@@ -17,6 +17,37 @@ interface GeoData {
     postalCode: number;
 }
 
+interface LogisRecieveData {
+    GeneralInfo: {
+        recieveStatus: string;
+        farmName: string;
+        productLot: string;
+        personInCharge: string;
+    };
+    ProductDetail: {
+        deliverTime: string;
+        recieveTime: string;
+        quantity: number;
+        quantityUnit: string;
+        temp: number;
+        tempUnit: string;
+        companyName: string;
+        firstName: string;
+        lastName: string;
+        email: string;
+        areaCode: string;
+        phoneNumber: string;
+        address: string;
+        province: string;
+        district: string;
+        subDistrict: string;
+        postalCode: string;
+        location: string;
+        abnormalType?: { [key: string]: boolean }; // Optional property for abnormalType
+    };
+    [key: string]: any; // Index signature
+}
+
 const Recieving = () => {
 
     const router = useRouter();
@@ -38,7 +69,7 @@ const Recieving = () => {
                 setGeoData(data);
 
                 // ดึงจังหวัดที่ไม่ซ้ำ (ใช้ภาษาไทยให้ตรงกับ selectedProvince)
-                const provinces = Array.from(new Set(data.map((item) => item.provinceNameEn)));
+                const provinces = Array.from(new Set(data.map((item: GeoData) => item.provinceNameEn)));
                 setProvinceList(provinces);
             })
             .catch((err) => console.error("Fetch error:", err));
@@ -48,7 +79,7 @@ const Recieving = () => {
         if (selectedProvince) {
             const filteredDistricts = Array.from(
                 new Set(
-                    geoData.filter((item) => item.provinceNameEn === selectedProvince).map((item) => item.districtNameEn)
+                    geoData.filter((item: GeoData) => item.provinceNameEn === selectedProvince).map((item: GeoData) => item.districtNameEn)
                 )
             );
 
@@ -63,7 +94,7 @@ const Recieving = () => {
         if (selectedDistrict) {
             const filteredSubDistricts = Array.from(
                 new Set(
-                    geoData.filter((item) => item.districtNameEn === selectedDistrict).map((item) => item.subdistrictNameEn)
+                    geoData.filter((item: GeoData) => item.districtNameEn === selectedDistrict).map((item: GeoData) => item.subdistrictNameEn)
                 )
             );
 
@@ -84,7 +115,7 @@ const Recieving = () => {
     }, []);
 
     // save form Data
-    const [LogisRecieve, setLogisRecieve] = useState([{
+    const [LogisRecieve, setLogisRecieve] = useState<LogisRecieveData[]>([{
         GeneralInfo: {
             recieveStatus: "", // moved here
             farmName: "",
@@ -149,7 +180,8 @@ const Recieving = () => {
 
     // ✅ ฟังก์ชัน handleLogisRecieveChange รองรับ text, select และ checkbox
     const handleLogisRecieveChange = useCallback((event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, index: number) => {
-        const { name, type, value, checked } = event.target;
+        const { name, type, value } = event.target;
+        const checked = (event.target as HTMLInputElement).checked; // Narrow down the type for checked
         const keys = name.split(".");
 
         setLogisRecieve((prevData) => {

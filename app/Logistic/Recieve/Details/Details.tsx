@@ -2,8 +2,41 @@
 
 import { useEffect, useState } from "react";
 
+interface Data {
+    Quantity: {
+        quantity: number;
+        quantityUnit: string;
+        temp: number;
+        tempUnit: string;
+        pH: number;
+        fat: number;
+        protein: number;
+        bacteria: boolean;
+        bacteriaInfo: string;
+        contaminants: boolean;
+        contaminantInfo: string;
+        abnormalChar: boolean;
+        abnormalType: {
+            smellBad: boolean;
+            smellNotFresh: boolean;
+            abnormalColor: boolean;
+            sour: boolean;
+            bitter: boolean;
+            cloudy: boolean;
+            lumpy: boolean;
+            separation: boolean;
+        };
+    };
+    RecipientInfo: {
+        personInCharge: string;
+        location: string;
+        pickUpTime: string;
+    };
+    // ...other properties...
+}
+
 const Details = () => {
-    const [data, setData] = useState(null);
+    const [data, setData] = useState<Data | null>(null);
 
     useEffect(() => {
         const storedData = localStorage.getItem("LogisRecieve");
@@ -23,15 +56,15 @@ const Details = () => {
                         <div className="flex flex-col space-y-2 gap-3">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Person in charge:</p>
-                                {/* <p>{data.RecipientInfo.personInCharge}</p> */}
+                                <p>{data?.RecipientInfo?.personInCharge}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Location:</p>
-                                {/* <p>{data.RecipientInfo.location}</p> */}
+                                <p>{data?.RecipientInfo?.location}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Pick Up Time:</p>
-                                {/* <p>{data.RecipientInfo.pickUpTime}</p> */}
+                                <p>{data?.RecipientInfo?.pickUpTime}</p>
                             </div>
                         </div>
                     </div>
@@ -42,62 +75,63 @@ const Details = () => {
                         <div className="flex flex-col space-y-2 gap-3">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Quantity:</p>
-                                {/* <p>{data.Quantity.quantity} {data.Quantity.quantityUnit}</p> */}
+                                <p>{data?.Quantity?.quantity} {data?.Quantity?.quantityUnit}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Temperature:</p>
-                                {/* <p>{data.Quantity.temp} {data.Quantity.tempUnit}</p> */}
+                                <p>{data?.Quantity?.temp} {data?.Quantity?.tempUnit}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">pH:</p>
-                                {/* <p>{data.Quantity.pH}</p> */}
+                                <p>{data?.Quantity?.pH}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Fat:</p>
-                                {/* <p>{data.Quantity.fat} %</p> */}
+                                <p>{data?.Quantity?.fat} %</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Protein:</p>
-                                {/* <p>{data.Quantity.protein} %</p> */}
+                                <p>{data?.Quantity?.protein} %</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Bacteria:</p>
                                 <div className="flex flex-col gap-2">
-                                    {/* <p>{data.Quantity.bacteria === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.bacteriaInfo}</p> */}
+                                    <p>{data?.Quantity?.bacteria === true ? "True" : "False"}</p>
+                                    <p>{data?.Quantity?.bacteriaInfo}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Contaminants:</p>
-                                {/* <div className="flex flex-col gap-2">
-                                    <p>{data.Quantity.contaminants === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.contaminantInfo}</p> */}
-                            </div>
-                        </div>
-                        <div className="flex justify-between">
-                            <div className="flex flex-col gap-3">
-                                <p className="font-semibold">Abnormal Characteristic:</p>
-                                <div className="flex flex-col gap-3">
-                                    <p className="font-semibold">Smell Bad:</p>
-                                    <p className="font-semibold">Smell Not Fresh:</p>
-                                    <p className="font-semibold">Abnormal Color:</p>
-                                    <p className="font-semibold">Sour:</p>
-                                    <p className="font-semibold">Bitter:</p>
-                                    <p className="font-semibold">Cloudy:</p>
-                                    <p className="font-semibold">Lumpy:</p>
-                                    <p className="font-semibold">Separation of milk and water:</p>
+                                <div className="flex flex-col gap-2">
+                                    <p>{data?.Quantity?.contaminants === true ? "True" : "False"}</p>
+                                    <p>{data?.Quantity?.contaminantInfo}</p>
                                 </div>
                             </div>
-                            <div className="flex flex-col gap-3">
-                                {/* <p>{data.Quantity.abnormalChar === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.smellBad === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.smellNotFresh === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.abnormalColor === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.sour === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.bitter === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.cloudy === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.lumpy === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.separation === true ? "True" : "False"}</p> */}
+                            <div className="flex justify-between">
+                                <div className="flex flex-col gap-3">
+                                    <p className="font-semibold">Abnormal Characteristic:</p>
+                                    <div className="flex flex-col gap-3">
+                                        <p className="font-semibold">Smell Bad:</p>
+                                        <p className="font-semibold">Smell Not Fresh:</p>
+                                        <p className="font-semibold">Abnormal Color:</p>
+                                        <p className="font-semibold">Sour:</p>
+                                        <p className="font-semibold">Bitter:</p>
+                                        <p className="font-semibold">Cloudy:</p>
+                                        <p className="font-semibold">Lumpy:</p>
+                                        <p className="font-semibold">Separation of milk and water:</p>
+                                    </div>
+                                </div>
+                                <div className="flex flex-col gap-3">
+                                    <p>{data?.Quantity?.abnormalChar === true ? "True" : "False"}</p>
+                                    <p>{data?.Quantity?.abnormalType?.smellBad === true ? "True" : "False"}</p>
+                                    <p>{data?.Quantity?.abnormalType?.smellNotFresh === true ? "True" : "False"}</p>
+                                    <p>{data?.Quantity?.abnormalType?.abnormalColor === true ? "True" : "False"}</p>
+                                    <p>{data?.Quantity?.abnormalType?.sour === true ? "True" : "False"}</p>
+                                    <p>{data?.Quantity?.abnormalType?.bitter === true ? "True" : "False"}</p>
+                                    <p>{data?.Quantity?.abnormalType?.cloudy === true ? "True" : "False"}</p>
+                                    <p>{data?.Quantity?.abnormalType?.lumpy === true ? "True" : "False"}</p>
+                                    <p>{data?.Quantity?.abnormalType?.separation === true ? "True" : "False"}</p>
+                                </div>
                             </div>
                         </div>
                     </div>

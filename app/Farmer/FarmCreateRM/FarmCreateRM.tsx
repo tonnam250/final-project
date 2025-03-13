@@ -19,6 +19,56 @@ interface GeoData {
     postalCode: number;
 }
 
+interface FormData {
+    GeneralInfo: {
+        recieveStatus: string;
+        farmName: string;
+        productLot: string;
+        personInCharge: string;
+    };
+    ProductDetail: {
+        deliverTime: string;
+        recieveTime: string;
+        quantity: number;
+        quantityUnit: string;
+        temp: number;
+        tempUnit: string;
+        pH: number;
+        fat: number;
+        protein: number;
+        bacteria: boolean;
+        bacteriaInfo: string;
+        contaminants: boolean;
+        contaminantInfo: string;
+        abnormalChar: boolean;
+        abnormalType: {
+            smellBad: boolean;
+            smellNotFresh: boolean;
+            abnormalColor: boolean;
+            sour: boolean;
+            bitter: boolean;
+            cloudy: boolean;
+            lumpy: boolean;
+            separation: boolean;
+        };
+        location: string;
+    };
+    shippingAddress: {
+        companyName: string;
+        firstName: string;
+        lastName: string;
+        email: string;
+        areaCode: string;
+        phoneNumber: string;
+        address: string;
+        province: string;
+        district: string;
+        subDistrict: string;
+        postalCode: string;
+        location: string;
+    };
+}
+
 declare global {
     interface Window {
         google: any;
@@ -104,11 +154,16 @@ const FarmCreateRM = () => {
     const router = useRouter();
 
     // save form Data
-    const [formData, setFormData] = useState({
-        milkTankInfo: {
+    const [formData, setFormData] = useState<FormData>({
+        GeneralInfo: {
+            recieveStatus: "",
             farmName: "",
-            milkTankNo: "",
-            personInCharge: "",
+            productLot: "",
+            personInCharge: ""
+        },
+        ProductDetail: {
+            deliverTime: "",
+            recieveTime: "",
             quantity: 0,
             quantityUnit: "Ton",
             temp: 0,
@@ -130,7 +185,8 @@ const FarmCreateRM = () => {
                 cloudy: false,
                 lumpy: false,
                 separation: false
-            }
+            },
+            location: ""
         },
         shippingAddress: {
             companyName: "",
@@ -170,12 +226,13 @@ const FarmCreateRM = () => {
 
     // ✅ ฟังก์ชัน handleFormDataChange รองรับ text, select และ checkbox
     const handleFormDataChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, type, value, checked } = event.target;
+        const { name, type, value } = event.target;
+        const checked = (event.target as HTMLInputElement).checked;
         const keys = name.split(".");
 
         setFormData((prevData) => {
             const updatedData = { ...prevData }; // Clone ข้อมูลเดิม
-            let temp = updatedData;
+            let temp: any = updatedData;
 
             for (let i = 0; i < keys.length - 1; i++) {
                 temp = temp[keys[i]];
@@ -209,10 +266,10 @@ const FarmCreateRM = () => {
 
         setFormData((prevData) => ({
             ...prevData,
-            milkTankInfo: {
-                ...prevData.milkTankInfo,
+            ProductDetail: {
+                ...prevData.ProductDetail,
                 abnormalType: {
-                    ...prevData.milkTankInfo.abnormalType,
+                    ...prevData.ProductDetail.abnormalType,
                     [name.split('.').pop()!]: checked
                 }
             }
@@ -293,20 +350,20 @@ const FarmCreateRM = () => {
                         <label htmlFor="farmName" className="font-semibold">Farm Name</label>
                         <input type="text" id="farmName"
                             placeholder="Enter your farm name" className="border rounded-full p-3 w-full"
-                            name="milkTankInfo.farmName" value={formData.milkTankInfo.farmName} onChange={handleFormDataChange} />
+                            name="GeneralInfo.farmName" value={formData.GeneralInfo.farmName} onChange={handleFormDataChange} />
                     </div>
                     {/* Milk tank no. */}
                     <div className="flex flex-col w-full items-start gap-3">
                         <label htmlFor="milkTankNo" className="font-semibold">Milk Tank No.</label>
                         <input type="text" id="milkTankNo" placeholder="Enter your milk tank number" className="border rounded-full p-3 w-full"
-                            name="milkTankInfo.milkTankNo" value={formData.milkTankInfo.milkTankNo} onChange={handleFormDataChange} />
+                            name="GeneralInfo.productLot" value={formData.GeneralInfo.productLot} onChange={handleFormDataChange} />
                     </div>
                     {/* Person in charge */}
                     <div className="flex flex-col w-full items-start gap-3">
                         <label htmlFor="personInCharge" className="font-semibold">Person In Charge</label>
-                        <input type="text" name="milkTankInfo.personInCharge" id="personInCharge"
+                        <input type="text" name="GeneralInfo.personInCharge" id="personInCharge"
                             placeholder="Enter name of person in charge" className="border rounded-full p-3 w-full"
-                            value={formData.milkTankInfo.personInCharge} onChange={handleFormDataChange} />
+                            value={formData.GeneralInfo.personInCharge} onChange={handleFormDataChange} />
                     </div>
                     {/* Quantity + temperature */}
                     <div className="flex w-full items-start gap-3">
@@ -314,11 +371,11 @@ const FarmCreateRM = () => {
                         <div className="flex flex-col w-1/2 items-start gap-3">
                             <label htmlFor="quantity" className="font-semibold">Quantity</label>
                             <div className="flex gap-3 w-full">
-                                <input type="number" name="milkTankInfo.quantity" id="quantity"
+                                <input type="number" name="ProductDetail.quantity" id="quantity"
                                     className="border rounded-full p-3 w-4/5" placeholder="0.00" step="0.01"
-                                    value={formData.milkTankInfo.quantity} onChange={handleFormDataChange} />
-                                <select name="milkTankInfo.quantityUnit" id="quantityUnit" className="border rounded-full p-3 w-1/5 font-semibold"
-                                    value={formData.milkTankInfo.quantityUnit} onChange={handleFormDataChange}>
+                                    value={formData.ProductDetail.quantity} onChange={handleFormDataChange} />
+                                <select name="ProductDetail.quantityUnit" id="quantityUnit" className="border rounded-full p-3 w-1/5 font-semibold"
+                                    value={formData.ProductDetail.quantityUnit} onChange={handleFormDataChange}>
                                     <option value="Ton">Ton</option>
                                     <option value="Liter">Liter</option>
                                     <option value="Ml">Milliliter</option>
@@ -332,10 +389,10 @@ const FarmCreateRM = () => {
                         <div className="flex flex-col w-1/2 items-start gap-3">
                             <label htmlFor="temp" className="font-semibold">Temperature</label>
                             <div className="flex w-full items-start gap-3">
-                                <input type="number" name="milkTankInfo.temp" id="temp" className="p-3 rounded-full border w-4/5" placeholder="0.00" step="0.01"
-                                    value={formData.milkTankInfo.temp} onChange={handleFormDataChange} />
-                                <select name="milkTankInfo.tempUnit" id="tempUnit" className="border rounded-full p-3 w-1/5 font-semibold"
-                                    value={formData.milkTankInfo.tempUnit} onChange={handleFormDataChange}>
+                                <input type="number" name="ProductDetail.temp" id="temp" className="p-3 rounded-full border w-4/5" placeholder="0.00" step="0.01"
+                                    value={formData.ProductDetail.temp} onChange={handleFormDataChange} />
+                                <select name="ProductDetail.tempUnit" id="tempUnit" className="border rounded-full p-3 w-1/5 font-semibold"
+                                    value={formData.ProductDetail.tempUnit} onChange={handleFormDataChange}>
                                     <option value="Celcius">°C</option>
                                     <option value="Farenheit">°F</option>
                                 </select>
@@ -345,22 +402,22 @@ const FarmCreateRM = () => {
                     {/* pH of Milk */}
                     <div className="flex flex-col w-full items-start gap-3">
                         <label htmlFor="pH" className="font-semibold">pH of Milk</label>
-                        <input type="number" name="milkTankInfo.pH" id="pH" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01"
-                            value={formData.milkTankInfo.pH} onChange={handleFormDataChange} />
+                        <input type="number" name="ProductDetail.pH" id="pH" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01"
+                            value={formData.ProductDetail.pH} onChange={handleFormDataChange} />
                     </div>
                     {/* Fat + Protein */}
                     <div className="flex w-full items-start gap-3">
                         {/* Fat */}
                         <div className="flex flex-col w-1/2 items-start gap-3">
                             <label htmlFor="fat" className="font-semibold">Fat (%)</label>
-                            <input type="number" name="milkTankInfo.fat" id="fat" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01"
-                                value={formData.milkTankInfo.fat} onChange={handleFormDataChange} />
+                            <input type="number" name="ProductDetail.fat" id="fat" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01"
+                                value={formData.ProductDetail.fat} onChange={handleFormDataChange} />
                         </div>
                         {/* Protein */}
                         <div className="flex flex-col w-1/2 items-start gap-3">
                             <label htmlFor="protein" className="font-semibold">Protein (%)</label>
-                            <input type="number" name="milkTankInfo.protein" id="protein" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01"
-                                value={formData.milkTankInfo.protein} onChange={handleFormDataChange} />
+                            <input type="number" name="ProductDetail.protein" id="protein" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01"
+                                value={formData.ProductDetail.protein} onChange={handleFormDataChange} />
                         </div>
                     </div>
                     {/* bacteria testing */}
@@ -368,22 +425,22 @@ const FarmCreateRM = () => {
                         <div className="flex w-full items-center gap-3">
                             <input
                                 type="checkbox"
-                                name="milkTankInfo.bacteria"
+                                name="ProductDetail.bacteria"
                                 id="bacteria"
                                 className="w-5 h-5 appearance-none border border-gray-400 rounded-full checked:bg-[#D3D596] checked:border-[#305066]"
                                 onChange={handleFormDataChange}
-                                checked={formData.milkTankInfo.bacteria}
+                                checked={formData.ProductDetail.bacteria}
                             />
                             <label htmlFor="bacteria" className="font-semibold">Bacteria Testing</label>
                         </div>
-                        {formData.milkTankInfo.bacteria && (
+                        {formData.ProductDetail.bacteria && (
                             <input
                                 type="text"
-                                name="milkTankInfo.bacteriaInfo"
+                                name="ProductDetail.bacteriaInfo"
                                 id="bacteriaInfo"
                                 className="border rounded-full p-3"
                                 placeholder="Please fill additional information"
-                                value={formData.milkTankInfo.bacteriaInfo}
+                                value={formData.ProductDetail.bacteriaInfo}
                                 onChange={handleFormDataChange}
                             />
                         )}
@@ -393,22 +450,22 @@ const FarmCreateRM = () => {
                         <div className="flex w-full items-center gap-3">
                             <input
                                 type="checkbox"
-                                name="milkTankInfo.contaminants"
-                                id="milkTankInfo.contaminants"
+                                name="ProductDetail.contaminants"
+                                id="ProductDetail.contaminants"
                                 className="w-5 h-5 appearance-none border border-gray-400 rounded-full checked:bg-[#D3D596] checked:border-[#305066]"
                                 onChange={handleFormDataChange}
-                                checked={formData.milkTankInfo.contaminants}
+                                checked={formData.ProductDetail.contaminants}
                             />
                             <label htmlFor="contaminants" className="font-semibold">Contaminants</label>
                         </div>
-                        {formData.milkTankInfo.contaminants && (
+                        {formData.ProductDetail.contaminants && (
                             <input
                                 type="text"
-                                name="milkTankInfo.contaminantInfo"
-                                id="milkTankInfo.contaminantInfo"
+                                name="ProductDetail.contaminantInfo"
+                                id="ProductDetail.contaminantInfo"
                                 className="border rounded-full p-3"
                                 placeholder="Please fill additional information"
-                                value={formData.milkTankInfo.contaminantInfo}
+                                value={formData.ProductDetail.contaminantInfo}
                                 onChange={handleFormDataChange}
                             />
                         )}
@@ -418,55 +475,55 @@ const FarmCreateRM = () => {
                         <div className="flex w-full items-center gap-3">
                             <input
                                 type="checkbox"
-                                name="milkTankInfo.abnormalChar"
+                                name="ProductDetail.abnormalChar"
                                 id="abnormalChar"
                                 className="w-5 h-5 appearance-none border border-gray-400 rounded-full checked:bg-[#D3D596] checked:border-[#305066]"
                                 onChange={handleAbnormalChange}
-                                checked={formData.milkTankInfo.abnormalChar}
+                                checked={formData.ProductDetail.abnormalChar}
                             />
                             <label htmlFor="abnormalChar" className="font-semibold">Abnormal Characteristic</label>
                         </div>
-                        {formData.milkTankInfo.abnormalChar && (
+                        {formData.ProductDetail.abnormalChar && (
                             <div className="flex flex-col w-full items-center gap-3 px-8">
                                 <div className="flex w-full items-center gap-3">
-                                    <input type="checkbox" name="milkTankInfo.abnormalType.smellBad" id="smellBad" className="border w-4 h-4"
-                                        checked={formData.milkTankInfo.abnormalType.smellBad} onChange={handleNestedCheckboxChange} />
+                                    <input type="checkbox" name="ProductDetail.abnormalType.smellBad" id="smellBad" className="border w-4 h-4"
+                                        checked={formData.ProductDetail.abnormalType.smellBad} onChange={handleNestedCheckboxChange} />
                                     <label htmlFor="smellBad" className="font-semibold">Smell Bad</label>
                                 </div>
                                 <div className="flex w-full items-center gap-3">
-                                    <input type="checkbox" name="milkTankInfo.abnormalType.smellNotFresh" id="smellNotFresh" className="border w-4 h-4"
-                                        checked={formData.milkTankInfo.abnormalType.smellNotFresh} onChange={handleNestedCheckboxChange} />
+                                    <input type="checkbox" name="ProductDetail.abnormalType.smellNotFresh" id="smellNotFresh" className="border w-4 h-4"
+                                        checked={formData.ProductDetail.abnormalType.smellNotFresh} onChange={handleNestedCheckboxChange} />
                                     <label htmlFor="smellNotFresh" className="font-semibold">Smell not fresh</label>
                                 </div>
                                 <div className="flex w-full items-center gap-3">
-                                    <input type="checkbox" name="milkTankInfo.abnormalType.abnormalColor" id="abnormalColor" className="border w-4 h-4"
-                                        checked={formData.milkTankInfo.abnormalType.abnormalColor} onChange={handleNestedCheckboxChange} />
+                                    <input type="checkbox" name="ProductDetail.abnormalType.abnormalColor" id="abnormalColor" className="border w-4 h-4"
+                                        checked={formData.ProductDetail.abnormalType.abnormalColor} onChange={handleNestedCheckboxChange} />
                                     <label htmlFor="abnormalColor" className="font-semibold">Abnormal Color</label>
                                     <p className="text-gray-500">ex. yellow or green</p>
                                 </div>
                                 <div className="flex w-full items-center gap-3">
-                                    <input type="checkbox" name="milkTankInfo.abnormalType.sour" id="sour" className="border w-4 h-4"
-                                        checked={formData.milkTankInfo.abnormalType.sour} onChange={handleNestedCheckboxChange} />
+                                    <input type="checkbox" name="ProductDetail.abnormalType.sour" id="sour" className="border w-4 h-4"
+                                        checked={formData.ProductDetail.abnormalType.sour} onChange={handleNestedCheckboxChange} />
                                     <label htmlFor="sour" className="font-semibold">Sour taste</label>
                                 </div>
                                 <div className="flex w-full items-center gap-3">
-                                    <input type="checkbox" name="milkTankInfo.abnormalType.bitter" id="bitter" className="border w-4 h-4"
-                                        checked={formData.milkTankInfo.abnormalType.bitter} onChange={handleNestedCheckboxChange} />
+                                    <input type="checkbox" name="ProductDetail.abnormalType.bitter" id="bitter" className="border w-4 h-4"
+                                        checked={formData.ProductDetail.abnormalType.bitter} onChange={handleNestedCheckboxChange} />
                                     <label htmlFor="bitter" className="font-semibold">Bitter taste</label>
                                 </div>
                                 <div className="flex w-full items-center gap-3">
-                                    <input type="checkbox" name="milkTankInfo.abnormalType.cloudy" id="cloudy" className="border w-4 h-4"
-                                        checked={formData.milkTankInfo.abnormalType.cloudy} onChange={handleNestedCheckboxChange} />
+                                    <input type="checkbox" name="ProductDetail.abnormalType.cloudy" id="cloudy" className="border w-4 h-4"
+                                        checked={formData.ProductDetail.abnormalType.cloudy} onChange={handleNestedCheckboxChange} />
                                     <label htmlFor="cloudy" className="font-semibold">Cloudy Appearance</label>
                                 </div>
                                 <div className="flex w-full items-center gap-3">
-                                    <input type="checkbox" name="milkTankInfo.abnormalType.lumpy" id="lumpy" className="border w-4 h-4"
-                                        checked={formData.milkTankInfo.abnormalType.lumpy} onChange={handleNestedCheckboxChange} />
+                                    <input type="checkbox" name="ProductDetail.abnormalType.lumpy" id="lumpy" className="border w-4 h-4"
+                                        checked={formData.ProductDetail.abnormalType.lumpy} onChange={handleNestedCheckboxChange} />
                                     <label htmlFor="lumpy" className="font-semibold">Lumpy Appearance</label>
                                 </div>
                                 <div className="flex w-full items-center gap-3">
-                                    <input type="checkbox" name="milkTankInfo.abnormalType.separation" id="separation" className="border w-4 h-4"
-                                        checked={formData.milkTankInfo.abnormalType.separation} onChange={handleNestedCheckboxChange} />
+                                    <input type="checkbox" name="ProductDetail.abnormalType.separation" id="separation" className="border w-4 h-4"
+                                        checked={formData.ProductDetail.abnormalType.separation} onChange={handleNestedCheckboxChange} />
                                     <label htmlFor="separation" className="font-semibold">Separation between water and fat</label>
                                 </div>
                             </div>
@@ -609,13 +666,6 @@ const FarmCreateRM = () => {
                                 placeholder="Paste location url"
                                 value={formData.shippingAddress.location}
                                 onChange={handleFormDataChange} />
-
-                            {/* {location && (
-                                <div ref={mapRef} className="w-full h-96 mt-5" ></div>
-                            )}
-                            {location && geocodeError && (
-                                <p className="text-red-500">{geocodeError}</p>
-                            )} */}
                         </div>
 
                         <button
