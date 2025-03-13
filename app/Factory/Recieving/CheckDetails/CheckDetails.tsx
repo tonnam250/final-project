@@ -3,8 +3,44 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 
+interface RecipientInfo {
+    personInCharge: string;
+    location: string;
+    pickUpTime: string;
+}
+
+interface Quantity {
+    quantity: number;
+    quantityUnit: string;
+    temp: number;
+    tempUnit: string;
+    pH: number;
+    fat: number;
+    protein: number;
+    bacteria: boolean;
+    bacteriaInfo: string;
+    contaminants: boolean;
+    contaminantInfo: string;
+    abnormalChar: boolean;
+    abnormalType: {
+        smellBad: boolean;
+        smellNotFresh: boolean;
+        abnormalColor: boolean;
+        sour: boolean;
+        bitter: boolean;
+        cloudy: boolean;
+        lumpy: boolean;
+        separation: boolean;
+    };
+}
+
+interface Data {
+    RecipientInfo: RecipientInfo;
+    Quantity: Quantity;
+}
+
 const CheckDetails = () => {
-    const [data, setData] = useState(null);
+    const [data, setData] = useState<Data | null>(null);
     const router = useRouter();
 
     useEffect(() => {
@@ -146,14 +182,14 @@ const CheckDetails = () => {
                             <div className="flex justify-between">
                                 <p className="font-semibold">Bacteria:</p>
                                 <div className="flex flex-col gap-2">
-                                    <p>{data.Quantity.bacteria === true ? "True" : "False"}</p>
+                                    <p>{data.Quantity.bacteria ? "True" : "False"}</p>
                                     <p>{data.Quantity.bacteriaInfo}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Contaminants:</p>
                                 <div className="flex flex-col gap-2">
-                                    <p>{data.Quantity.contaminants === true ? "True" : "False"}</p>
+                                    <p>{data.Quantity.contaminants ? "True" : "False"}</p>
                                     <p>{data.Quantity.contaminantInfo}</p>
                                 </div>
                             </div>
@@ -172,15 +208,15 @@ const CheckDetails = () => {
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-3">
-                                    <p>{data.Quantity.abnormalChar === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.smellBad === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.smellNotFresh === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.abnormalColor === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.sour === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.bitter === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.cloudy === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.lumpy === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.separation === true ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalChar ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalType.smellBad ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalType.smellNotFresh ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalType.abnormalColor ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalType.sour ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalType.bitter ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalType.cloudy ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalType.lumpy ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalType.separation ? "True" : "False"}</p>
                                 </div>
                             </div>
                         </div>

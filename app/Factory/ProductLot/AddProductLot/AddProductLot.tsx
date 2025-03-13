@@ -340,7 +340,7 @@ const AddProductLot = () => {
         });
     };
 
-    const handleShippingAddressChange = (index: number, event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const handleShippingAddressChange = (index: number, event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = event.target;
 
         setShippingAddresses((prevAddresses) => {

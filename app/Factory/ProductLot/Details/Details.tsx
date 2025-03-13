@@ -2,14 +2,78 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 
+// Define the type for shipping addresses
+type ShippingAddress = {
+    companyName: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    areaCode: string;
+    phoneNumber: string;
+    address: string;
+    province: string;
+    district: string;
+    subDistrict: string;
+    postalCode: string;
+    location: string;
+};
+
 const CheckDetails = () => {
     const router = useRouter();
     const [data, setData] = useState({
-        GeneralInfo: {},
-        selectMilkTank: {},
-        Quality: {},
-        nutrition: {},
-        shippingAddresses: []
+        GeneralInfo: {
+            productName: "",
+            category: "",
+            description: "",
+            quantity: 0,
+            quantityUnit: ""
+        },
+        selectMilkTank: {
+            temp: 0,
+            tempUnit: "",
+            pH: 0,
+            fat: 0,
+            protein: 0,
+            bacteria: false,
+            bacteriaInfo: "",
+            contaminants: false,
+            contaminantInfo: "",
+            abnormalChar: false,
+            abnormalType: {
+                smellBad: false,
+                smellNotFresh: false,
+                abnormalColor: false,
+                sour: false,
+                bitter: false,
+                cloudy: false,
+                lumpy: false,
+                separation: false
+            }
+        },
+        Quality: {
+            grade: "",
+            inspectionDate: "",
+            inspector: "",
+            comments: ""
+        },
+        nutrition: {
+            calories: 0,
+            totalFat: 0,
+            colestoral: 0,
+            sodium: 0,
+            potassium: 0,
+            totalCarbohydrates: 0,
+            fiber: 0,
+            sugar: 0,
+            vitaminC: 0,
+            calcium: 0,
+            iron: 0,
+            vitaminD: 0,
+            vitaminB6: 0,
+            vitaminB12: 0,
+            magnesium: 0
+        },
+        shippingAddresses: [] as ShippingAddress[] // Define the type for shipping addresses
     });
 
     useEffect(() => {
@@ -33,19 +97,19 @@ const CheckDetails = () => {
                             <div className="flex flex-col space-y-2 gap-3 text-gray-600">
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Product Name:</p>
-                                    <p>{data.GeneralInfo.productName}</p>
+                                    <p>{data.GeneralInfo?.productName}</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Category:</p>
-                                    <p>{data.GeneralInfo.category}</p>
+                                    <p>{data.GeneralInfo?.category}</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Description:</p>
-                                    <p>{data.GeneralInfo.description}</p>
+                                    <p>{data.GeneralInfo?.description}</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Quantity Per Unit:</p>
-                                    <p>{data.GeneralInfo.quantity} {data.GeneralInfo.quantityUnit}</p>
+                                    <p>{data.GeneralInfo?.quantity} {data.GeneralInfo?.quantityUnit}</p>
                                 </div>
                             </div>
                         </div>
@@ -56,73 +120,73 @@ const CheckDetails = () => {
                             <div className="flex flex-col space-y-2 gap-3 text-gray-600">
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Temperature:</p>
-                                    <p>{data.selectMilkTank.temp} {data.selectMilkTank.tempUnit}</p>
+                                    <p>{data.selectMilkTank?.temp} {data.selectMilkTank?.tempUnit}</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">pH:</p>
-                                    <p>{data.selectMilkTank.pH}</p>
+                                    <p>{data.selectMilkTank?.pH}</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Fat:</p>
-                                    <p>{data.selectMilkTank.fat} %</p>
+                                    <p>{data.selectMilkTank?.fat} %</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Protein:</p>
-                                    <p>{data.selectMilkTank.protein} %</p>
+                                    <p>{data.selectMilkTank?.protein} %</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Bacteria:</p>
-                                    <p>{data.selectMilkTank.bacteria ? "Yes" : "No"}</p>
+                                    <p>{data.selectMilkTank?.bacteria ? "Yes" : "No"}</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Bacteria Info:</p>
-                                    <p>{data.selectMilkTank.bacteriaInfo}</p>
+                                    <p>{data.selectMilkTank?.bacteriaInfo}</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Contaminants:</p>
-                                    <p>{data.selectMilkTank.contaminants ? "Yes" : "No"}</p>
+                                    <p>{data.selectMilkTank?.contaminants ? "Yes" : "No"}</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Contaminant Info:</p>
-                                    <p>{data.selectMilkTank.contaminantInfo}</p>
+                                    <p>{data.selectMilkTank?.contaminantInfo}</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Abnormal Characteristic:</p>
-                                    <p>{data.selectMilkTank.abnormalChar ? "Yes" : "No"}</p>
+                                    <p>{data.selectMilkTank?.abnormalChar ? "Yes" : "No"}</p>
                                 </div>
                                 <div className="flex flex-col space-y-2 gap-3">
                                     <p className="font-semibold">Abnormal Type:</p>
                                     <div className="flex justify-between text-gray-600">
                                         <p>Smell Bad:</p>
-                                        <p>{data.selectMilkTank.abnormalType?.smellBad ? "Yes" : "No"}</p>
+                                        <p>{data.selectMilkTank?.abnormalType?.smellBad ? "Yes" : "No"}</p>
                                     </div>
                                     <div className="flex justify-between text-gray-600">
                                         <p>Smell Not Fresh:</p>
-                                        <p>{data.selectMilkTank.abnormalType?.smellNotFresh ? "Yes" : "No"}</p>
+                                        <p>{data.selectMilkTank?.abnormalType?.smellNotFresh ? "Yes" : "No"}</p>
                                     </div>
                                     <div className="flex justify-between text-gray-600">
                                         <p>Abnormal Color:</p>
-                                        <p>{data.selectMilkTank.abnormalType?.abnormalColor ? "Yes" : "No"}</p>
+                                        <p>{data.selectMilkTank?.abnormalType?.abnormalColor ? "Yes" : "No"}</p>
                                     </div>
                                     <div className="flex justify-between text-gray-600">
                                         <p>Sour:</p>
-                                        <p>{data.selectMilkTank.abnormalType?.sour ? "Yes" : "No"}</p>
+                                        <p>{data.selectMilkTank?.abnormalType?.sour ? "Yes" : "No"}</p>
                                     </div>
                                     <div className="flex justify-between text-gray-600">
                                         <p>Bitter:</p>
-                                        <p>{data.selectMilkTank.abnormalType?.bitter ? "Yes" : "No"}</p>
+                                        <p>{data.selectMilkTank?.abnormalType?.bitter ? "Yes" : "No"}</p>
                                     </div>
                                     <div className="flex justify-between text-gray-600">
                                         <p>Cloudy:</p>
-                                        <p>{data.selectMilkTank.abnormalType?.cloudy ? "Yes" : "No"}</p>
+                                        <p>{data.selectMilkTank?.abnormalType?.cloudy ? "Yes" : "No"}</p>
                                     </div>
                                     <div className="flex justify-between text-gray-600">
                                         <p>Lumpy:</p>
-                                        <p>{data.selectMilkTank.abnormalType?.lumpy ? "Yes" : "No"}</p>
+                                        <p>{data.selectMilkTank?.abnormalType?.lumpy ? "Yes" : "No"}</p>
                                     </div>
                                     <div className="flex justify-between text-gray-600">
                                         <p>Separation:</p>
-                                        <p>{data.selectMilkTank.abnormalType?.separation ? "Yes" : "No"}</p>
+                                        <p>{data.selectMilkTank?.abnormalType?.separation ? "Yes" : "No"}</p>
                                     </div>
                                 </div>
                             </div>
@@ -134,19 +198,19 @@ const CheckDetails = () => {
                             <div className="flex flex-col space-y-2 gap-3 text-gray-600">
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Grade:</p>
-                                    <p>{data.Quality.grade}</p>
+                                    <p>{data.Quality?.grade}</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Inspection Date:</p>
-                                    <p>{data.Quality.inspectionDate}</p>
+                                    <p>{data.Quality?.inspectionDate}</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Inspector:</p>
-                                    <p>{data.Quality.inspector}</p>
+                                    <p>{data.Quality?.inspector}</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Comments:</p>
-                                    <p>{data.Quality.comments}</p>
+                                    <p>{data.Quality?.comments}</p>
                                 </div>
                             </div>
                         </div>
@@ -157,63 +221,63 @@ const CheckDetails = () => {
                             <div className="flex flex-col space-y-2 gap-3 text-gray-600">
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Calories:</p>
-                                    <p>{data.nutrition.calories}</p>
+                                    <p>{data.nutrition?.calories}</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Total Fat:</p>
-                                    <p>{data.nutrition.totalFat} g</p>
+                                    <p>{data.nutrition?.totalFat} g</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Cholesterol:</p>
-                                    <p>{data.nutrition.colestoral} mg</p>
+                                    <p>{data.nutrition?.colestoral} mg</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Sodium:</p>
-                                    <p>{data.nutrition.sodium} mg</p>
+                                    <p>{data.nutrition?.sodium} mg</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Potassium:</p>
-                                    <p>{data.nutrition.potassium} mg</p>
+                                    <p>{data.nutrition?.potassium} mg</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Total Carbohydrates:</p>
-                                    <p>{data.nutrition.totalCarbohydrates} g</p>
+                                    <p>{data.nutrition?.totalCarbohydrates} g</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Fiber:</p>
-                                    <p>{data.nutrition.fiber} g</p>
+                                    <p>{data.nutrition?.fiber} g</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Sugar:</p>
-                                    <p>{data.nutrition.sugar} g</p>
+                                    <p>{data.nutrition?.sugar} g</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Vitamin C:</p>
-                                    <p>{data.nutrition.vitaminC} %</p>
+                                    <p>{data.nutrition?.vitaminC} %</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Calcium:</p>
-                                    <p>{data.nutrition.calcium} %</p>
+                                    <p>{data.nutrition?.calcium} %</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Iron:</p>
-                                    <p>{data.nutrition.iron} %</p>
+                                    <p>{data.nutrition?.iron} %</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Vitamin D:</p>
-                                    <p>{data.nutrition.vitaminD} %</p>
+                                    <p>{data.nutrition?.vitaminD} %</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Vitamin B6:</p>
-                                    <p>{data.nutrition.vitaminB6} %</p>
+                                    <p>{data.nutrition?.vitaminB6} %</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Vitamin B12:</p>
-                                    <p>{data.nutrition.vitaminB12} %</p>
+                                    <p>{data.nutrition?.vitaminB12} %</p>
                                 </div>
                                 <div className="flex justify-between">
                                     <p className="font-semibold">Magnesium:</p>
-                                    <p>{data.nutrition.magnesium} %</p>
+                                    <p>{data.nutrition?.magnesium} %</p>
                                 </div>
                             </div>
                         </div>
@@ -226,47 +290,47 @@ const CheckDetails = () => {
                                     <div className="flex flex-col space-y-2 gap-3 text-gray-600">
                                         <div className="flex justify-between">
                                             <p className="font-semibold">Company Name:</p>
-                                            <p>{address.companyName}</p>
+                                            <p>{address?.companyName}</p>
                                         </div>
                                         <div className="flex justify-between">
                                             <p className="font-semibold">First Name:</p>
-                                            <p>{address.firstName}</p>
+                                            <p>{address?.firstName}</p>
                                         </div>
                                         <div className="flex justify-between">
                                             <p className="font-semibold">Last Name:</p>
-                                            <p>{address.lastName}</p>
+                                            <p>{address?.lastName}</p>
                                         </div>
                                         <div className="flex justify-between">
                                             <p className="font-semibold">Email:</p>
-                                            <p>{address.email}</p>
+                                            <p>{address?.email}</p>
                                         </div>
                                         <div className="flex justify-between">
                                             <p className="font-semibold">Phone Number:</p>
-                                            <p>{address.areaCode} {address.phoneNumber}</p>
+                                            <p>{address?.areaCode} {address?.phoneNumber}</p>
                                         </div>
                                         <div className="flex justify-between">
                                             <p className="font-semibold">Address:</p>
-                                            <p>{address.address}</p>
+                                            <p>{address?.address}</p>
                                         </div>
                                         <div className="flex justify-between">
                                             <p className="font-semibold">Province:</p>
-                                            <p>{address.province}</p>
+                                            <p>{address?.province}</p>
                                         </div>
                                         <div className="flex justify-between">
                                             <p className="font-semibold">District:</p>
-                                            <p>{address.district}</p>
+                                            <p>{address?.district}</p>
                                         </div>
                                         <div className="flex justify-between">
                                             <p className="font-semibold">Sub-District:</p>
-                                            <p>{address.subDistrict}</p>
+                                            <p>{address?.subDistrict}</p>
                                         </div>
                                         <div className="flex justify-between">
                                             <p className="font-semibold">Postal Code:</p>
-                                            <p>{address.postalCode}</p>
+                                            <p>{address?.postalCode}</p>
                                         </div>
                                         <div className="flex justify-between">
                                             <p className="font-semibold">Location:</p>
-                                            <p>{address.location}</p>
+                                            <p>{address?.location}</p>
                                         </div>
                                     </div>
                                 </div>
