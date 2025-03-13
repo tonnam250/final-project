@@ -83,7 +83,7 @@ const TrackingPage = () => {
                                 <span className="font-semibold">Address:<span className="inline font-normal"> </span></span>
                                 <span className="font-semibold">Contact:<span className="inline font-normal"> </span></span>
                             </div>
-                            <div className="flex flex-col w-full sm:w-1/2 h-full gap-3 sm:gap-5 p-3 text-base sm:text-xl sm:border-b">
+                            <div className="flex flex-col w-full sm:w-1/2 h-full gap-3 sm:gap-5 p-3 text-base sm:text-xl">
                                 <span className="font-semibold">Quality</span>
                                 <span className="font-semibold">pH:<span className="inline font-normal"> 7</span></span>
                                 <span className="font-semibold">Temperature:<span className="inline font-normal"> 7</span></span>
