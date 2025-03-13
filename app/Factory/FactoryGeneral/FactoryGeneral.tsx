@@ -106,6 +106,17 @@ const FactoryGeneral = () => {
         // });
     };
 
+    const handleButtonClick = () => {
+        if (isEditable) {
+            const form = document.querySelector('form');
+            if (form) {
+                form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+            }
+        } else {
+            handleSaveEditToggle();
+        }
+    };
+
     return (
         <div className="flex flex-col text-center w-full justify-center items-center text- h-full pt-20">
             <h1 className="text-3xl md:text-4xl font-bold my-4 md:my-8">General Information</h1>
@@ -281,7 +292,7 @@ const FactoryGeneral = () => {
                     <button
                         type="button"
                         className="flex items-center justify-center text- md:text-xl bg-[#C98986] hover: w-full md:w-1/6 rounded-full p-2 px-3 text-[#F7FCD4] self-center"
-                        onClick={isEditable ? handleSubmit : handleSaveEditToggle}
+                        onClick={handleButtonClick}
                     >
                         {isEditable ? "Save" : "Edit"}
                         {isEditable ? (
