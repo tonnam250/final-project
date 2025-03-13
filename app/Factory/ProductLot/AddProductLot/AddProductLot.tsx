@@ -18,6 +18,79 @@ interface GeoData {
     postalCode: number;
 }
 
+interface ProductLotForm {
+    GeneralInfo: {
+        productName: string;
+        category: string;
+        description: string;
+        quantity: number;
+        quantityUnit: string;
+    };
+    selectMilkTank: Record<string, any>;
+    Quality: {
+        temp: number;
+        tempUnit: string;
+        pH: number;
+        fat: number;
+        protein: number;
+        bacteria: boolean;
+        bacteriaInfo: string;
+        contaminants: boolean;
+        contaminantInfo: string;
+        abnormalChar: boolean;
+        abnormalType: {
+            smellBad: boolean;
+            smellNotFresh: boolean;
+            abnormalColor: boolean;
+            sour: boolean;
+            bitter: boolean;
+            cloudy: boolean;
+            lumpy: boolean;
+            separation: boolean;
+        };
+    };
+    nutrition: {
+        calories: number;
+        totalFat: number;
+        colestoral: number;
+        sodium: number;
+        potassium: number;
+        totalCarbohydrates: number;
+        fiber: number;
+        sugar: number;
+        vitaminC: number;
+        calcium: number;
+        iron: number;
+        vitaminD: number;
+        vitaminB6: number;
+        vitaminB12: number;
+        magnesium: number;
+    };
+    shippingAddress: {
+        companyName: string;
+        firstName: string;
+        lastName: string;
+        email: string;
+        areaCode: string;
+        phoneNumber: string;
+        address: string;
+        province: string;
+        district: string;
+        subDistrict: string;
+        postalCode: string;
+        location: string;
+    };
+}
+
+interface StepStatus {
+    step1: string;
+    step2: string;
+    step3: string;
+    step4: string;
+    step5: string;
+    step6: string;
+}
+
 const AddProductLot = () => {
     // for province fetching
     const [geoData, setGeoData] = useState<GeoData[]>([]);
@@ -73,7 +146,7 @@ const AddProductLot = () => {
     // Step status update function
     const [showShippingAddress, setShowShippingAddress] = useState<boolean>(false);
     const shippingAddressRef = useRef<HTMLDivElement>(null);
-    const [stepStatus, setStepStatus] = useState({
+    const [stepStatus, setStepStatus] = useState<StepStatus>({
         step1: 'in-progress',
         step2: 'not-started',
         step3: 'not-started',
@@ -87,9 +160,9 @@ const AddProductLot = () => {
     const handleNextClick = (currentStep: number) => {
         const nextStep = currentStep + 1;
         setStepStatus((prevStatus) => {
-            const newStatus = { ...prevStatus, [`step${currentStep}`]: 'completed' };
+            const newStatus = { ...prevStatus, [`step${currentStep}`]: 'completed' } as StepStatus;
             if (nextStep <= 6) {
-                newStatus[`step${nextStep}`] = 'in-progress';
+                newStatus[`step${nextStep}` as keyof StepStatus] = 'in-progress';
             }
             return newStatus;
         });
@@ -101,7 +174,7 @@ const AddProductLot = () => {
     // end step status update function
 
     // save form Data
-    const [productLotForm, setFormData] = useState({
+    const [productLotForm, setFormData] = useState<ProductLotForm>({
         GeneralInfo: {
             productName: "",
             category: "",
@@ -198,7 +271,7 @@ const AddProductLot = () => {
     };
 
     const handleFormDataChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, type, value, checked } = event.target;
+        const { name, type, value, checked } = event.target as HTMLInputElement;
         const keys = name.split(".");
 
         setFormData((prevData) => {
@@ -227,10 +300,41 @@ const AddProductLot = () => {
             const updatedData = { ...prevData };
 
             // ตรวจสอบว่า `Quality.abnormalType` มีค่าอยู่แล้วหรือไม่
-            if (!updatedData.Quality) updatedData.Quality = {};
-            if (!updatedData.Quality.abnormalType) updatedData.Quality.abnormalType = {};
+            if (!updatedData.Quality) updatedData.Quality = {
+                temp: 0,
+                tempUnit: "Celcius",
+                pH: 0,
+                fat: 0,
+                protein: 0,
+                bacteria: false,
+                bacteriaInfo: "",
+                contaminants: false,
+                contaminantInfo: "",
+                abnormalChar: false,
+                abnormalType: {
+                    smellBad: false,
+                    smellNotFresh: false,
+                    abnormalColor: false,
+                    sour: false,
+                    bitter: false,
+                    cloudy: false,
+                    lumpy: false,
+                    separation: false
+                }
+            };
+            if (!updatedData.Quality.abnormalType) updatedData.Quality.abnormalType = {
+                smellBad: false,
+                smellNotFresh: false,
+                abnormalColor: false,
+                sour: false,
+                bitter: false,
+                cloudy: false,
+                lumpy: false,
+                separation: false
+            };
 
-            updatedData.Quality.abnormalType[name.split('.').pop()!] = checked;
+            const key = name.split('.').pop() as keyof typeof updatedData.Quality.abnormalType;
+            updatedData.Quality.abnormalType[key] = checked;
 
             return updatedData;
         });
