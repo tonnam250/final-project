@@ -19,7 +19,7 @@ const FarmRawMilk = async () => {
 
         {/* Raw milk item */}
         <div className="flex flex-col justify-center items-center w-full h-full my-10 gap-8">
-          {data.map((item: { milkTankInfo: { tankId: string, personInCharge: string }, status: string }, index: number) => (
+          {data.map((item: { id: string, milkTankInfo: { tankId: string, personInCharge: string }, status: string }, index: number) => (
             <div key={index} className="flex flex-col justify-center items-center w-full md:w-1/3 h-40 gap-5 bg-white text-slate-500 shadow-xl border rounded-2xl p-5">
               <div className="flex flex-col md:flex-row justify-between items-center w-full h-1/2">
                 <span className="text-xl md:text-2xl font-semibold">Milk Tank no: <p className="font-normal inline">{item.milkTankInfo.tankId}</p></span>
