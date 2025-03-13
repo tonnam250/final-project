@@ -26,7 +26,7 @@ interface ProductLotForm {
         quantity: number;
         quantityUnit: string;
     };
-    selectMilkTank: Record<string, any>;
+    selectMilkTank: string; // Change this line
     Quality: {
         temp: number;
         tempUnit: string;
@@ -182,7 +182,7 @@ const AddProductLot = () => {
             quantity: 0,
             quantityUnit: "Ton"
         },
-        selectMilkTank: { tankId: "", quantity: 0 }, // Ensure this is initialized correctly
+        selectMilkTank: "", // Change this line
         Quality: {
             temp: 0,
             tempUnit: "Celcius",
@@ -551,7 +551,7 @@ const AddProductLot = () => {
                 {/* Select Milk Tank */}
                 <div id="section2" className={`flex flex-col items-center w-full h-full text-xl gap-8 mt-20 ${visibleSection >= 2 ? '' : 'hidden'}`}>
                     <h1 className="text-5xl font-bold">Select Milk Tank</h1>
-                    <select name="milkTank" id="milkTank" className="border rounded-full p-3 w-1/2 text-center"
+                    <select name="selectMilkTank" id="milkTank" className="border rounded-full p-3 w-1/2 text-center"
                         value={productLotForm.selectMilkTank} onChange={handleFormDataChange}
                     >
                         <option value="T1">Milk Tank 1</option>
