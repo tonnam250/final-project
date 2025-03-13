@@ -150,7 +150,8 @@ const AddProduct = () => {
 
     // ✅ ฟังก์ชัน handleFormDataChange รองรับ text, select และ checkbox
     const handleFormDataChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, type, value, checked } = event.target;
+        const { name, type, value } = event.target;
+        const checked = event.target instanceof HTMLInputElement ? event.target.checked : undefined;
         const keys = name.split(".");
 
         setFormData((prevData) => {
