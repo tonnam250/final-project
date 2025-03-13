@@ -182,7 +182,7 @@ const AddProductLot = () => {
             quantity: 0,
             quantityUnit: "Ton"
         },
-        selectMilkTank: {},
+        selectMilkTank: { tankId: "", quantity: 0 }, // Ensure this is initialized correctly
         Quality: {
             temp: 0,
             tempUnit: "Celcius",
@@ -280,12 +280,12 @@ const AddProductLot = () => {
 
             // ใช้ reduce เพื่อสร้าง object ซ้อนกันให้ครบก่อนอัปเดตค่า
             temp = keys.slice(0, -1).reduce((obj, key) => {
-                if (!obj[key]) obj[key] = {}; // ถ้า key ยังไม่มี ให้สร้าง object
-                return obj[key];
+                if (!obj[key as keyof typeof obj]) obj[key as keyof typeof obj] = {}; // ถ้า key ยังไม่มี ให้สร้าง object
+                return obj[key as keyof typeof obj];
             }, updatedData);
 
             // กำหนดค่าล่าสุดที่ตำแหน่งสุดท้าย
-            temp[keys[keys.length - 1]] = type === "checkbox" ? checked : value;
+            temp[keys[keys.length - 1] as keyof typeof temp] = type === "checkbox" ? checked : value;
 
             return updatedData;
         });
