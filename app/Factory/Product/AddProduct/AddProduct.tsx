@@ -17,6 +17,42 @@ interface GeoData {
     postalCode: number;
 }
 
+interface Nutrition {
+    quantity: number;
+    quantityUnit: string;
+    temp: number;
+    tempUnit: string;
+    pH: number;
+    fat: number;
+    protein: number;
+    calories: number;
+    totalFat: number;
+    colestoral: number;
+    sodium: number;
+    potassium: number;
+    totalCarbohydrates: number;
+    fiber: number;
+    sugar: number;
+    vitaminC: number;
+    calcium: number;
+    iron: number;
+    vitaminD: number;
+    vitaminB6: number;
+    vitaminB12: number;
+    magnesium: number;
+    abnormalType: { [key: string]: boolean }; // Update this line
+}
+
+interface FormData {
+    GeneralInfo: {
+        prodName: string;
+        category: string;
+        description: string;
+        quantity: string;
+    };
+    Nutrition: Nutrition;
+}
+
 const AddProduct = () => {
 
     // for province fetching
@@ -95,7 +131,7 @@ const AddProduct = () => {
     // end step status update function
 
     // save form Data
-    const [addProductForm, setFormData] = useState({
+    const [addProductForm, setFormData] = useState<FormData>({
         GeneralInfo: {
             prodName: "",
             category: "",
@@ -125,7 +161,7 @@ const AddProduct = () => {
             vitaminB6: 0,
             vitaminB12: 0,
             magnesium: 0,
-            abnormalType: {} // Add this line
+            abnormalType: {} // Ensure this is an object
         }
     });
 
