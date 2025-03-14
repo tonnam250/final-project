@@ -18,6 +18,17 @@ interface GeoData {
     postalCode: number;
 }
 
+interface RecipientInfo {
+    personInCharge: string;
+    location: string;
+    // Add other properties as needed
+}
+
+interface Data {
+    RecipientInfo: RecipientInfo;
+    // Add other properties as needed
+}
+
 const GeneralInfo = () => {
     const [fileNames, setFileNames] = useState<string[]>(["No file selected."]);
     const [isEditable, setIsEditable] = useState<boolean>(true);
@@ -45,6 +56,8 @@ const GeneralInfo = () => {
         lng: 76.5048004,
     });
 
+    const [data, setData] = useState<Data | null>(null);
+
     useEffect(() => {
         fetch("/data/geography.json")
             .then((res) => res.json())
@@ -54,6 +67,15 @@ const GeneralInfo = () => {
                 // ดึงจังหวัดที่ไม่ซ้ำ (ใช้ภาษาไทยให้ตรงกับ selectedProvince)
                 const provinces = Array.from(new Set(data.map((item) => item.provinceNameEn)));
                 setProvinceList(provinces);
+            })
+            .catch((err) => console.error("Fetch error:", err));
+    }, []);
+
+    useEffect(() => {
+        fetch("/data/recipient-info.json")
+            .then((res) => res.json())
+            .then((data: Data) => {
+                setData(data);
             })
             .catch((err) => console.error("Fetch error:", err));
     }, []);
@@ -358,8 +380,20 @@ const GeneralInfo = () => {
                         )}
                     </button>
                 </form>
-            </div >
-        </div >
+            </div>
+            {data && (
+                <div className="flex flex-col gap-4">
+                    <div className="flex justify-between">
+                        <p className="font-semibold">Person in charge:</p>
+                        <p>{data.RecipientInfo.personInCharge}</p>
+                    </div>
+                    <div className="flex justify-between">
+                        <p className="font-semibold">Location:</p>
+                        <p>{data.RecipientInfo.location}</p>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 };
 
