@@ -243,11 +243,11 @@ const Recieving = () => {
 
         if (typeof window !== "undefined") {
             const savedData = localStorage.getItem("LogisRecieve");
-            let parsedData = savedData ? JSON.parse(savedData) : [];
+            let parsedData: LogisRecieveData[] = savedData ? JSON.parse(savedData) : [];
 
             // Check if the current recieveStatus already exists in the array
             const currentStatus = LogisRecieve[0].GeneralInfo.recieveStatus;
-            const isStatusExist = parsedData.some(item => item.GeneralInfo.recieveStatus === currentStatus);
+            const isStatusExist = parsedData.some((item: LogisRecieveData) => item.GeneralInfo.recieveStatus === currentStatus);
 
             // If the current status doesn't exist, add the current LogisRecieve to the array
             if (!isStatusExist) {
