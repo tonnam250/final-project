@@ -18,7 +18,7 @@ const QrScannerComponent: React.FC = () => {
   return (
     <div>
       <h1>แสกน QR Code</h1>
-      <QrScanner
+      <QrScannerd
         delay={300}
         onError={handleError}
         onScan={handleScan}
