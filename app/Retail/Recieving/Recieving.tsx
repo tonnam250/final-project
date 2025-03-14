@@ -149,7 +149,8 @@ const Recieving = () => {
 
     // ✅ ฟังก์ชัน handleFormDataChange รองรับ text, select และ checkbox
     const handleFormDataChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, type, value, checked } = event.target;
+        const { name, type, value } = event.target;
+        const checked = type === "checkbox" ? (event.target as HTMLInputElement).checked : undefined;
         const keys = name.split(".");
 
         setFormData((prevData) => {
