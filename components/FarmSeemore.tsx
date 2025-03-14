@@ -6,8 +6,56 @@ interface FarmSeeMoreModalProps {
     onClose: () => void;
 }
 
+interface MilkTankInfo {
+    milkTankNo: string;
+    personInCharge: string;
+    quantity: number;
+    quantityUnit: string;
+    temp: number;
+    tempUnit: string;
+    pH: number;
+    fat: number;
+    protein: number;
+    bacteria: boolean;
+    bacteriaInfo: string;
+    contaminants: boolean;
+    contaminantInfo: string;
+    abnormalChar: boolean;
+    abnormalType: {
+        smellBad: boolean;
+        smellNotFresh: boolean;
+        abnormalColor: boolean;
+        sour: boolean;
+        bitter: boolean;
+        cloudy: boolean;
+        lumpy: boolean;
+        separation: boolean;
+    };
+}
+
+interface ShippingAddress {
+    companyName: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    areaCode: string;
+    phoneNumber: string;
+    address: string;
+    province: string;
+    district: string;
+    subDistrict: string;
+    postalCode: string;
+    location: string;
+}
+
+interface FormData {
+    farmName: string;
+    milkTankInfo: MilkTankInfo;
+    shippingAddress: ShippingAddress;
+}
+
 export default function FarmSeemore({ isOpen, onClose }: FarmSeeMoreModalProps) {
-    const [data, setData] = useState(null);
+    const [data, setData] = useState<FormData | null>(null);
 
     useEffect(() => {
         const storedData = localStorage.getItem("formData");
