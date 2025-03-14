@@ -3,6 +3,9 @@ import { QrButton } from "@/components/qr-button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 const page = async () => {
+  const onScan = (data: string) => {
+    console.log("Scanned data:", data);
+  };
 
   return (
     <div className="flex flex-col w-full h-full">
@@ -40,7 +43,7 @@ const page = async () => {
                   <path fill="currentColor" d="M23 19h-4v4h-6V13h1h-1v6h2v2h2v-6h-2v-2h-1h3v2h2v2h2v-4h2zm0 2v2h-2v-2z" />
                 </svg>
               </a> */}
-              <QrButton />
+              <QrButton onScan={onScan} />
             </div>
           </div>
           {/* end Welcome text */}
