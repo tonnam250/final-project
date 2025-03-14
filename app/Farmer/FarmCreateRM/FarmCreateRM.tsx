@@ -225,7 +225,7 @@ const FarmCreateRM = () => {
     }, [formData]);
 
     // ✅ ฟังก์ชัน handleFormDataChange รองรับ text, select และ checkbox
-    const handleFormDataChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const handleFormDataChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, type, value } = event.target;
         const checked = (event.target as HTMLInputElement).checked;
         const keys = name.split(".");
