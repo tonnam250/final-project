@@ -111,11 +111,19 @@ const FarmGeneralInfo = () => {
         formData.append("subDistrict", selectedSubDistrict);
     };
 
+    const handleButtonClick = () => {
+        if (isEditable) {
+            document.getElementById("farmGeneralInfoForm")?.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
+        } else {
+            handleSaveEditToggle();
+        }
+    };
+
     return (
         <div className="flex flex-col text-center w-full justify-center items-center text- h-full pt-20">
             <h1 className="text-5xl md:text-4xl font-bold my-4 md:my-8">General Information</h1>
             <div className="flex h-full w-11/12 md:w-8/12 h-11/12 p-4 md:p-5 shadow-xl justify-center items-center border rounded-2xl m-2 md:m-5">
-                <form action="" className="flex flex-col gap-4 w-full" onSubmit={handleSubmit}>
+                <form id="farmGeneralInfoForm" action="" className="flex flex-col gap-4 w-full" onSubmit={handleSubmit}>
                     <div className="flex flex-col md:flex-row gap-4 md:gap-5 text-start w-full">
 
                         {/* first name */}
@@ -292,7 +300,7 @@ const FarmGeneralInfo = () => {
                     <button
                         type="button"
                         className="flex items-center justify-center text- md:text-xl bg-[#abc32f] hover: w-full md:w-1/6 rounded-full p-2 px-3 text-white self-center"
-                        onClick={isEditable ? handleSubmit : handleSaveEditToggle}
+                        onClick={handleButtonClick}
                     >
                         {isEditable ? "Save" : "Edit"}
                         {isEditable ? (
