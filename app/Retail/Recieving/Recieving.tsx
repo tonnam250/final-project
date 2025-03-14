@@ -189,7 +189,7 @@ const Recieving = () => {
 
         setFormData((prevData) => {
             const updatedData = { ...prevData };
-            let temp = updatedData.Quantity.abnormalType;
+            let temp: Record<string, boolean> = updatedData.Quantity.abnormalType;
 
             temp[name.split('.').pop()!] = checked;
 
