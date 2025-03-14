@@ -155,10 +155,10 @@ const Recieving = () => {
 
         setFormData((prevData) => {
             const updatedData = { ...prevData }; // Clone ข้อมูลเดิม
-            let temp = updatedData;
+            let temp: any = updatedData;
 
             for (let i = 0; i < keys.length - 1; i++) {
-                temp = temp[keys[i]];
+                temp = temp[keys[i]] as any;
             }
 
             // ถ้าเป็น checkbox ให้ใช้ checked ถ้าไม่ใช่ให้ใช้ value
