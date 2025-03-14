@@ -129,6 +129,17 @@ const GeneralInfo = () => {
         // });
     };
 
+    const handleButtonClick = () => {
+        if (isEditable) {
+            const form = document.querySelector("form");
+            if (form) {
+                form.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
+            }
+        } else {
+            handleSaveEditToggle();
+        }
+    };
+
     // const fetchCoordinates = async (address: string) => {
     //     const response = await fetch(
     //         `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_API}`
@@ -333,7 +344,7 @@ const GeneralInfo = () => {
                     <button
                         type="button"
                         className="flex items-center justify-center text- md:text-xl bg-[#D23D2D] hover:bg-[#F8EECB] hover:text-[#D23D2D] w-full md:w-1/6 rounded-full p-2 px-3 text-white self-center"
-                        onClick={isEditable ? handleSubmit : handleSaveEditToggle}
+                        onClick={handleButtonClick}
                     >
                         {isEditable ? "Save" : "Edit"}
                         {isEditable ? (
