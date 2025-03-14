@@ -179,7 +179,7 @@ const Recieving = () => {
     }, [LogisRecieve]);
 
     // ✅ ฟังก์ชัน handleLogisRecieveChange รองรับ text, select และ checkbox
-    const handleLogisRecieveChange = useCallback((event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, index: number) => {
+    const handleLogisRecieveChange = useCallback((event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>, index: number) => {
         const { name, type, value } = event.target;
         const checked = (event.target as HTMLInputElement).checked; // Narrow down the type for checked
         const keys = name.split(".");
