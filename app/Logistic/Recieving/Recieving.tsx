@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface GeoData {
     id: number;
@@ -30,6 +30,8 @@ const Recieving = () => {
     const [selectedProvince, setSelectedProvince] = useState<string>("");
     const [selectedDistrict, setSelectedDistrict] = useState<string>("");
     const [selectedSubDistrict, setSelectedSubDistrict] = useState<string>("");
+    const searchParams = useSearchParams(); // ✅ ใช้ useSearchParams เพื่อดึงค่าจาก URL
+    const trackingIdFromURL = searchParams.get("id") || ""; // ✅ ดึงค่า id ถ้าไม่มีให้เป็น
 
     useEffect(() => {
         fetch("/data/geography.json")
@@ -76,114 +78,143 @@ const Recieving = () => {
     const [showShippingAddress, setShowShippingAddress] = useState<boolean>(false);
     const shippingAddressRef = useRef<HTMLDivElement>(null);
 
-    const handleNextClick = useCallback(() => {
-        setShowShippingAddress(true);
-        setTimeout(() => {
-            shippingAddressRef.current?.scrollIntoView({ behavior: "smooth" });
-        }, 100);
-    }, []);
-
-    // save form Data
-    const [LogisRecieve, setLogisRecieve] = useState([{
-        GeneralInfo: {
-            recieveStatus: "", // moved here
+// ✅ ตั้งค่า state ให้มีโครงสร้างที่ถูกต้อง
+const [LogisRecieve, setLogisRecieve] = useState([
+    {
+        trackingId: "", // ต้องเก็บค่าของ tracking ID
+        checkpoints: {
+            before: [],
+            during: [],
+            after: [],
+        },
+        GeneralInfo: { // ใช้เฉพาะใน UI
+            recieveStatus: "",
             farmName: "",
             milkTankNo: "",
-            personInCharge: ""
+            personInCharge: "",
         },
-        ProductDetail: {
-            deliverTime: "",
-            recieveTime: "",
-            quantity: 0,
-            quantityUnit: "Ton",
-            temp: 0,
-            tempUnit: "Celcius",
-            companyName: "",
-            firstName: "",
-            lastName: "",
-            email: "",
-            areaCode: "+66",
-            phoneNumber: "",
-            address: "",
-            province: "",
-            district: "",
-            subDistrict: "",
-            postalCode: "",
-            location: ""
-        },
-    }]);
+    },
+]);
+ // ✅ ใช้ useEffect เพื่อตั้งค่า trackingId หลังจากที่โหลดข้อมูลเสร็จ
+ useEffect(() => {
+    if (trackingIdFromURL) {
+        setLogisRecieve((prevData) => {
+            const updatedData = [...prevData];
+            updatedData[0].trackingId = trackingIdFromURL;
+            return updatedData;
+        });
+    }
+}, [trackingIdFromURL]); // ✅ ทำงานเฉพาะเมื่อ URL มีการเปลี่ยนค่า id
 
-    // ✅ ควบคุมการแสดงผลของ abnormalType
-    const [showAbnormalInfo, setShowAbnormalInfo] = useState(false);
+ // ✅ อัปเดต handleNextClick ให้ตรวจสอบ recieveStatus ก่อน
+ const handleNextClick = useCallback(() => {
+    if (!LogisRecieve[0].GeneralInfo.recieveStatus) {
+        alert("Please select a Receiving Status before proceeding.");
+        return;
+    }
+    setShowShippingAddress(true);
+    setTimeout(() => {
+        shippingAddressRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+}, [LogisRecieve]); // เพิ่ม Dependency
 
-    // ✅ โหลดข้อมูลจาก localStorage เมื่อหน้าเว็บโหลด
-    useEffect(() => {
-        if (typeof window !== "undefined") {
-            const savedData = localStorage.getItem("LogisRecieve");
-            if (savedData) {
+// ✅ โหลดข้อมูลจาก localStorage เมื่อหน้าเว็บโหลด
+useEffect(() => {
+    if (typeof window !== "undefined") {
+        const savedData = localStorage.getItem("LogisRecieve");
+        if (savedData) {
+            try {
                 const parsedData = JSON.parse(savedData);
-                if (parsedData[0].GeneralInfo && parsedData[0].GeneralInfo.recieveStatus) {
-                    setLogisRecieve(parsedData);
-                } else {
-                    // Move recieveStatus to GeneralInfo if it exists outside
-                    const updatedData = {
-                        ...parsedData,
-                        GeneralInfo: {
-                            ...parsedData[0].GeneralInfo,
-                            recieveStatus: parsedData[0].recieveStatus || ""
+                if (
+                    parsedData.length &&
+                    parsedData[0].trackingId !== undefined &&
+                    parsedData[0].checkpoints !== undefined
+                ) {
+                    setLogisRecieve((prevData) => {
+                        const updatedData = [...parsedData];
+
+                        // ✅ กำหนดค่าเริ่มต้นให้ recieveStatus ถ้ามันว่าง
+                        if (!updatedData[0].GeneralInfo.recieveStatus) {
+                            updatedData[0].GeneralInfo.recieveStatus = "Before";
                         }
-                    };
-                    setLogisRecieve([updatedData]);
-                    localStorage.setItem("LogisRecieve", JSON.stringify([updatedData]));
+
+                        return updatedData;
+                    });
                 }
+            } catch (error) {
+                console.error("❌ Error parsing LocalStorage data:", error);
             }
         }
-    }, []);
+    }
+}, []);
 
-    // ✅ บันทึกข้อมูลลง localStorage ทุกครั้งที่ LogisRecieve เปลี่ยน
-    useEffect(() => {
-        if (typeof window !== "undefined") {
-            localStorage.setItem("LogisRecieve", JSON.stringify(LogisRecieve));
-        }
-    }, [LogisRecieve]);
 
-    // ✅ ฟังก์ชัน handleLogisRecieveChange รองรับ text, select และ checkbox
-    const handleLogisRecieveChange = useCallback((event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, index: number) => {
+// ✅ บันทึกข้อมูลลง localStorage ทุกครั้งที่ LogisRecieve เปลี่ยน
+useEffect(() => {
+    if (typeof window !== "undefined" && LogisRecieve.length > 0 && LogisRecieve[0].trackingId) {
+        console.log("📌 Saving to LocalStorage:", LogisRecieve);
+        localStorage.setItem("LogisRecieve", JSON.stringify(LogisRecieve));
+    }
+}, [LogisRecieve]);
+
+useEffect(() => {
+    console.log("✅ Current recieveStatus:", LogisRecieve[0].GeneralInfo.recieveStatus);
+}, [LogisRecieve[0].GeneralInfo.recieveStatus]);
+
+
+// ✅ ฟังก์ชัน handleLogisRecieveChange รองรับ text, select และ checkbox
+const handleLogisRecieveChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, type, value, checked } = event.target;
         const keys = name.split(".");
 
+        console.log(`🛠 Before Update: ${name} ->`, LogisRecieve[0]?.ProductDetail); // ✅ Log ก่อนอัปเดต
+
         setLogisRecieve((prevData) => {
-            const updatedData = [...prevData]; // Clone the array
-            let temp = updatedData[index]; // Access the specific object in the array
+            return prevData.map((entry, index) => {
+                if (index === 0) {  // อัปเดตเฉพาะรายการแรก
+                    let temp: any = { ...entry };
+                    let target = temp;
+        
+                    for (let i = 0; i < keys.length - 1; i++) {
+                        if (!target[keys[i]]) {
+                            target[keys[i]] = {};
+                        }
+                        target = target[keys[i]];
+                    }
+        
+                    target[keys[keys.length - 1]] = type === "checkbox" ? checked : value;
 
-            for (let i = 0; i < keys.length - 1; i++) {
-                if (!temp[keys[i]]) {
-                    temp[keys[i]] = {}; // Ensure the nested object exists
+                    console.log(`🔄 Updated: ${name} ->`, target[keys[keys.length - 1]]); // ✅ Log หลังอัปเดต
+
+                    return temp;
                 }
-                temp = temp[keys[i]];
-            }
-
-            // If it's a checkbox, use checked, otherwise use value
-            temp[keys[keys.length - 1]] = type === "checkbox" ? checked : value;
-
-            // Update province, district, and subdistrict
-            if (name === "ProductDetail.province") {
-                setSelectedProvince(value);
-            } else if (name === "ProductDetail.district") {
-                setSelectedDistrict(value);
-            } else if (name === "ProductDetail.subDistrict") {
-                setSelectedSubDistrict(value);
-            }
-
-            return updatedData;
+                return entry;
+            });
         });
-    }, []);
+
+        if (name === "ProductDetail.province") {
+            setSelectedProvince(value);
+            setSelectedDistrict(""); 
+            setSelectedSubDistrict(""); 
+        } else if (name === "ProductDetail.district") {
+            setSelectedDistrict(value);
+            setSelectedSubDistrict("");
+        } else if (name === "ProductDetail.subDistrict") {
+            setSelectedSubDistrict(value);
+        }
+    },
+    []
+);
+
+
 
     // ✅ ฟังก์ชัน handleAbnormalChange → เช็ค abnormalChar และโชว์ abnormalType
     const handleAbnormalChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        handleLogisRecieveChange(event, 0);
+        handleLogisRecieveChange(event);
         setShowAbnormalInfo(event.target.checked);
     };
+    
 
     // ✅ ฟังก์ช์น handleNestedCheckboxChange สำหรับ abnormalType
     const handleNestedCheckboxChange = useCallback((event: React.ChangeEvent<HTMLInputElement>, index: number) => {
@@ -205,49 +236,130 @@ const Recieving = () => {
         });
     }, []);
 
-    // ✅ ฟังก์ช์น Submit → บันทึกข้อมูลลง localStorage
-    const saveToLocalStorage = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
+   // ✅ ฟังก์ช์น Submit → บันทึกข้อมูลลง localStorage
+const saveToLocalStorage = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
-        if (typeof window !== "undefined") {
-            const savedData = localStorage.getItem("LogisRecieve");
-            let parsedData = savedData ? JSON.parse(savedData) : [];
+    if (typeof window !== "undefined") {
+        localStorage.setItem("LogisRecieve", JSON.stringify(LogisRecieve));
+        alert("✅ Information Saved!");
+    }
+};
 
-            // Check if the current recieveStatus already exists in the array
-            const currentStatus = LogisRecieve[0].GeneralInfo.recieveStatus;
-            const isStatusExist = parsedData.some(item => item.GeneralInfo.recieveStatus === currentStatus);
+// ✅ ฟังก์ชัน Save & Navigate
+const saveToLocalStorageAndNavigate = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
 
-            // If the current status doesn't exist, add the current LogisRecieve to the array
-            if (!isStatusExist) {
-                parsedData.push(LogisRecieve[0]);
+    if (typeof window !== "undefined") {
+        const savedData = localStorage.getItem("LogisRecieve");
+        let parsedData = savedData ? JSON.parse(savedData) : [];
+
+        const trackingId = LogisRecieve[0].trackingId;
+        const currentStatus = LogisRecieve[0].GeneralInfo.recieveStatus.toLowerCase(); // ✅ ใช้ตัวพิมพ์เล็ก
+        const currentData = { ...LogisRecieve[0].ProductDetail }; // ✅ ข้อมูลที่ต้องเก็บใน checkpoints
+
+        if (!trackingId) {
+            alert("❌ Tracking ID is missing!");
+            return;
+        }
+
+        if (!currentStatus) {
+            alert("❌ Please select a Receiving Status before proceeding.");
+            return;
+        }
+
+        // ✅ ค้นหา entry ที่มี trackingId นี้ใน localStorage
+        const existingEntryIndex = parsedData.findIndex((item: any) => item.trackingId === trackingId);
+
+        if (existingEntryIndex !== -1) {
+            // ✅ ถ้ามี trackingId อยู่แล้ว ให้ใช้ข้อมูลเก่า
+            let existingEntry = parsedData[existingEntryIndex];
+
+            if (!existingEntry.checkpoints[currentStatus]) {
+                existingEntry.checkpoints[currentStatus] = []; // ✅ สร้าง array ถ้ายังไม่มี
             }
 
-            localStorage.setItem("LogisRecieve", JSON.stringify(parsedData));
-            alert("Information Saved!");
-            console.log(parsedData);
-        }
-    };
+            // ✅ ตรวจสอบก่อนเพิ่มข้อมูลใหม่ ว่าซ้ำหรือไม่
+            const isDuplicate = existingEntry.checkpoints[currentStatus].some(
+                (entry: any) =>
+                    JSON.stringify(entry) === JSON.stringify(currentData)
+            );
 
-    const saveToLocalStorageAndNavigate = (event: React.MouseEvent<HTMLButtonElement>) => {
-        event.preventDefault();
-
-        if (typeof window !== "undefined") {
-            const savedData = localStorage.getItem("LogisRecieve");
-            let parsedData = savedData ? JSON.parse(savedData) : [];
-
-            // Check if the current recieveStatus already exists in the array
-            const currentStatus = LogisRecieve[0].GeneralInfo.recieveStatus;
-            const isStatusExist = parsedData.some(item => item.GeneralInfo.recieveStatus === currentStatus);
-
-            // If the current status doesn't exist, add the current LogisRecieve to the array
-            if (!isStatusExist) {
-                parsedData.push(LogisRecieve[0]);
+            if (!isDuplicate) {
+                existingEntry.checkpoints[currentStatus].push(currentData);
             }
 
-            localStorage.setItem("LogisRecieve", JSON.stringify(parsedData));
-            router.push('/Logistic/Recieving/CheckDetails');
+            parsedData[existingEntryIndex] = existingEntry;
+        } else {
+            // ✅ ถ้ายังไม่มี trackingId นี้ ให้เพิ่มเป็น entry ใหม่
+            const newEntry = {
+                trackingId,
+                checkpoints: {
+                    before: [],
+                    during: [],
+                    after: [],
+                },
+                GeneralInfo: LogisRecieve[0].GeneralInfo, // ✅ ข้อมูล UI ที่ต้องใช้
+            };
+
+            newEntry.checkpoints[currentStatus].push(currentData); // ✅ บันทึกค่าใหม่
+            parsedData.push(newEntry);
         }
-    };
+
+        // ✅ บันทึกข้อมูลใหม่ลง localStorage
+        localStorage.setItem("LogisRecieve", JSON.stringify(parsedData));
+
+        // ✅ Log ตรวจสอบค่าที่ถูกบันทึก
+        console.log("✅ บันทึกข้อมูลลง LocalStorage:", JSON.stringify(parsedData, null, 2));
+
+        // ✅ ไปยังหน้าถัดไป
+        router.push("/Logistic/Recieving/CheckDetails");
+    }
+};
+
+
+
+// ✅ ฟังก์ชัน Save & Next Status (ไม่ไป CheckDetails ทันที)
+const handleNextStatus = () => {
+    const currentStatus = LogisRecieve[0].GeneralInfo.recieveStatus.toLowerCase();
+    const nextStatus = currentStatus === "before" ? "During" : currentStatus === "during" ? "After" : null;
+
+    if (!nextStatus) {
+        alert("✅ คุณได้กรอกครบทุกสถานะแล้ว! กรุณากด Submit");
+        return;
+    }
+
+    setLogisRecieve((prevData) => {
+        const updatedData = [...prevData];
+        const currentData = { ...updatedData[0].ProductDetail };
+
+        // ✅ เพิ่มข้อมูลลง checkpoints
+        updatedData[0].checkpoints[currentStatus].push(currentData);
+        
+        if (nextStatus === "After") {
+            updatedData[0].checkpoints["after"].push(currentData); // ✅ เพิ่มไปยัง After ด้วย
+        }
+
+        // ✅ อัปเดต `recieveStatus` เป็นสถานะถัดไป
+        updatedData[0].GeneralInfo.recieveStatus = nextStatus;
+
+        console.log(`🔄 Updated recieveStatus: ${nextStatus}`);
+        console.log(`📌 Checkpoints AFTER Update:`, JSON.stringify(updatedData[0].checkpoints, null, 2));
+
+        // ✅ บันทึกข้อมูลลง LocalStorage **ทันที** ก่อนเปลี่ยนหน้า
+        localStorage.setItem("LogisRecieve", JSON.stringify(updatedData));
+
+        return updatedData;
+    });
+};
+
+
+
+// ✅ ฟังก์ชัน Submit & ไปหน้า CheckDetails (เมื่อถึง After)
+const submitAndNavigate = () => {
+    router.push("/Logistic/Recieving/CheckDetails");
+};
+
 
     return (
         <div className="flex flex-col justify-center items-center w-full min-h-screen">
@@ -528,12 +640,18 @@ const Recieving = () => {
                         </div>
 
                         <button
-                            type="submit"
+                            type="button"
                             className="flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8]"
-                            onClick={saveToLocalStorageAndNavigate}
+                            onClick={
+                                LogisRecieve[0].GeneralInfo.recieveStatus === "After"
+                                    ? submitAndNavigate  // ถ้าเป็น After → ไป CheckDetails
+                                    : handleNextStatus   // ถ้ายังไม่ใช่ After → เปลี่ยนเป็นสถานะถัดไป
+                            }
                         >
-                            Next
+                            {LogisRecieve[0].GeneralInfo.recieveStatus === "After" ? "Submit & CheckDetails" : "Next"}
                         </button>
+
+
                     </div>
                 )}
             </form>

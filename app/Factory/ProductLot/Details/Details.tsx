@@ -12,7 +12,7 @@ const CheckDetails = () => {
 
     const [data, setData] = useState({
         GeneralInfo: {},
-        selectMilkTank: {},
+        selectMilkTank: { tankIds: [] },  // ✅ ตั้งค่าเริ่มต้น
         Quality: {},
         nutrition: {},
         shippingAddresses: []
@@ -25,16 +25,23 @@ const CheckDetails = () => {
         }
 
         const getProductLotDetails = async () => {
-            console.log("📡 Fetching product lot details for:", lotId); // ✅ Debug log
+            console.log("📡 Fetching product lot details for:", lotId);
             const productLotData = await fetchProductLotDetails(lotId);
+            console.log("📌 Debug - API Response:", productLotData);  // ✅ Debug API Response
+
             if (productLotData) {
-                setData(productLotData);
+                setData({
+                    ...productLotData,
+                    selectMilkTank: {
+                        ...productLotData.selectMilkTank,
+                        tankIds: productLotData.selectMilkTank?.tankIds || []  // ✅ ป้องกัน `undefined`
+                    }
+                });
             }
         };
 
-        getProductLotDetails(); // ✅ เรียก API ดึงรายละเอียด Product Lot
+        getProductLotDetails();
     }, [lotId]);
-
     return (
         <div className="flex flex-col w-full h-full min-h-screen items-center justify-center pt-24 bg-gray-100 text-black">
             <h1 className="text-5xl font-bold mt-10 text-black">Product Lot Detail</h1>
@@ -251,71 +258,78 @@ const CheckDetails = () => {
                         </div>
 
                         {/* Shipping Address */}
-                        {data.shippingAddresses && data.shippingAddresses.length > 0 ? (
-                            data.shippingAddresses.map((address, index) => (
-                                <div key={index} className="flex flex-col gap-4 md:gap-10 w-full h-fit bg-white border p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
-                                    <h1 className="text-xl md:text-3xl font-bold text-center text-black">Shipping Address {index + 1}</h1>
-                                    <div className="flex flex-col space-y-2 gap-3 text-gray-600">
-                                        <div className="flex justify-between">
-                                            <p className="font-semibold">Company Name:</p>
-                                            <p>{address.companyName}</p>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <p className="font-semibold">First Name:</p>
-                                            <p>{address.firstName}</p>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <p className="font-semibold">Last Name:</p>
-                                            <p>{address.lastName}</p>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <p className="font-semibold">Email:</p>
-                                            <p>{address.email}</p>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <p className="font-semibold">Phone Number:</p>
-                                            <p>{address.areaCode} {address.phoneNumber}</p>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <p className="font-semibold">Address:</p>
-                                            <p>{address.address}</p>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <p className="font-semibold">Province:</p>
-                                            <p>{address.province}</p>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <p className="font-semibold">District:</p>
-                                            <p>{address.district}</p>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <p className="font-semibold">Sub-District:</p>
-                                            <p>{address.subDistrict}</p>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <p className="font-semibold">Postal Code:</p>
-                                            <p>{address.postalCode}</p>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <p className="font-semibold">Location:</p>
-                                            <p>{address.location}</p>
+                            {data.shippingAddresses && data.shippingAddresses.length > 0 ? (
+                                data.shippingAddresses.map((address, index) => (
+                                    <div key={index} className="flex flex-col gap-4 md:gap-10 w-full h-fit bg-white border p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
+                                        <h1 className="text-xl md:text-3xl font-bold text-center text-black">Shipping Address {index + 1}</h1>
+                                        <div className="flex flex-col space-y-2 gap-3 text-gray-600">
+                                            <div className="flex justify-between">
+                                                <p className="font-semibold">Company Name:</p>
+                                                <p>{address.qrCodeData?.retailer?.companyName || "N/A"}</p>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <p className="font-semibold">First Name:</p>
+                                                <p>{address.qrCodeData?.retailer?.firstName}</p>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <p className="font-semibold">Last Name:</p>
+                                                <p>{address.qrCodeData?.retailer?.lastName}</p>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <p className="font-semibold">Email:</p>
+                                                <p>{address.qrCodeData?.retailer?.email}</p>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <p className="font-semibold">Phone Number:</p>
+                                                <p>{address.qrCodeData?.retailer?.areaCode} {address.qrCodeData?.retailer?.phoneNumber}</p>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <p className="font-semibold">Address:</p>
+                                                <p>{address.qrCodeData?.retailer?.address || "N/A"}</p>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <p className="font-semibold">Province:</p>
+                                                <p>{address.qrCodeData?.retailer?.province}</p>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <p className="font-semibold">District:</p>
+                                                <p>{address.qrCodeData?.retailer?.district}</p>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <p className="font-semibold">Sub-District:</p>
+                                                <p>{address.qrCodeData?.retailer?.subDistrict}</p>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <p className="font-semibold">Postal Code:</p>
+                                                <p>{address.qrCodeData?.retailer?.postalCode}</p>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <p className="font-semibold">Location:</p>
+                                                <p>{address.qrCodeData?.retailer?.location}</p>
+                                            </div>
+
+                                            {/* ✅ แสดง QR Code ใต้ข้อมูล Shipping Address */}
+                                            {address.qrCodeImg && (
+                                                <div className="flex flex-col items-center justify-center mt-5">
+                                                    <img src={address.qrCodeImg} alt={`QR Code for ${address.trackingId}`} className="w-32 h-32 object-contain"/>
+                                                    <p className="text-center font-semibold text-gray-700 mt-2">Tracking ID: {address.trackingId}</p>
+                                                </div>
+                                            )}
+
                                         </div>
                                     </div>
+                                ))
+                            ) : (
+                                <div className="flex flex-col gap-4 md:gap-10 w-full h-fit bg-white border p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
+                                    <h1 className="text-xl md:text-3xl font-bold text-center text-black">Shipping Address</h1>
+                                    <p className="text-gray-600">No shipping addresses available.</p>
                                 </div>
-                            ))
-                        ) : (
-                            <div className="flex flex-col gap-4 md:gap-10 w-full h-fit bg-white border p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
-                                <h1 className="text-xl md:text-3xl font-bold text-center text-black">Shipping Address</h1>
-                                <p className="text-gray-600">No shipping addresses available.</p>
-                            </div>
-                        )}
+                            )}
                     </div>
                 </div>
             )}
 
-            <div className="flex justify-center items-center w-full h-full gap-5 mt-10 px-8">
-                <h1 className="text-5xl">QR code Section</h1>
-            </div>
+            
         </div>
     );
 };

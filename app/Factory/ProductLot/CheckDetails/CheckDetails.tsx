@@ -34,16 +34,19 @@ const CheckDetails = () => {
                     quality: data.Quality,
                     nutrition: data.nutrition,
                 },
+                shippingAddresses: data.shippingAddresses || [], // ✅ เพิ่ม Shipping Addresses
             };
-
-            console.log("📌 Sending data:", requestData); // Debugging log
-
+    
+            console.log("📌 Sending data to Backend:", JSON.stringify(requestData, null, 2)); // Debugging log
+    
             // ✅ เรียก API
             const response = await createProductLot(requestData);
-
+    
             if (response.success) {
                 alert("Product Lot Created Successfully!");
-                router.push('/Factory/ProductLot/Details');
+    
+                // ✅ ส่งไปที่หน้ารายละเอียด พร้อม `lotId` และ `productId`
+                router.push(`/Factory/ProductLot/Details?lotId=${response.lotId}`);
             } else {
                 alert(`Error: ${response.message}`);
             }
@@ -51,6 +54,8 @@ const CheckDetails = () => {
             alert("An unexpected error occurred.");
         }
     };
+    
+    
 
     // Step status update function
     const [showShippingAddress, setShowShippingAddress] = useState<boolean>(false);

@@ -2,23 +2,73 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { updateLogisticsCheckpoint } from "@/services/trackingService"; // ✅ เชื่อม API
 
 const CheckDetails = () => {
     const [data, setData] = useState<any[]>([]);
     const router = useRouter();
+    const [selectedStatus, setSelectedStatus] = useState<"before" | "during" | "after">("before"); // ✅ State เลือกสถานะ
 
     useEffect(() => {
         const storedData = localStorage.getItem("LogisRecieve");
+    
         if (storedData) {
-            setData(JSON.parse(storedData));
+            try {
+                const parsedData = JSON.parse(storedData);
+                setData(parsedData);
+    
+                console.log("✅ Loaded from LocalStorage:", parsedData);
+            } catch (error) {
+                console.error("❌ Error parsing LocalStorage data:", error);
+            }
+        } else {
+            console.warn("⚠️ No data found in LocalStorage.");
         }
     }, []);
 
-    const handleSubmit = () => {
-        router.push("/Logistic/Recieving/Details");
-        alert("Submitted successfully!");
-        // localStorage.clear(); // Clear the form data in localStorage after submission
+    const handleSubmit = async () => {
+        if (data.length === 0) {
+            alert("❌ No data to submit.");
+            return;
+        }
+    
+        const trackingId = data[0]?.trackingId;
+        if (!trackingId) {
+            alert("❌ Missing Tracking ID.");
+            return;
+        }
+    
+        // ✅ แปลงค่าที่เป็น string → number ก่อนส่งไป API
+        const parseNumericFields = (entry: any) => ({
+            ...entry,
+            quantity: entry.quantity ? Number(entry.quantity) : 0, // ✅ Convert to number
+            temp: entry.temp ? Number(entry.temp) : 0, // ✅ Convert to number
+            deliverTime: entry.deliverTime || "", // ✅ เวลายังใช้ string ได้
+            recieveTime: entry.recieveTime || "", 
+        });
+    
+        const checkpoints = {
+            before: data[0]?.checkpoints?.before?.map(parseNumericFields) || [],
+            during: data[0]?.checkpoints?.during?.map(parseNumericFields) || [],
+            after: data[0]?.checkpoints?.after?.map(parseNumericFields) || [],
+        };
+    
+        console.log("📡 Sending to API:", { trackingId, checkpoints });
+    
+        try {
+            const response = await updateLogisticsCheckpoint(trackingId, checkpoints);
+            if (response) {
+                alert("✅ Submitted successfully!");
+                router.push("/Logistic/Recieving/Details");
+            } else {
+                alert("❌ Failed to submit data.");
+            }
+        } catch (error) {
+            console.error("❌ Error updating logistics checkpoint:", error);
+            alert("❌ API request failed.");
+        }
     };
+    
 
     const [showShippingAddress, setShowShippingAddress] = useState<boolean>(false);
     const shippingAddressRef = useRef<HTMLDivElement>(null);
@@ -107,6 +157,21 @@ const CheckDetails = () => {
                 </div>
             </div>
             {/* End Detail Status */}
+            {/* 🔹 ปุ่มเลือกสถานะ */}
+            <div className="flex gap-4 mb-6">
+                {["before", "during", "after"].map((status) => (
+                    <button
+                        key={status}
+                        onClick={() => setSelectedStatus(status as "before" | "during" | "after")}
+                        className={`p-2 px-5 rounded-full text-lg font-semibold shadow-md transition ${
+                            selectedStatus === status ? "bg-emerald-500 text-white" : "bg-gray-200 text-gray-700"
+                        }`}
+                    >
+                        {status.charAt(0).toUpperCase() + status.slice(1)}
+                    </button>
+                ))}
+            </div>
+
 
             {data.length > 0 && data.map((item, index) => (
                 <div key={index} className="flex flex-col md:flex-row justify-between gap-10 w-full p-4 md:p-14">

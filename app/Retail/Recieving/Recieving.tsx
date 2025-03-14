@@ -18,60 +18,89 @@ interface GeoData {
 }
 
 const Recieving = () => {
+    const router = useRouter();
 
-    // for province fetching
+    // ✅ ดึงข้อมูลจาก LocalStorage หรือใช้ค่าเริ่มต้น
+    const [retailerRecieve, setRetailerRecieve] = useState(() => {
+        if (typeof window !== "undefined") {
+            const savedData = localStorage.getItem("retailerRecieve");
+            return savedData ? JSON.parse(savedData) : {
+                pickupTime: "",
+                deliveryTime: "",
+                quantity: 0,
+                quantityUnit: "Crate",
+                temperature: 0,
+                temperatureUnit: "Celcius",
+                companyName: "",
+                firstName: "",
+                lastName: "",
+                email: "",
+                phoneNumber: "",
+                address: "",
+                province: "",
+                district: "",
+                subDistrict: "",
+                postalCode: "",
+                location: ""
+            };
+        }
+        return {};
+    });
+
+    // ✅ บันทึกลง LocalStorage เมื่อมีการเปลี่ยนแปลงข้อมูล
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            localStorage.setItem("retailerRecieve", JSON.stringify(retailerRecieve));
+        }
+    }, [retailerRecieve]);
+
+    // ✅ อัปเดตข้อมูลใน retailerRecieve
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = event.target;
+        setRetailerRecieve((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    // ✅ ดึงข้อมูลภูมิศาสตร์ (Province/District/Subdistrict)
     const [geoData, setGeoData] = useState<GeoData[]>([]);
     const [provinceList, setProvinceList] = useState<string[]>([]);
     const [districtList, setDistrictList] = useState<string[]>([]);
     const [subDistrictList, setSubDistrictList] = useState<string[]>([]);
-
-    const [selectedProvince, setSelectedProvince] = useState<string>("");
-    const [selectedDistrict, setSelectedDistrict] = useState<string>("");
-    const [selectedSubDistrict, setSelectedSubDistrict] = useState<string>("");
 
     useEffect(() => {
         fetch("/data/geography.json")
             .then((res) => res.json())
             .then((data: GeoData[]) => {
                 setGeoData(data);
-
-                // ดึงจังหวัดที่ไม่ซ้ำ (ใช้ภาษาไทยให้ตรงกับ selectedProvince)
-                const provinces = Array.from(new Set(data.map((item) => item.provinceNameEn)));
-                setProvinceList(provinces);
+                setProvinceList(Array.from(new Set(data.map((item) => item.provinceNameEn))));
             })
             .catch((err) => console.error("Fetch error:", err));
     }, []);
 
     useEffect(() => {
-        if (selectedProvince) {
-            const filteredDistricts = Array.from(
-                new Set(
-                    geoData.filter((item) => item.provinceNameEn === selectedProvince).map((item) => item.districtNameEn)
-                )
+        if (retailerRecieve.province) {
+            setDistrictList(
+                Array.from(new Set(geoData.filter((item) => item.provinceNameEn === retailerRecieve.province)
+                    .map((item) => item.districtNameEn)))
             );
-
-            setDistrictList(filteredDistricts);
-            setSelectedDistrict("");
+            setRetailerRecieve((prev) => ({ ...prev, district: "", subDistrict: "" }));
             setSubDistrictList([]);
-            setSelectedSubDistrict("");
         }
-    }, [selectedProvince]);
+    }, [retailerRecieve.province]);
 
     useEffect(() => {
-        if (selectedDistrict) {
-            const filteredSubDistricts = Array.from(
-                new Set(
-                    geoData.filter((item) => item.districtNameEn === selectedDistrict).map((item) => item.subdistrictNameEn)
-                )
+        if (retailerRecieve.district) {
+            setSubDistrictList(
+                Array.from(new Set(geoData.filter((item) => item.districtNameEn === retailerRecieve.district)
+                    .map((item) => item.subdistrictNameEn)))
             );
-
-            setSubDistrictList(filteredSubDistricts);
-            setSelectedSubDistrict("");
+            setRetailerRecieve((prev) => ({ ...prev, subDistrict: "" }));
         }
-    }, [selectedDistrict]);
-    // end province fetching function
+    }, [retailerRecieve.district]);
 
-    // Step status update function
+    // ✅ จัดการขั้นตอนของ UI (Step Status)
     const [showShippingAddress, setShowShippingAddress] = useState<boolean>(false);
     const shippingAddressRef = useRef<HTMLDivElement>(null);
     const [stepStatus, setStepStatus] = useState({
@@ -90,124 +119,22 @@ const Recieving = () => {
 
         setTimeout(() => {
             shippingAddressRef.current?.scrollIntoView({ behavior: "smooth" });
-        }, 100); // Delay to ensure the section is rendered
-    };
-    // end step status update function
-
-    // save form Data
-    const [recievedForm, setFormData] = useState({
-        RecipientInfo: {
-            personInCharge: "",
-            location: "",
-            pickUpTime: ""
-        },
-        Quantity: {
-            quantity: 0,
-            quantityUnit: "Crate",
-            temp: 0,
-            tempUnit: "Celcius",
-            pH: 0,
-            fat: 0,
-            protein: 0,
-            bacteria: false,
-            bacteriaInfo: "",
-            contaminants: false,
-            contaminantInfo: "",
-            abnormalChar: false,
-            abnormalType: {
-                smellBad: false,
-                smellNotFresh: false,
-                abnormalColor: false,
-                sour: false,
-                bitter: false,
-                cloudy: false,
-                lumpy: false,
-                separation: false
-            }
-        }
-    });
-
-    // ✅ ควบคุมการแสดงผลของ abnormalType
-    const [showAbnormalInfo, setShowAbnormalInfo] = useState(false);
-
-    // ✅ โหลดข้อมูลจาก localStorage เมื่อหน้าเว็บโหลด
-    useEffect(() => {
-        if (typeof window !== "undefined") {
-            const savedData = localStorage.getItem("recievedForm");
-            if (savedData) {
-                setFormData(JSON.parse(savedData));
-            }
-        }
-    }, []); 0
-
-    // ✅ บันทึกข้อมูลลง localStorage ทุกครั้งที่ recieveForm เปลี่ยน
-    useEffect(() => {
-        if (typeof window !== "undefined") {
-            localStorage.setItem("recievedForm", JSON.stringify(recievedForm));
-        }
-    }, [recievedForm]);
-
-    // ✅ ฟังก์ชัน handleFormDataChange รองรับ text, select และ checkbox
-    const handleFormDataChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, type, value, checked } = event.target;
-        const keys = name.split(".");
-
-        setFormData((prevData) => {
-            const updatedData = { ...prevData }; // Clone ข้อมูลเดิม
-            let temp = updatedData;
-
-            for (let i = 0; i < keys.length - 1; i++) {
-                temp = temp[keys[i]];
-            }
-
-            // ถ้าเป็น checkbox ให้ใช้ checked ถ้าไม่ใช่ให้ใช้ value
-            temp[keys[keys.length - 1]] = type === "checkbox" ? checked : value;
-
-            // อัปเดต province, district และ subdistrict
-            if (name === "RecipientInfo.province") {
-                setSelectedProvince(value);
-            } else if (name === "RecipientInfo.district") {
-                setSelectedDistrict(value);
-            } else if (name === "RecipientInfo.subDistrict") {
-                setSelectedSubDistrict(value);
-            }
-
-            return updatedData;
-        });
+        }, 100);
     };
 
-    // ✅ ฟังก์ชัน handleAbnormalChange → เช็ค abnormalChar และโชว์ abnormalType
-    const handleAbnormalChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        handleFormDataChange(event);
-        setShowAbnormalInfo(event.target.checked);
-    };
-
-    // ✅ ฟังก์ชัน handleNestedCheckboxChange สำหรับ abnormalType
-    const handleNestedCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, checked } = event.target;
-
-        setFormData((prevData) => {
-            const updatedData = { ...prevData };
-            let temp = updatedData.Quantity.abnormalType;
-
-            temp[name.split('.').pop()!] = checked;
-
-            return updatedData;
-        });
-    };
-
-    // ✅ ฟังก์ชัน Submit → บันทึกข้อมูลลง localStorage
-    const saveToLocalStorage = (event: React.FormEvent<HTMLFormElement>) => {
+    // ✅ ฟังก์ชัน Submit → ไปหน้าตรวจสอบ `/Retail/Recieving/CheckDetails`
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        localStorage.setItem("recievedForm", JSON.stringify(recievedForm));
-        console.log(recievedForm);
+        localStorage.setItem("retailerRecieve", JSON.stringify(retailerRecieve));
+        console.log("📦 Saved Retailer Data:", retailerRecieve);
+        router.push("/Retail/Recieving/CheckDetails");
     };
-    // end save form Data
-
-    const router = useRouter();
-
+    
     return (
+    
+
         <div className="flex flex-col w-full h-full min-h-screen items-center justify-center pt-24 bg-gray-100">
+            
             {/* Detail Status */}
             <div className="flex items-center w-full mt-10 h-full p-10">
                 <div className="flex border shadow-xl w-full h-full p-5 rounded-3xl gap-8">
@@ -264,216 +191,281 @@ const Recieving = () => {
             {/* End Detail Status */}
 
             {/* Form Section */}
-            <form className="flex flex-col w-5/6 h-full p-20 m-10" onSubmit={saveToLocalStorage}>
-                {/* Milk Tank Info Section */}
-                <div className="flex flex-col items-center w-full h-full text-xl gap-5">
-                    <h1 className="text-5xl font-bold">Recipient Information</h1>
-                    {/* Person in charge */}
-                    <div className="flex flex-col w-full items-start gap-3">
-                        <label htmlFor="personInCharge" className="font-semibold">Person In Charge</label>
-                        <input type="text" name="RecipientInfo.personInCharge" id="personInCharge"
-                            placeholder="Enter name of person in charge" className="border rounded-full p-3 w-full"
-                            value={recievedForm.RecipientInfo.personInCharge} onChange={handleFormDataChange} />
-                    </div>
-                    {/* Location */}
-                    <div className="flex flex-col w-full items-start gap-3">
-                        <label htmlFor="location" className="font-semibold">Location</label>
-                        <input type="text" id="location"
-                            placeholder="Enter location" className="border rounded-full p-3 w-full"
-                            name="RecipientInfo.location" value={recievedForm.RecipientInfo.location} onChange={handleFormDataChange} />
-                    </div>
-                    {/* Pick up time */}
-                    <div className="flex flex-col w-full items-start gap-3">
-                        <label htmlFor="pickUpTime" className="font-semibold">Pick up time</label>
-                        <input type="datetime-local" id="pickUpTime" placeholder="Pick up date time." className="border rounded-full p-3 w-full"
-                            name="RecipientInfo.pickUpTime" value={recievedForm.RecipientInfo.pickUpTime} onChange={handleFormDataChange} />
-                    </div>
+            <form className="w-full max-w-4xl p-5 bg-white shadow-lg rounded-lg" onSubmit={handleSubmit}>
+            <div className="flex flex-col items-center w-full h-full text-xl gap-5">
+    <h1 className="text-5xl font-bold">Recipient Information</h1>
 
-                    <button
-                        type="button"
-                        className={`flex text-center justify-center self-end bg-[#C2CC8D] text-[#52600A] p-3 w-1/12 rounded-full hover:bg-[#C0E0C8] ${showShippingAddress ? 'hidden' : ''}`}
-                        onClick={handleNextClick}
-                    >
-                        Next
-                    </button>
-                </div>
+    {/* Person in charge */}
+    <div className="flex flex-col w-full items-start gap-3">
+        <label htmlFor="personInCharge" className="font-semibold">Person In Charge</label>
+        <input type="text" name="personInCharge" id="personInCharge"
+            placeholder="Enter name of person in charge"
+            className="border rounded-full p-3 w-full"
+            value={retailerRecieve.personInCharge}
+            onChange={handleChange} />
+    </div>
+
+    {/* Email */}
+    <div className="flex flex-col w-full items-start gap-3">
+        <label htmlFor="email" className="font-semibold">Email</label>
+        <input type="email" name="email" id="email"
+            placeholder="Enter email"
+            className="border rounded-full p-3 w-full"
+            value={retailerRecieve.email}
+            onChange={handleChange} />
+    </div>
+
+    {/* Phone Number */}
+    <div className="flex flex-col w-full items-start gap-3">
+        <label htmlFor="phoneNumber" className="font-semibold">Phone Number</label>
+        <input type="tel" name="phoneNumber" id="phoneNumber"
+            placeholder="Enter phone number"
+            className="border rounded-full p-3 w-full"
+            value={retailerRecieve.phoneNumber}
+            onChange={handleChange} />
+    </div>
+
+    {/* Address */}
+    <div className="flex flex-col w-full items-start gap-3">
+        <label htmlFor="address" className="font-semibold">Address</label>
+        <textarea name="address" id="address"
+            placeholder="Enter address"
+            className="border rounded-3xl p-3 w-full"
+            value={retailerRecieve.address}
+            onChange={handleChange} />
+    </div>
+
+    {/* Province */}
+    <div className="flex flex-col w-full items-start gap-3">
+        <label htmlFor="province" className="font-semibold">Province</label>
+        <select name="province" id="province"
+            className="border rounded-full p-3 w-full"
+            value={selectedProvince}
+            onChange={(e) => {
+                handleChange(e);
+                setSelectedProvince(e.target.value);
+            }}>
+            <option value="">Select Province</option>
+            {provinceList.map((prov, index) => (
+                <option key={index} value={prov}>{prov}</option>
+            ))}
+        </select>
+    </div>
+
+    {/* District + Sub-district */}
+    <div className="flex flex-row w-full gap-4">
+        {/* District */}
+        <div className="flex flex-col w-1/2 items-start gap-3">
+            <label htmlFor="district" className="font-semibold">District</label>
+            <select name="district" id="district"
+                className="border rounded-full p-3 w-full"
+                value={selectedDistrict}
+                onChange={(e) => {
+                    handleChange(e);
+                    setSelectedDistrict(e.target.value);
+                }}
+                disabled={!selectedProvince}>
+                <option value="">Select District</option>
+                {districtList.map((dist, index) => (
+                    <option key={index} value={dist}>{dist}</option>
+                ))}
+            </select>
+        </div>
+
+        {/* Sub-district */}
+        <div className="flex flex-col w-1/2 items-start gap-3">
+            <label htmlFor="subDistrict" className="font-semibold">Sub-District</label>
+            <select name="subDistrict" id="subDistrict"
+                className="border rounded-full p-3 w-full"
+                value={selectedSubDistrict}
+                onChange={(e) => {
+                    handleChange(e);
+                    setSelectedSubDistrict(e.target.value);
+                }}
+                disabled={!selectedDistrict}>
+                <option value="">Select Sub-District</option>
+                {subDistrictList.map((subDist, index) => (
+                    <option key={index} value={subDist}>{subDist}</option>
+                ))}
+            </select>
+        </div>
+    </div>
+
+    {/* Postal Code */}
+    <div className="flex flex-col w-full items-start gap-3">
+        <label htmlFor="postalCode" className="font-semibold">Postal Code</label>
+        <input type="text" name="postalCode" id="postalCode"
+            placeholder="Enter postal code"
+            className="border rounded-full p-3 w-full"
+            value={retailerRecieve.postalCode}
+            onChange={handleChange} />
+    </div>
+
+    {/* Location */}
+    <div className="flex flex-col w-full items-start gap-3">
+        <label htmlFor="location" className="font-semibold">Location</label>
+        <input type="text" name="location" id="location"
+            placeholder="Paste location URL"
+            className="border rounded-full p-3 w-full"
+            value={retailerRecieve.location}
+            onChange={handleChange} />
+    </div>
+
+    <button
+        type="button"
+        className={`flex text-center justify-center self-end bg-[#C2CC8D] text-[#52600A] p-3 w-1/12 rounded-full hover:bg-[#C0E0C8] ${showShippingAddress ? 'hidden' : ''}`}
+        onClick={handleNextClick}
+    >
+        Next
+    </button>
+
+
+
 
                 {/* Shipping Address section */}
-                {showShippingAddress && (
-                    <div ref={shippingAddressRef} className="flex flex-col items-center w-full h-full text-xl gap-8 mt-20">
-                        <h1 className="text-5xl font-bold mb-10">Quality</h1>
-                        {/* Quantity + temperature */}
-                        <div className="flex w-full items-start gap-3">
-                            {/* Quantity */}
-                            <div className="flex flex-col w-1/2 items-start gap-3">
-                                <label htmlFor="quantity" className="font-semibold">Quantity Per Unit</label>
-                                <div className="flex gap-3 w-full">
-                                    <input type="number" name="Quantity.quantity" id="quantity"
-                                        className="border rounded-full p-3 w-4/5" placeholder="0.00" step="0.01"
-                                        value={recievedForm.Quantity.quantity} onChange={handleFormDataChange} />
-                                    <select name="Quantity.quantityUnit" id="quantityUnit" className="border rounded-full p-3 w-1/5 font-semibold"
-                                        value={recievedForm.Quantity.quantityUnit} onChange={handleFormDataChange}>
-                                        <option value="Ton">Crate</option>
-                                        <option value="Liter">Box</option>
-                                    </select>
-                                </div>
-                            </div>
-                            {/* Temperature */}
-                            <div className="flex flex-col w-1/2 items-start gap-3">
-                                <label htmlFor="temp" className="font-semibold">Temperature</label>
-                                <div className="flex w-full items-start gap-3">
-                                    <input type="number" name="Quantity.temp" id="temp" className="p-3 rounded-full borcder w-4/5" placeholder="0.00" step="0.01"
-                                        value={recievedForm.Quantity.temp} onChange={handleFormDataChange} />
-                                    <select name="Quantity.tempUnit" id="tempUnit" className="border rounded-full p-3 w-1/5 font-semibold"
-                                        value={recievedForm.Quantity.tempUnit} onChange={handleFormDataChange}>
-                                        <option value="Celcius">°C</option>
-                                        <option value="Farenheit">°F</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        {/* pH of Milk */}
-                        <div className="flex flex-col w-full items-start gap-3">
-                            <label htmlFor="pH" className="font-semibold">pH of Milk</label>
-                            <input type="number" name="Quantity.pH" id="pH" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01"
-                                value={recievedForm.Quantity.pH} onChange={handleFormDataChange} />
-                        </div>
-                        {/* Fat + Protein */}
-                        <div className="flex w-full items-start gap-3">
-                            {/* Fat */}
-                            <div className="flex flex-col w-1/2 items-start gap-3">
-                                <label htmlFor="fat" className="font-semibold">Fat (%)</label>
-                                <input type="number" name="Quantity.fat" id="fat" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01"
-                                    value={recievedForm.Quantity.fat} onChange={handleFormDataChange} />
-                            </div>
-                            {/* Protein */}
-                            <div className="flex flex-col w-1/2 items-start gap-3">
-                                <label htmlFor="protein" className="font-semibold">Protein (%)</label>
-                                <input type="number" name="Quantity.protein" id="protein" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01"
-                                    value={recievedForm.Quantity.protein} onChange={handleFormDataChange} />
-                            </div>
-                        </div>
-                        {/* bacteria testing */}
-                        <div className="flex flex-col w-full justify-center gap-3">
-                            <div className="flex w-full items-center gap-3">
-                                <input
-                                    type="checkbox"
-                                    name="Quantity.bacteria"
-                                    id="bacteria"
-                                    className="w-5 h-5 appearance-none border border-gray-400 rounded-full checked:bg-[#D3D596] checked:border-[#305066]"
-                                    onChange={handleFormDataChange}
-                                    checked={recievedForm.Quantity.bacteria}
-                                />
-                                <label htmlFor="bacteria" className="font-semibold">Bacteria Testing</label>
-                            </div>
-                            {recievedForm.Quantity.bacteria && (
-                                <input
-                                    type="text"
-                                    name="Quantity.bacteriaInfo"
-                                    id="bacteriaInfo"
-                                    className="border rounded-full p-3"
-                                    placeholder="Please fill additional information"
-                                    value={recievedForm.Quantity.bacteriaInfo}
-                                    onChange={handleFormDataChange}
-                                />
-                            )}
-                        </div>
-                        {/* Contaminants */}
-                        <div className="flex flex-col w-full justify-center gap-3">
-                            <div className="flex w-full items-center gap-3">
-                                <input
-                                    type="checkbox"
-                                    name="Quantity.contaminants"
-                                    id="contaminants"
-                                    className="w-5 h-5 appearance-none border border-gray-400 rounded-full checked:bg-[#D3D596] checked:border-[#305066]"
-                                    onChange={handleFormDataChange}
-                                    checked={recievedForm.Quantity.contaminants}
-                                />
-                                <label htmlFor="contaminants" className="font-semibold">Contaminants</label>
-                            </div>
-                            {recievedForm.Quantity.contaminants && (
-                                <input
-                                    type="text"
-                                    name="Quantity.contaminantInfo"
-                                    id="contaminantInfo"
-                                    className="border rounded-full p-3"
-                                    placeholder="Please fill additional information"
-                                    value={recievedForm.Quantity.contaminantInfo}
-                                    onChange={handleFormDataChange}
-                                />
-                            )}
-                        </div>
-                        {/* Abnormal Characteristic */}
-                        <div className="flex flex-col w-full justify-center items-start gap-3">
-                            <div className="flex w-full items-center gap-3">
-                                <input
-                                    type="checkbox"
-                                    name="Quantity.abnormalChar"
-                                    id="abnormalChar"
-                                    className="w-5 h-5 appearance-none border border-gray-400 rounded-full checked:bg-[#D3D596] checked:border-[#305066]"
-                                    onChange={handleAbnormalChange}
-                                    checked={recievedForm.Quantity.abnormalChar}
-                                />
-                                <label htmlFor="abnormalChar" className="font-semibold">Abnormal Characteristic</label>
-                            </div>
-                            {recievedForm.Quantity.abnormalChar && (
-                                <div className="flex flex-col w-full items-center gap-3 px-8">
-                                    <div className="flex w-full items-center gap-3">
-                                        <input type="checkbox" name="Quantity.abnormalType.smellBad" id="smellBad" className="border w-4 h-4"
-                                            checked={recievedForm.Quantity.abnormalType.smellBad} onChange={handleNestedCheckboxChange} />
-                                        <label htmlFor="smellBad" className="font-semibold">Smell Bad</label>
-                                    </div>
-                                    <div className="flex w-full items-center gap-3">
-                                        <input type="checkbox" name="Quantity.abnormalType.smellNotFresh" id="smellNotFresh" className="border w-4 h-4"
-                                            checked={recievedForm.Quantity.abnormalType.smellNotFresh} onChange={handleNestedCheckboxChange} />
-                                        <label htmlFor="smellNotFresh" className="font-semibold">Smell not fresh</label>
-                                    </div>
-                                    <div className="flex w-full items-center gap-3">
-                                        <input type="checkbox" name="Quantity.abnormalType.abnormalColor" id="abnormalColor" className="border w-4 h-4"
-                                            checked={recievedForm.Quantity.abnormalType.abnormalColor} onChange={handleNestedCheckboxChange} />
-                                        <label htmlFor="abnormalColor" className="font-semibold">Abnormal Color</label>
-                                        <p className="text-gray-500">ex. yellow or green</p>
-                                    </div>
-                                    <div className="flex w-full items-center gap-3">
-                                        <input type="checkbox" name="Quantity.abnormalType.sour" id="sour" className="border w-4 h-4"
-                                            checked={recievedForm.Quantity.abnormalType.sour} onChange={handleNestedCheckboxChange} />
-                                        <label htmlFor="sour" className="font-semibold">Sour taste</label>
-                                    </div>
-                                    <div className="flex w-full items-center gap-3">
-                                        <input type="checkbox" name="Quantity.abnormalType.bitter" id="bitter" className="border w-4 h-4"
-                                            checked={recievedForm.Quantity.abnormalType.bitter} onChange={handleNestedCheckboxChange} />
-                                        <label htmlFor="bitter" className="font-semibold">Bitter taste</label>
-                                    </div>
-                                    <div className="flex w-full items-center gap-3">
-                                        <input type="checkbox" name="Quantity.abnormalType.cloudy" id="cloudy" className="border w-4 h-4"
-                                            checked={recievedForm.Quantity.abnormalType.cloudy} onChange={handleNestedCheckboxChange} />
-                                        <label htmlFor="cloudy" className="font-semibold">Cloudy Appearance</label>
-                                    </div>
-                                    <div className="flex w-full items-center gap-3">
-                                        <input type="checkbox" name="Quantity.abnormalType.lumpy" id="lumpy" className="border w-4 h-4"
-                                            checked={recievedForm.Quantity.abnormalType.lumpy} onChange={handleNestedCheckboxChange} />
-                                        <label htmlFor="lumpy" className="font-semibold">Lumpy Appearance</label>
-                                    </div>
-                                    <div className="flex w-full items-center gap-3">
-                                        <input type="checkbox" name="Quantity.abnormalType.separation" id="separation" className="border w-4 h-4"
-                                            checked={recievedForm.Quantity.abnormalType.separation} onChange={handleNestedCheckboxChange} />
-                                        <label htmlFor="separation" className="font-semibold">Separation between water and fat</label>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+{showShippingAddress && (
+    <div ref={shippingAddressRef} className="flex flex-col items-center w-full h-full text-xl gap-8 mt-20">
+        <h1 className="text-5xl font-bold mb-10">Product Quality & Receiving Status</h1>
 
-                        <button
-                            type="submit"
-                            className="flex text-center self-end w-1/12 justify-center bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8]"
-                            onClick={() => router.push("/Retail/Recieving/CheckDetails")}
-                        >
-                            Next
-                        </button>
-                    </div>
-                )}
+        {/* Pickup Time */}
+        <div className="flex flex-col w-full items-start gap-3">
+            <label htmlFor="pickupTime" className="font-semibold">Pickup Time</label>
+            <input 
+                type="datetime-local" 
+                name="pickupTime" 
+                id="pickupTime" 
+                className="border rounded-full p-3 w-full"
+                value={retailerRecieve.pickupTime} 
+                onChange={handleChange} 
+            />
+        </div>
+
+        {/* Delivery Time */}
+        <div className="flex flex-col w-full items-start gap-3">
+            <label htmlFor="deliveryTime" className="font-semibold">Delivery Time</label>
+            <input 
+                type="datetime-local" 
+                name="deliveryTime" 
+                id="deliveryTime" 
+                className="border rounded-full p-3 w-full"
+                value={retailerRecieve.deliveryTime} 
+                onChange={handleChange} 
+            />
+        </div>
+        {/* Quantity Unit */}
+        <div className="flex flex-col w-full items-start gap-3">
+            <label htmlFor="quantityUnit" className="font-semibold">Quantity Unit</label>
+            <select 
+                name="quantityUnit" 
+                id="quantityUnit" 
+                className="border rounded-full p-3 w-full font-semibold"
+                value={retailerRecieve.quantityUnit} 
+                onChange={handleChange}
+            >
+                <option value="Crate">Crate</option>
+                <option value="Box">Box</option>
+                <option value="Bag">Bag</option>
+                <option value="Pallet">Pallet</option>
+            </select>
+        </div>
+
+        {/* Temperature */}
+        <div className="flex flex-col w-full items-start gap-3">
+            <label htmlFor="temperature" className="font-semibold">Storage Temperature</label>
+            <div className="flex w-full items-start gap-3">
+                <input 
+                    type="number" 
+                    name="temperature" 
+                    id="temperature" 
+                    className="border rounded-full p-3 w-4/5" 
+                    placeholder="0.00" 
+                    step="0.01"
+                    value={retailerRecieve.temperature} 
+                    onChange={handleChange} 
+                />
+                <select 
+                    name="temperatureUnit" 
+                    id="temperatureUnit" 
+                    className="border rounded-full p-3 w-1/5 font-semibold"
+                    value={retailerRecieve.temperatureUnit} 
+                    onChange={handleChange}
+                >
+                    <option value="Celcius">°C</option>
+                    <option value="Fahrenheit">°F</option>
+                </select>
+            </div>
+        </div>
+
+        {/* Product Quality Status */}
+        <div className="flex flex-col w-full items-start gap-3">
+            <label className="font-semibold">Product Quality Status</label>
+            <div className="flex gap-5">
+                <label className="flex items-center gap-2">
+                    <input 
+                        type="radio" 
+                        name="qualityStatus" 
+                        value="pass"
+                        checked={retailerRecieve.qualityStatus === "pass"}
+                        onChange={handleChange}
+                        className="w-5 h-5"
+                    />
+                    <span>Pass</span>
+                </label>
+                <label className="flex items-center gap-2">
+                    <input 
+                        type="radio" 
+                        name="qualityStatus" 
+                        value="fail"
+                        checked={retailerRecieve.qualityStatus === "fail"}
+                        onChange={handleChange}
+                        className="w-5 h-5"
+                    />
+                    <span>Fail</span>
+                </label>
+            </div>
+        </div>
+
+        {/* Accept/Reject Product */}
+        <div className="flex flex-col w-full items-start gap-3">
+            <label className="font-semibold">Receiving Decision</label>
+            <div className="flex gap-5">
+                <label className="flex items-center gap-2">
+                    <input 
+                        type="radio" 
+                        name="receivingDecision" 
+                        value="accept"
+                        checked={retailerRecieve.receivingDecision === "accept"}
+                        onChange={handleChange}
+                        className="w-5 h-5"
+                    />
+                    <span>Accept</span>
+                </label>
+                <label className="flex items-center gap-2">
+                    <input 
+                        type="radio" 
+                        name="receivingDecision" 
+                        value="reject"
+                        checked={retailerRecieve.receivingDecision === "reject"}
+                        onChange={handleChange}
+                        className="w-5 h-5"
+                    />
+                    <span>Reject</span>
+                </label>
+            </div>
+        </div>
+
+        <button
+            type="submit"
+            className="flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8]"
+            onClick={handleSubmit}
+        >
+            Submit
+        </button>
+    </div>
+)}
             </form>
         </div>
     );
 };
+
 export default Recieving;
