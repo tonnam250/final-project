@@ -43,7 +43,7 @@ const page = async () => {
                   <path fill="currentColor" d="M23 19h-4v4h-6V13h1h-1v6h2v2h2v-6h-2v-2h-1h3v2h2v2h2v-4h2zm0 2v2h-2v-2z" />
                 </svg>
               </a> */}
-              <QrButton onScan={onScan} />
+              <QrButton />
             </div>
           </div>
           {/* end Welcome text */}
