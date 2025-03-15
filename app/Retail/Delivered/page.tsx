@@ -2,12 +2,15 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { getRetailerTracking } from "@/services/trackingService";
 
 const Delivered = () => {
     const [trackingData, setTrackingData] = useState<
         { trackingId?: string; moreInfoLink?: string }[]
     >([]);
+    
+    const router = useRouter();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -46,12 +49,22 @@ const Delivered = () => {
                                         </span>
                                     )}
                                 </div>
-                                <div className="flex flex-col md:flex-row justify-between items-center w-full">
+                                <div className="flex flex-col md:flex-row justify-between items-center w-full gap-3">
                                     {/* ✅ ปุ่ม "More Info" */}
                                     {item.moreInfoLink && (
-                                        <Link href={item.moreInfoLink} className="text-lg md:text-xl underline italic cursor-pointer mt-2 md:mt-0">
+                                        <Link href={item.moreInfoLink} className="text-lg md:text-xl underline italic cursor-pointer">
                                             More info
                                         </Link>
+                                    )}
+
+                                    {/* ✅ ปุ่ม "รับ" ที่จะนำไปยังหน้า Recieving */}
+                                    {item.trackingId && (
+                                        <button
+                                            className="bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8] transition-all"
+                                            onClick={() => router.push(`http://192.168.43.218:3000/Retail/Recieving?trackingId=${item.trackingId}`)}
+                                        >
+                                            รับ
+                                        </button>
                                     )}
                                 </div>
                             </div>

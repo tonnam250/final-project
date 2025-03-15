@@ -117,3 +117,63 @@ export const getRetailerTracking = async (): Promise<any> => {
         return [];
     }
 };
+
+export const retailerReceiveProduct = async (trackingId: string, formData: any) => {
+    try {
+        // ✅ ตรวจสอบและแปลงค่า quantity ให้เป็น float
+        formData.Quantity.quantity = parseFloat(formData.Quantity.quantity);
+        formData.Quantity.temp = parseFloat(formData.Quantity.temp);
+        formData.Quantity.pH = parseFloat(formData.Quantity.pH);
+        formData.Quantity.fat = parseFloat(formData.Quantity.fat);
+        formData.Quantity.protein = parseFloat(formData.Quantity.protein);
+
+        console.log("📡 Sending to API:", JSON.stringify({
+            trackingId,
+            Input: formData,
+        }, null, 2));
+
+        const response = await fetch(`${API_URL}retailer/receive`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+                trackingId,
+                Input: formData,
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP Error: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("❌ Failed to submit retailer receive product:", error);
+        return null;
+    }
+};
+
+export const getRetailerReceivedProduct = async (trackingId: string) => {
+    try {
+        const response = await fetch(`${API_URL}retailer/received?trackingId=${trackingId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            credentials: "include",
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP Error: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("❌ Failed to fetch retailer received product:", error);
+        return null;
+    }
+};
+

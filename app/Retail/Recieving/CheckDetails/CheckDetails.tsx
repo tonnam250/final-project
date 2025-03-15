@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { retailerReceiveProduct } from "@/services/trackingService"; // ✅ Import function
 
 const CheckDetails = () => {
     const [data, setData] = useState(null);
@@ -14,10 +15,25 @@ const CheckDetails = () => {
         }
     }, []);
 
-    const handleSubmit = () => {
-        router.push("/Retail/Recieving/Details");
-        alert("Submitted Successfully!");
-        // localStorage.clear(); // Clear the form data in localStorage after submission
+    const handleSubmit = async () => {
+        if (!data?.trackingId) {
+            alert("Tracking ID is missing.");
+            return;
+        }
+
+        try {
+            const response = await retailerReceiveProduct(data.trackingId, data);
+            if (response && response.message) {
+                alert("Submitted Successfully!");
+                router.push(`/Retail/Recieving/Details?trackingId=${encodeURIComponent(data.trackingId)}`);
+                // localStorage.clear(); // Clear the form data in localStorage after submission
+            } else {
+                alert("Submission failed. Please try again.");
+            }
+        } catch (error) {
+            console.error("❌ Error submitting retailer receive product:", error);
+            alert("An error occurred. Please try again.");
+        }
     };
 
     const [showShippingAddress, setShowShippingAddress] = useState<boolean>(false);

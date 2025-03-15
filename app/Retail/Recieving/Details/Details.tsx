@@ -1,16 +1,28 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { getRetailerReceivedProduct } from "@/services/trackingService";
 
 const CheckDetails = () => {
     const [data, setData] = useState(null);
+    const searchParams = useSearchParams();
+    const trackingId = searchParams.get("trackingId");
 
     useEffect(() => {
-        const storedData = localStorage.getItem("recievedForm");
-        if (storedData) {
-            setData(JSON.parse(storedData));
-        }
-    }, []);
+        const fetchData = async () => {
+            if (trackingId) {
+                const response = await getRetailerReceivedProduct(trackingId);
+                if (response) {
+                    setData(response);
+                }
+            }
+        };
+        fetchData();
+    }, [trackingId]);
+
+    if (!data || !data.Input) return <p>Loading...</p>;
+
 
     return (
         <div className="flex flex-col justify-center items-center pt-20 w-full h-full min-h-screen">
@@ -23,15 +35,15 @@ const CheckDetails = () => {
                         <div className="flex flex-col space-y-2 gap-3 text-gray-500">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Person in charge:</p>
-                                <p>{data.RecipientInfo.personInCharge}</p>
+                                <p>{data.Input.RecipientInfo.personInCharge}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Location:</p>
-                                <p>{data.RecipientInfo.location}</p>
+                                <p>{data.Input.RecipientInfo.location}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Pick Up Time:</p>
-                                <p>{data.RecipientInfo.pickUpTime}</p>
+                                <p>{data.Input.RecipientInfo.pickUpTime}</p>
                             </div>
                         </div>
                     </div>
@@ -42,36 +54,36 @@ const CheckDetails = () => {
                         <div className="flex flex-col space-y-2 gap-3 text-gray-500">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Quantity:</p>
-                                <p>{data.Quantity.quantity} {data.Quantity.quantityUnit}</p>
+                                <p>{data.Input.Quantity.quantity} {data.Input.Quantity.quantityUnit}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Temperature:</p>
-                                <p>{data.Quantity.temp} {data.Quantity.tempUnit}</p>
+                                <p>{data.Input.Quantity.temp} {data.Input.Quantity.tempUnit}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">pH:</p>
-                                <p>{data.Quantity.pH}</p>
+                                <p>{data.Input.Quantity.pH}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Fat:</p>
-                                <p>{data.Quantity.fat} %</p>
+                                <p>{data.Input.Quantity.fat} %</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Protein:</p>
-                                <p>{data.Quantity.protein} %</p>
+                                <p>{data.Input.Quantity.protein} %</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Bacteria:</p>
                                 <div className="flex flex-col gap-2">
-                                    <p>{data.Quantity.bacteria === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.bacteriaInfo}</p>
+                                    <p>{data.Input.Quantity.bacteria === true ? "True" : "False"}</p>
+                                    <p>{data.Input.Quantity.bacteriaInfo}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Contaminants:</p>
                                 <div className="flex flex-col gap-2">
-                                    <p>{data.Quantity.contaminants === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.contaminantInfo}</p>
+                                    <p>{data.Input.Quantity.contaminants === true ? "True" : "False"}</p>
+                                    <p>{data.Input.Quantity.contaminantInfo}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between">
@@ -89,15 +101,15 @@ const CheckDetails = () => {
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-3">
-                                    <p>{data.Quantity.abnormalChar === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.smellBad === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.smellNotFresh === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.abnormalColor === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.sour === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.bitter === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.cloudy === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.lumpy === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.separation === true ? "True" : "False"}</p>
+                                    <p>{data.Input.Quantity.abnormalChar === true ? "True" : "False"}</p>
+                                    <p>{data.Input.Quantity.abnormalType.smellBad === true ? "True" : "False"}</p>
+                                    <p>{data.Input.Quantity.abnormalType.smellNotFresh === true ? "True" : "False"}</p>
+                                    <p>{data.Input.Quantity.abnormalType.abnormalColor === true ? "True" : "False"}</p>
+                                    <p>{data.Input.Quantity.abnormalType.sour === true ? "True" : "False"}</p>
+                                    <p>{data.Input.Quantity.abnormalType.bitter === true ? "True" : "False"}</p>
+                                    <p>{data.Input.Quantity.abnormalType.cloudy === true ? "True" : "False"}</p>
+                                    <p>{data.Input.Quantity.abnormalType.lumpy === true ? "True" : "False"}</p>
+                                    <p>{data.Input.Quantity.abnormalType.separation === true ? "True" : "False"}</p>
                                 </div>
                             </div>
                         </div>

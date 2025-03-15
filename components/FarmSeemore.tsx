@@ -1,168 +1,136 @@
-import { X } from "lucide-react";
-import { useEffect, useState } from "react";
+"use client";
 
-interface FarmSeeMoreModalProps {
+import { FC, useState } from "react";
+import { MapPinIcon, PhoneIcon, EnvelopeIcon, ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
+
+interface FarmSeemoreProps {
     isOpen: boolean;
     onClose: () => void;
+    farm?: {
+        companyName: string;
+        address: string;
+        subDistrict: string;
+        district: string;
+        province: string;
+        country: string;
+        postCode: string;
+        telephone: string;
+        email: string;
+        locationLink: string;
+        milkTankIDs: string[];
+    };
 }
 
-export default function FarmSeemore({ isOpen, onClose }: FarmSeeMoreModalProps) {
-    const [data, setData] = useState(null);
+const FarmSeemore: FC<FarmSeemoreProps> = ({ isOpen, onClose, farm }) => {
+    if (!isOpen || !farm) return null;
 
-    useEffect(() => {
-        const storedData = localStorage.getItem("formData");
-        if (storedData) {
-            setData(JSON.parse(storedData));
-        }
-    }, []);
-
-    if (!isOpen) return null;
+    // ✅ State สำหรับจัดการแท็บของ Milk Tanks
+    const [activeTab, setActiveTab] = useState(0);
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white p-4 rounded-2xl shadow-lg w-full max-w-lg lg:max-w-7xl h-auto max-h-[80vh] overflow-y-auto relative">
-                <button
-                    onClick={onClose}
-                    className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-200 transition"
-                >
-                    <X className="w-5 h-5" />
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white w-full max-w-3xl rounded-3xl shadow-2xl p-8 relative border border-gray-300">
+                
+                {/* ปุ่มปิด */}
+                <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-black text-xl">
+                    ✕
                 </button>
-                <h1 className="text-3xl font-bold mb-4">Farm Detail</h1>
-                {data && (
-                    <div className="flex flex-col lg:flex-row lg:flex-wrap gap-4 lg:w-full">
-                        {/* General Info Section */}
-                        <div className="flex flex-col gap-4 w-full lg:w-[48%] p-4">
-                            <h1 className="text-xl font-bold text-center">General Info</h1>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Farm Name:</p>
-                                <p>{data.farmName}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Tank ID:</p>
-                                <p>{data.milkTankInfo.milkTankNo}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Person in charge:</p>
-                                <p>{data.milkTankInfo.personInCharge}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Quantity:</p>
-                                <p>{data.milkTankInfo.quantity} {data.milkTankInfo.quantityUnit}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Temperature:</p>
-                                <p>{data.milkTankInfo.temp} {data.milkTankInfo.tempUnit}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">pH:</p>
-                                <p>{data.milkTankInfo.pH}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Fat:</p>
-                                <p>{data.milkTankInfo.fat} %</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Protein:</p>
-                                <p>{data.milkTankInfo.protein} %</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Bacteria:</p>
-                                <div className="flex flex-col gap-2">
-                                    <p>{data.milkTankInfo.bacteria ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.bacteriaInfo}</p>
-                                </div>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Contaminants:</p>
-                                <div className="flex flex-col gap-2">
-                                    <p>{data.milkTankInfo.contaminants ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.contaminantInfo}</p>
-                                </div>
-                            </div>
-                            <div className="flex justify-between">
-                                <div className="flex flex-col gap-3">
-                                    <p className="font-semibold">Abnormal characteristic:</p>
-                                    <div className="flex flex-col gap-3">
-                                        <p className="font-semibold">Smell Bad:</p>
-                                        <p className="font-semibold">Smell Not Fresh:</p>
-                                        <p className="font-semibold">Abnormal Color:</p>
-                                        <p className="font-semibold">Sour:</p>
-                                        <p className="font-semibold">Bitter:</p>
-                                        <p className="font-semibold">Cloudy:</p>
-                                        <p className="font-semibold">Lumpy:</p>
-                                        <p className="font-semibold">Separation of milk and water:</p>
-                                    </div>
-                                </div>
-                                <div className="flex flex-col gap-3">
-                                    <p>{data.milkTankInfo.abnormalChar === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.abnormalType.smellBad === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.abnormalType.smellNotFresh === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.abnormalType.abnormalColor === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.abnormalType.sour === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.abnormalType.bitter === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.abnormalType.cloudy === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.abnormalType.lumpy === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.abnormalType.separation === true ? "True" : "False"}</p>
-                                </div>
-                            </div>
-                        </div>
 
-                        {/* Shipping Address Section */}
-                        <div className="flex flex-col gap-4 w-full lg:w-[48%] bg-white p-4 text-base">
-                            <h1 className="text-xl font-bold text-center">Shipping Address</h1>
-                            <div className="flex flex-col gap-3">
-                                <div className="flex justify-between">
-                                    <p className="font-semibold">Company Name:</p>
-                                    <p>{data.shippingAddress.companyName}</p>
-                                </div>
-                                <div className="flex justify-between">
-                                    <p className="font-semibold">First Name:</p>
-                                    <p>{data.shippingAddress.firstName}</p>
-                                </div>
-                                <div className="flex justify-between">
-                                    <p className="font-semibold">Last Name:</p>
-                                    <p>{data.shippingAddress.lastName}</p>
-                                </div>
-                                <div className="flex justify-between">
-                                    <p className="font-semibold">Email:</p>
-                                    <p>{data.shippingAddress.email}</p>
-                                </div>
-                                <div className="flex justify-between">
-                                    <p className="font-semibold">Phone:</p>
-                                    <div className="flex gap-2">
-                                        <p>{data.shippingAddress.areaCode}</p>
-                                        <p>{data.shippingAddress.phoneNumber}</p>
-                                    </div>
-                                </div>
-                                <div className="flex justify-between">
-                                    <p className="font-semibold">Address:</p>
-                                    <p>{data.shippingAddress.address}</p>
-                                </div>
-                                <div className="flex justify-between">
-                                    <p className="font-semibold">Province:</p>
-                                    <p>{data.shippingAddress.province}</p>
-                                </div>
-                                <div className="flex justify-between">
-                                    <p className="font-semibold">District:</p>
-                                    <p>{data.shippingAddress.district}</p>
-                                </div>
-                                <div className="flex justify-between">
-                                    <p className="font-semibold">Sub-district:</p>
-                                    <p>{data.shippingAddress.subDistrict}</p>
-                                </div>
-                                <div className="flex justify-between">
-                                    <p className="font-semibold">Postal Code:</p>
-                                    <p>{data.shippingAddress.postalCode}</p>
-                                </div>
-                                <div className="flex justify-between">
-                                    <p className="font-semibold">Location URL:</p>
-                                    <p className="w-1/2 whitespace-normal break-all">{data.shippingAddress.location}</p>
-                                </div>
-                            </div>
+                {/* ชื่อฟาร์ม */}
+                <h2 className="text-5xl font-serif font-bold text-center text-gray-900 tracking-wide uppercase bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 text-transparent bg-clip-text">
+                    {farm.companyName || "No Data"}
+                </h2>
+
+                {/* 🏡 กล่องที่อยู่ */}
+                <div className="bg-gray-100 p-6 rounded-lg mt-6 shadow-sm border border-gray-300">
+                    <div className="flex items-center gap-3 text-lg text-gray-700">
+                        <MapPinIcon className="h-6 w-6 text-yellow-500" />
+                        <span className="font-semibold">Location:</span>
+                        <span className="text-gray-600">
+                            {farm.address ? `${farm.address}, ${farm.subDistrict}, ${farm.district}, ${farm.province}, ${farm.postCode}` : "N/A"}
+                        </span>
+                    </div>
+                    {/* 🔗 ลิงก์ไปยังแผนที่ */}
+                    {farm.locationLink && (
+                        <div className="mt-2">
+                            <a 
+                                href={farm.locationLink} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-blue-600 underline text-sm"
+                            >
+                                View on Map
+                            </a>
+                        </div>
+                    )}
+                </div>
+
+                {/* 📞 กล่องติดต่อ (Luxury Contact Box) */}
+                <div className="mt-6 flex flex-col sm:flex-row gap-6">
+                    <div className="flex items-center gap-3 bg-gray-50 px-6 py-4 rounded-lg shadow-sm border border-gray-300 flex-1">
+                        <PhoneIcon className="h-6 w-6 text-yellow-500" />
+                        <div className="flex flex-col">
+                            <span className="font-semibold text-gray-700">Telephone</span>
+                            <span className="text-gray-600">{farm.telephone || "N/A"}</span>
                         </div>
                     </div>
-                )}
+                    <div className="flex items-center gap-3 bg-gray-50 px-6 py-4 rounded-lg shadow-sm border border-gray-300 flex-1">
+                        <EnvelopeIcon className="h-6 w-6 text-yellow-500" />
+                        <div className="flex flex-col">
+                            <span className="font-semibold text-gray-700">Email</span>
+                            <span className="text-gray-600">{farm.email || "N/A"}</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* 🥛 Milk Tanks Section */}
+                <div className="mt-8">
+                    <h3 className="text-2xl font-semibold text-gray-900 text-center mb-4">Milk Tanks</h3>
+                    
+                    {/* Tabs Navigation */}
+                    <div className="flex justify-center mb-4">
+                        {farm.milkTankIDs.map((_, index) => (
+                            <button
+                                key={index}
+                                onClick={() => setActiveTab(index)}
+                                className={`px-4 py-2 mx-1 rounded-full text-sm font-medium ${
+                                    activeTab === index ? "bg-yellow-500 text-white" : "bg-gray-200 text-gray-800"
+                                } transition-all`}
+                            >
+                                Tank {index + 1}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Tabs Content */}
+                    <div className="relative h-32 overflow-hidden">
+                        <div
+                            className="absolute top-0 left-0 w-full transition-all duration-500"
+                            style={{ transform: `translateY(-${activeTab * 100}%)` }}
+                        >
+                            {farm.milkTankIDs.map((tank, index) => (
+                                <div key={index} className="w-full h-32 flex items-center justify-center">
+                                    <div className="px-6 py-3 bg-gray-200 rounded-lg shadow-md text-lg font-medium text-gray-800">
+                                        {tank}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* ปุ่มปิด */}
+                <div className="flex justify-center mt-8">
+                    <button
+                        onClick={onClose}
+                        className="px-6 py-2 bg-black text-white rounded-lg text-lg font-medium hover:bg-gray-800 transition-all"
+                    >
+                        Close
+                    </button>
+                </div>
             </div>
         </div>
     );
-}
+};
+
+export default FarmSeemore;
