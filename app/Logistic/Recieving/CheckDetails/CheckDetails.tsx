@@ -59,7 +59,9 @@ const CheckDetails = () => {
             const response = await updateLogisticsCheckpoint(trackingId, checkpoints);
             if (response) {
                 alert("✅ Submitted successfully!");
-                router.push("/Logistic/Recieving/Details");
+                
+                // ✅ เพิ่ม Tracking ID เข้าไปใน URL
+                router.push(`/Logistic/Recieving/Details?trackingId=${trackingId}`);
             } else {
                 alert("❌ Failed to submit data.");
             }
@@ -68,6 +70,7 @@ const CheckDetails = () => {
             alert("❌ API request failed.");
         }
     };
+    
     
 
     const [showShippingAddress, setShowShippingAddress] = useState<boolean>(false);
@@ -177,25 +180,21 @@ const CheckDetails = () => {
                 <div key={index} className="flex flex-col md:flex-row justify-between gap-10 w-full p-4 md:p-14">
                     {/* General Info */}
                     <div className="flex flex-col gap-4 md:gap-10 w-full h-fit md:w-1/2 bg-white border p-4 md:p-10 rounded-3xl shadow-lg text-base md:text-xl">
-                        <h1 className="text-xl md:text-3xl font-bold text-center">General Info</h1>
-                        <div className="flex flex-col space-y-2 gap-3">
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Farm Name:</p>
-                                <p>{item.GeneralInfo.farmName}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Milk Tank No:</p>
-                                <p>{item.GeneralInfo.milkTankNo}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Person In Charge:</p>
-                                <p>{item.GeneralInfo.personInCharge}</p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Recieve Status</p>
-                                <p>{item.GeneralInfo.recieveStatus}</p>
-                            </div>
+                    <h1 className="text-xl md:text-3xl font-bold text-center">General Info</h1>
+                    <div className="flex flex-col space-y-2 gap-3">
+                        <div className="flex justify-between">
+                        <p className="font-semibold">Person In Charge:</p>
+                        <p>{item.checkpoints?.before[0]?.personInCharge || "N/A"}</p>
                         </div>
+                        <div className="flex justify-between">
+                        <p className="font-semibold">Location:</p>
+                        <p>{item.checkpoints?.before[0]?.receiverInfo?.location || "N/A"}</p>
+                        </div>
+                        <div className="flex justify-between">
+                        <p className="font-semibold">Pick Up Time:</p>
+                        <p>{item.checkpoints?.before[0]?.pickupTime ? formatDateTime(item.checkpoints.before[0].pickupTime) : "N/A"}</p>
+                        </div>
+                    </div>
                     </div>
 
                     {/* Product Detail */}

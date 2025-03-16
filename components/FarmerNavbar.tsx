@@ -1,28 +1,15 @@
 "use client";
 import Link from "next/link";
-import { usePathname, useRouter} from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { logout } from  "../services/authService"; // ✅ Import ฟังก์ชัน Logout
 
 const FarmerNavbar = () => {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const router = useRouter();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-
-  const handleLogout = async () => {
-    const success = await logout();
-    if (success) {
-      alert("Logout successful");
-      router.push("/"); // ✅ กลับไปหน้า Login
-    } else {
-      alert("Failed to logout");
-    }
-  };
-
 
   return (
     <div className="flex flex-col md:flex-row px-4 md:px-8 h-18 w-full bg-[#D3D596] items-center text-[#52600A] text-xl md:text-2xl font-semibold fixed z-10">
@@ -55,9 +42,6 @@ const FarmerNavbar = () => {
           </div>
           <p className="text-base md:text-lg">Profile</p>
         </Link>
-        <button onClick={handleLogout} className="text-[#52600A] hover:text-red-500 text-xl font-semibold">
-          Logout
-        </button>
       </div>
     </div>
   );

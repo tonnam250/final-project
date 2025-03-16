@@ -4,6 +4,42 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { getRetailerReceivedProduct } from "@/services/trackingService";
 
+interface RecipientInfo {
+    personInCharge: string;
+    location: string;
+    pickUpTime: string;
+}
+
+interface Quantity {
+    quantity: number;
+    quantityUnit: string;
+    temp: number;
+    tempUnit: string;
+    pH: number;
+    fat: number;
+    protein: number;
+    bacteria: boolean;
+    bacteriaInfo: string;
+    contaminants: boolean;
+    contaminantInfo: string;
+    abnormalChar: boolean;
+    abnormalType: {
+        smellBad: boolean;
+        smellNotFresh: boolean;
+        abnormalColor: boolean;
+        sour: boolean;
+        bitter: boolean;
+        cloudy: boolean;
+        lumpy: boolean;
+        separation: boolean;
+    };
+}
+
+interface Data {
+    RecipientInfo: RecipientInfo;
+    Quantity: Quantity;
+}
+
 const CheckDetails = () => {
     const [data, setData] = useState(null);
     const searchParams = useSearchParams();

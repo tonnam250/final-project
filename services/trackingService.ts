@@ -106,10 +106,13 @@ export const getRetailerTracking = async (): Promise<any> => {
             return [];
         }
 
-        // ✅ แปลงข้อมูลให้เป็นรูปแบบที่ frontend ใช้
+        // ✅ แปลงข้อมูลครบทุก field
         return data.trackingList.map((tracking: any) => ({
             trackingId: tracking?.trackingId || "Unknown",
             moreInfoLink: tracking?.moreInfoLink || "#",
+            personInCharge: tracking?.personInCharge || "Unknown",
+            productLotId: tracking?.productLotId || "Unknown",
+            status: tracking?.status || 0,
         }));
 
     } catch (error) {
@@ -117,6 +120,8 @@ export const getRetailerTracking = async (): Promise<any> => {
         return [];
     }
 };
+
+
 
 export const retailerReceiveProduct = async (trackingId: string, formData: any) => {
     try {

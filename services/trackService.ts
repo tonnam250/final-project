@@ -132,8 +132,8 @@ export interface RetailerData {
 }
 
 export interface TrackingResponse {
-  retailer?: RetailerData;
-  logistics?: LogisticsData;
+  retailer?: RetailerData[];    // เปลี่ยนจาก object → array
+  logistics?: LogisticsData[];
   factory?: FactoryData;
   farm?: FarmData;
 }
@@ -143,9 +143,15 @@ export interface TrackingResponse {
  * @param {string} trackingId - The tracking ID to fetch details for
  * @returns {Promise<TrackingResponse>} - Returns the tracking details JSON
  */
-export const getTrackingDetails = async (trackingId: string): Promise<TrackingResponse> => {
+export const getTrackingDetails = async (productLotId: string): Promise<TrackingResponse> => {
   try {
-    const response = await fetch(`${API_URL}/tracking-details?trackingId=${trackingId}`);
+    const response = await fetch(`${API_URL}/tracking-details?productLotId=${productLotId}`, {  // ✅ ต้องใช้ ( , { ) แบบนี้!
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
 
     if (!response.ok) {
       console.warn(`⚠️ API Warning: ${response.statusText}`);
@@ -157,6 +163,7 @@ export const getTrackingDetails = async (trackingId: string): Promise<TrackingRe
     return data;
   } catch (error) {
     console.error("❌ Error fetching tracking details:", error);
-    return {}; // ✅ ป้องกัน UI พัง
+    return {}; // ป้องกัน UI พัง
   }
 };
+

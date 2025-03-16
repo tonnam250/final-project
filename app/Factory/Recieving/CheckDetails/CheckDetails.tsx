@@ -4,8 +4,44 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter,useSearchParams } from "next/navigation";
 import { updateMilkTankStatus } from "@/services/rawMilkFacService"; // ✅ เพิ่ม API ที่ต้องใช้
 
+interface RecipientInfo {
+    personInCharge: string;
+    location: string;
+    pickUpTime: string;
+}
+
+interface Quantity {
+    quantity: number;
+    quantityUnit: string;
+    temp: number;
+    tempUnit: string;
+    pH: number;
+    fat: number;
+    protein: number;
+    bacteria: boolean;
+    bacteriaInfo: string;
+    contaminants: boolean;
+    contaminantInfo: string;
+    abnormalChar: boolean;
+    abnormalType: {
+        smellBad: boolean;
+        smellNotFresh: boolean;
+        abnormalColor: boolean;
+        sour: boolean;
+        bitter: boolean;
+        cloudy: boolean;
+        lumpy: boolean;
+        separation: boolean;
+    };
+}
+
+interface Data {
+    RecipientInfo: RecipientInfo;
+    Quantity: Quantity;
+}
+
 const CheckDetails = () => {
-    const [data, setData] = useState(null);
+    const [data, setData] = useState<Data | null>(null);
     const router = useRouter();
     const [approved, setApproved] = useState<boolean | null>(null); // ✅ เพิ่ม State เก็บค่าที่ผู้ใช้เลือก
     const [showShippingAddress, setShowShippingAddress] = useState<boolean>(false);
@@ -36,16 +72,11 @@ const CheckDetails = () => {
     
 
     const handleSubmit = async () => {
-        if (approved === null) {
-            alert("กรุณาเลือกว่าจะรับหรือไม่รับนมดิบก่อนกด Submit!");
-            return;
-        }
-
         if (!data) {
             alert("No data found to submit!");
             return;
         }
-
+    
         try {
             const tankId = data?.tankId || "";
             const input = {
@@ -59,13 +90,13 @@ const CheckDetails = () => {
                     protein: parseFloat(data.Quantity.protein),
                 },
             };
-            
-
-            const response = await updateMilkTankStatus(tankId, approved, input);
-
+    
+            // ✅ ส่งค่า approved เป็น true เสมอ
+            const response = await updateMilkTankStatus(tankId, true, input);
+    
             if (response) {
-                alert(approved ? "คุณรับนมดิบสำเร็จ!" : "คุณปฏิเสธนมดิบสำเร็จ!");
-                localStorage.removeItem("recievedForm"); // ✅ เคลียร์เฉพาะข้อมูลนี้
+                alert("คุณรับนมดิบสำเร็จ!");
+                localStorage.removeItem("recievedForm");
                 router.push(`/Factory/FactoryDetails?id=${tankId}`);
             } else {
                 alert("เกิดข้อผิดพลาดในการส่งข้อมูล!");
@@ -75,6 +106,7 @@ const CheckDetails = () => {
             alert("Error submitting data!");
         }
     };
+    
 
     const handleNextClick = () => {
         setShowShippingAddress(true);
@@ -195,14 +227,14 @@ const CheckDetails = () => {
                             <div className="flex justify-between">
                                 <p className="font-semibold">Bacteria:</p>
                                 <div className="flex flex-col gap-2">
-                                    <p>{data.Quantity.bacteria === true ? "True" : "False"}</p>
+                                    <p>{data.Quantity.bacteria ? "True" : "False"}</p>
                                     <p>{data.Quantity.bacteriaInfo}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Contaminants:</p>
                                 <div className="flex flex-col gap-2">
-                                    <p>{data.Quantity.contaminants === true ? "True" : "False"}</p>
+                                    <p>{data.Quantity.contaminants ? "True" : "False"}</p>
                                     <p>{data.Quantity.contaminantInfo}</p>
                                 </div>
                             </div>
@@ -221,40 +253,23 @@ const CheckDetails = () => {
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-3">
-                                    <p>{data.Quantity.abnormalChar === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.smellBad === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.smellNotFresh === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.abnormalColor === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.sour === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.bitter === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.cloudy === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.lumpy === true ? "True" : "False"}</p>
-                                    <p>{data.Quantity.abnormalType.separation === true ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalChar ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalType.smellBad ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalType.smellNotFresh ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalType.abnormalColor ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalType.sour ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalType.bitter ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalType.cloudy ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalType.lumpy ? "True" : "False"}</p>
+                                    <p>{data.Quantity.abnormalType.separation ? "True" : "False"}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
-            {/* ✅ Selection buttons for accepting or rejecting raw milk */}
-            <div className="flex flex-col items-center gap-4 my-6">
-                <h2 className="text-xl font-semibold">Do you want to accept this tank?</h2>
-                <div className="flex gap-4">
-                    <button 
-                        className={`px-5 py-2 rounded-full font-semibold ${approved === true ? 'bg-green-500 text-white' : 'bg-gray-300'}`}
-                        onClick={() => setApproved(true)}
-                    >
-                        ✅ Accept Raw Milk
-                    </button>
-                    <button 
-                        className={`px-5 py-2 rounded-full font-semibold ${approved === false ? 'bg-red-500 text-white' : 'bg-gray-300'}`}
-                        onClick={() => setApproved(false)}
-                    >
-                        ❌ Reject Raw Milk
-                    </button>
-                </div>
-            </div>
             <button type="button" onClick={handleSubmit} className="text-xl bg-emerald-400 p-3 mb-5 self-end mx-14 rounded-3xl text-white font-semibold">Submit</button>
+
             </div>
     );
 };

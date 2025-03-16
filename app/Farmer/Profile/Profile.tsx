@@ -2,19 +2,22 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { getUserInfo, updateUserInfo } from "../../../services/authService";
+import { logout } from '@/services/authService'; // ✅ Import ฟังก์ชัน Logout
+
 
 const Profile = () => {
     const [profileImage, setProfileImage] = useState("/images/ProfileDefault.jpg");
     const [isEditing, setIsEditing] = useState(false);
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [telephone, setTelephone] = useState("");
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [role, setRole] = useState("Farmer");
     const [showPassword, setShowPassword] = useState(false);
-
+    const [username, setUsername] = useState("user");
+    const [password, setPassword] = useState("12345");
+    const [email, setEmail] = useState("user@gmail.com");
+    const [phone, setPhone] = useState("+0123456789");
     // ดึงข้อมูลฟาร์มและข้อมูลผู้ใช้เมื่อ component mount
     useEffect(() => {
         const fetchData = async () => {
@@ -66,11 +69,20 @@ const Profile = () => {
         }
         setIsEditing(!isEditing);
     };
+    const handleSignOut = async () => {
+           const success = await logout();
+           if (success) {
+               alert("Logout successful");
+               router.push('/'); // กลับไปหน้า Login
+           } else {
+               alert("Failed to logout");
+           }
+       };
 
 
     return (
         <div className="flex flex-col items-center min-h-screen pt-24 px-10 p-10 bg-slate-100">
-            <div className="flex flex-col items-center gap-4 bg-white w-3/4 border rounded-3xl p-10 shadow-xl">
+            <div className='flex flex-col items-center gap-4 bg-white w-3/4 border rounded-3xl p-10 shadow-xl '>
                 <h1 className="text-5xl font-semibold">Your Profile</h1>
                 <div className="flex justify-center w-full items-center gap-10 mt-10">
                     <div className="flex flex-col items-center gap-5 w-1/2">
@@ -81,41 +93,21 @@ const Profile = () => {
                             <input type="file" className="hidden" onChange={handleImageChange} />
                             Choose Profile Image
                         </label>
-                        {/* ใน non-edit mode แสดง username โดยคำนวณจาก firstName + " " + lastName */}
-                        {isEditing ? (
-                            <p className="text-2xl font-semibold">Editing...</p>
-                        ) : (
-                            <p className="text-2xl font-semibold">{`${firstName} ${lastName}`}</p>
-                        )}
                     </div>
-                    <div className="flex flex-col items-center gap-3 w-full">
-                        {isEditing ? (
-                            <>
-                                <div className="flex justify-between gap-6 w-full">
-                                    <p className="text-lg font-bold">First Name:</p>
-                                    <input
-                                        type="text"
-                                        value={firstName}
-                                        onChange={(e) => setFirstName(e.target.value)}
-                                        className="text-lg text-left w-32 border-b-2 border-gray-300 focus:outline-none"
-                                    />
-                                </div>
-                                <div className="flex justify-between gap-6 w-full">
-                                    <p className="text-lg font-bold">Last Name:</p>
-                                    <input
-                                        type="text"
-                                        value={lastName}
-                                        onChange={(e) => setLastName(e.target.value)}
-                                        className="text-lg text-left w-32 border-b-2 border-gray-300 focus:outline-none"
-                                    />
-                                </div>
-                            </>
-                        ) : (
-                            <div className="flex justify-between gap-6 w-full">
-                                <p className="text-lg font-bold">Username:</p>
-                                <p className="text-lg text-left w-32">{`${firstName} ${lastName}`}</p>
-                            </div>
-                        )}
+                    <div className="flex flex-col items-center gap-3 w-1/2">
+                        <div className="flex justify-between gap-6 w-full">
+                            <p className="text-lg font-bold">Username:</p>
+                            {isEditing ? (
+                                <input
+                                    type="text"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    className="text-lg text-left w-32 border-b-2 border-gray-300 focus:outline-none"
+                                />
+                            ) : (
+                                <p className="text-lg text-left w-32">{username}</p>
+                            )}
+                        </div>
                         <div className="flex justify-between gap-6 w-full">
                             <p className="text-lg font-bold">Password:</p>
                             <div className='flex gap-2 w-32'>
@@ -132,9 +124,9 @@ const Profile = () => {
                                 <button onClick={() => setShowPassword(!showPassword)} className="text-sm text-gray-500">
                                     {showPassword ? (
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                            <g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5">
-                                                <path d="M3 13c3.6-8 14.4-8 18 0"/>
-                                                <path fill="currentColor" d="M12 17a3 3 0 1 1 0-6a3 3 0 0 1 0 6"/>
+                                            <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">
+                                                <path d="M3 13c3.6-8 14.4-8 18 0" />
+                                                <path fill="currentColor" d="M12 17a3 3 0 1 1 0-6a3 3 0 0 1 0 6" />
                                             </g>
                                         </svg>
                                     ) : (
@@ -145,7 +137,6 @@ const Profile = () => {
                                 </button>
                             </div>
                         </div>
-                        {/* Email field จาก userInfo */}
                         <div className="flex justify-between gap-6 w-full">
                             <p className="text-lg font-bold">Role:</p>
                             <p className="text-lg text-left w-32">{role}</p>
@@ -163,36 +154,39 @@ const Profile = () => {
                                 <p className="text-lg text-left w-32">{email}</p>
                             )}
                         </div>
-                        {/* Phone field จาก farm info */}
                         <div className="flex justify-between gap-6 w-full">
                             <p className="text-lg font-bold">Phone:</p>
                             {isEditing ? (
                                 <input
                                     type="tel"
-                                    value={telephone}
-                                    onChange={(e) => setTelephone(e.target.value)}
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value)}
                                     className="text-lg text-left w-32 border-b-2 border-gray-300 focus:outline-none"
                                 />
                             ) : (
-                                <p className="text-lg text-left w-32">{telephone}</p>
+                                <p className="text-lg text-left w-32">{phone}</p>
                             )}
                         </div>
                     </div>
                 </div>
-                <button
-                    type="button"
-                    onClick={handleEditClick}
-                    className="bg-emerald-400 p-2 text-white rounded-full w-24 hover:bg-green-700 flex items-center justify-center gap-2"
-                >
-                    {isEditing ? "Save" : (
-                        <>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="m14.06 9l.94.94L5.92 19H5v-.92zm3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83l3.75 3.75l1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94z" />
-                            </svg>
-                            Edit
-                        </>
-                    )}
-                </button>
+                <div className='flex items-center justify-center gap-4 w-full mt-10'>
+                    <button type="button" onClick={handleEditClick} className='bg-emerald-400 p-2 text-white rounded-full w-24 hover:bg-green-700 flex items-center justify-center gap-2'>
+                        {isEditing ? "Save" : (
+                            <>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="m14.06 9l.94.94L5.92 19H5v-.92zm3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83l3.75 3.75l1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94z" />
+                                </svg>
+                                Edit
+                            </>
+                        )}
+                    </button>
+                    <button type='button' onClick={handleSignOut} className='flex text-center border-2 rounded-full border-red-500 p-1 px-2 text-red-500 w-fit gap-2 hover:bg-red-500 hover:text-white'>
+                        Sign out
+                        <svg xmlns="http://www.w3.org/2000/svg" className='h-7 w-7 inline' viewBox="0 0 24 24">
+                            <g fill="currentColor" fillRule="evenodd" clipRule="evenodd"><path d="M15.99 7.823a.75.75 0 0 1 1.061.021l3.49 3.637a.75.75 0 0 1 0 1.038l-3.49 3.637a.75.75 0 0 1-1.082-1.039l2.271-2.367h-6.967a.75.75 0 0 1 0-1.5h6.968l-2.272-2.367a.75.75 0 0 1 .022-1.06" /><path d="M3.25 4A.75.75 0 0 1 4 3.25h9.455a.75.75 0 0 1 .75.75v3a.75.75 0 1 1-1.5 0V4.75H4.75v14.5h7.954V17a.75.75 0 0 1 1.5 0v3a.75.75 0 0 1-.75.75H4a.75.75 0 0 1-.75-.75z" /></g>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
     );

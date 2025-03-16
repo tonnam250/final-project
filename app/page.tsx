@@ -1,43 +1,12 @@
 "use client"; // ✅ ใช้ Client Component
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { getUserRole, getRedirectUrl } from "../services/authService"; 
+import { QrButton } from "@/components/qr-button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
-
-export default function HomePage() {
-  const [role, setRole] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // ✅ เพิ่ม Loading State
-  const router = useRouter();
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const userRole = await getUserRole();
-        if (userRole) {
-          setRole(userRole);
-          const redirectUrl = getRedirectUrl(userRole);
-          if (redirectUrl) {
-            router.push(redirectUrl); // ✅ Redirect เฉพาะถ้ามี URL ที่ถูกต้อง
-          }
-        }
-      } catch (error) {
-        console.error("❌ [Auth Check Error]:", error);
-      } finally {
-        setIsLoading(false); // ✅ หยุด Loading เมื่อเช็คเสร็จ
-      }
-    };
-
-    checkAuth();
-  }, []); // ✅ เพิ่ม Dependency Array ให้ useEffect ทำงานแค่ครั้งเดียว
-
-  if (isLoading) {
-    return (
-      <div className="flex flex-col w-full h-screen justify-center items-center">
-        <p className="text-xl text-gray-700">Loading...</p>
-      </div>
-    );
-  }
+const page = async () => {
+  const onScan = (data: string) => {
+    console.log("Scanned data:", data);
+  };
 
   return (
     <div className="flex flex-col w-full h-full">
@@ -64,7 +33,7 @@ export default function HomePage() {
                   <path fill="currentColor" d="M9.5 16q-2.725 0-4.612-1.888T3 9.5t1.888-4.612T9.5 3t4.613 1.888T16 9.5q0 1.1-.35 2.075T14.7 13.3l5.6 5.6q.275.275.275.7t-.275.7t-.7.275t-.7-.275l-5.6-5.6q-.75.6-1.725.95T9.5 16m0-2q1.875 0 3.188-1.312T14 9.5t-1.312-3.187T9.5 5T6.313 6.313T5 9.5t1.313 3.188T9.5 14" />
                 </svg>
               </button>
-              <a href="/" className="flex bg-gray-500 rounded-full w-12 h-12 text-center justify-center items-center">
+              {/* <a href="/" className="flex bg-gray-500 rounded-full w-12 h-12 text-center justify-center items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M1 1h10v10H1zm2 2v6h6V3z" />
                   <path fill="currentColor" d="M5 5h2v2H5z" />
@@ -74,7 +43,8 @@ export default function HomePage() {
                   <path fill="currentColor" d="M5 17h2v2H5z" />
                   <path fill="currentColor" d="M23 19h-4v4h-6V13h1h-1v6h2v2h2v-6h-2v-2h-1h3v2h2v2h2v-4h2zm0 2v2h-2v-2z" />
                 </svg>
-              </a>
+              </a> */}
+              <QrButton />
             </div>
           </div>
           {/* end Welcome text */}
@@ -256,3 +226,4 @@ export default function HomePage() {
   );
 }
 
+export default page;

@@ -3,6 +3,58 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { createProduct } from "@/services/productService"; // ✅ Import API Service
 
+interface GeneralInfo {
+    productName: string;
+    category: string;
+    description: string;
+    quantity: string;
+}
+
+interface Nutrition {
+    quantity: string;
+    quantityUnit: string;
+    temp: string;
+    tempUnit: string;
+    pH: string;
+    fat: string;
+    protein: string;
+    calories: string;
+    totalFat: string;
+    colestoral: string;
+    sodium: string;
+    potassium: string;
+    totalCarbohydrates: string;
+    fiber: string;
+    sugar: string;
+    vitaminC: string;
+    calcium: string;
+    iron: string;
+    vitaminD: string;
+    vitaminB6: string;
+    vitaminB12: string;
+    magnesium: string;
+    bacteria: boolean;
+    bacteriaInfo: string;
+    contaminants: boolean;
+    contaminantInfo: string;
+    abnormalChar: boolean;
+    abnormalType: {
+        smellBad: boolean;
+        smellNotFresh: boolean;
+        abnormalColor: boolean;
+        sour: boolean;
+        bitter: boolean;
+        cloudy: boolean;
+        lumpy: boolean;
+        separation: boolean;
+    };
+}
+
+interface ProductData {
+    GeneralInfo: GeneralInfo;
+    Nutrition: Nutrition;
+}
+
 const CheckProductDetails = () => {
     const router = useRouter();
     const [data, setData] = useState<any>(null);

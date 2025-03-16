@@ -17,6 +17,42 @@ interface GeoData {
     postalCode: number;
 }
 
+interface Nutrition {
+    quantity: number;
+    quantityUnit: string;
+    temp: number;
+    tempUnit: string;
+    pH: number;
+    fat: number;
+    protein: number;
+    calories: number;
+    totalFat: number;
+    colestoral: number;
+    sodium: number;
+    potassium: number;
+    totalCarbohydrates: number;
+    fiber: number;
+    sugar: number;
+    vitaminC: number;
+    calcium: number;
+    iron: number;
+    vitaminD: number;
+    vitaminB6: number;
+    vitaminB12: number;
+    magnesium: number;
+    abnormalType: { [key: string]: boolean }; // Update this line
+}
+
+interface FormData {
+    GeneralInfo: {
+        prodName: string;
+        category: string;
+        description: string;
+        quantity: string;
+    };
+    Nutrition: Nutrition;
+}
+
 const AddProduct = () => {
 
     // for province fetching
@@ -95,7 +131,7 @@ const AddProduct = () => {
     // end step status update function
 
     // save form Data
-    const [addProductForm, setFormData] = useState({
+    const [addProductForm, setFormData] = useState<FormData>({
         GeneralInfo: {
             prodName: "",
             category: "",
@@ -124,7 +160,8 @@ const AddProduct = () => {
             vitaminD: 0,
             vitaminB6: 0,
             vitaminB12: 0,
-            magnesium: 0
+            magnesium: 0,
+            abnormalType: {} // Ensure this is an object
         }
     });
 
@@ -150,7 +187,8 @@ const AddProduct = () => {
 
     // ✅ ฟังก์ชัน handleFormDataChange รองรับ text, select และ checkbox
     const handleFormDataChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, type, value, checked } = event.target;
+        const { name, type, value } = event.target;
+        const checked = event.target instanceof HTMLInputElement ? event.target.checked : undefined;
         const keys = name.split(".");
 
         setFormData((prevData) => {
@@ -194,7 +232,7 @@ const AddProduct = () => {
 
         setFormData((prevData) => {
             const updatedData = { ...prevData };
-            let temp = updatedData.Quantity.abnormalType;
+            let temp = updatedData.Nutrition.abnormalType;
 
             temp[name.split('.').pop()!] = checked;
 

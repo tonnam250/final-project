@@ -168,12 +168,13 @@ useEffect(() => {
 
     // ✅ ฟังก์ชัน handleFormDataChange รองรับ text, select และ checkbox
     const handleFormDataChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, type, value, checked } = event.target;
+        const { name, type, value } = event.target;
+        const checked = (event.target as HTMLInputElement).checked; // Explicitly cast to HTMLInputElement for checked property
         const keys = name.split(".");
 
         setFormData((prevData) => {
             const updatedData = { ...prevData }; // Clone ข้อมูลเดิม
-            let temp = updatedData;
+            let temp: any = updatedData; // Use 'any' type for temp variable
 
             for (let i = 0; i < keys.length - 1; i++) {
                 temp = temp[keys[i]];
@@ -209,7 +210,7 @@ useEffect(() => {
 
         setFormData((prevData) => {
             const updatedData = { ...prevData };
-            let temp = updatedData.Quantity.abnormalType;
+            let temp: any = updatedData.Quantity.abnormalType; // Use 'any' type for temp variable
 
             temp[name.split('.').pop()!] = checked;
 

@@ -23,6 +23,79 @@ interface GeoData {
     postalCode: number;
 }
 
+interface ProductLotForm {
+    GeneralInfo: {
+        productName: string;
+        category: string;
+        description: string;
+        quantity: number;
+        quantityUnit: string;
+    };
+    selectMilkTank: string; // Change this line
+    Quality: {
+        temp: number;
+        tempUnit: string;
+        pH: number;
+        fat: number;
+        protein: number;
+        bacteria: boolean;
+        bacteriaInfo: string;
+        contaminants: boolean;
+        contaminantInfo: string;
+        abnormalChar: boolean;
+        abnormalType: {
+            smellBad: boolean;
+            smellNotFresh: boolean;
+            abnormalColor: boolean;
+            sour: boolean;
+            bitter: boolean;
+            cloudy: boolean;
+            lumpy: boolean;
+            separation: boolean;
+        };
+    };
+    nutrition: {
+        calories: number;
+        totalFat: number;
+        colestoral: number;
+        sodium: number;
+        potassium: number;
+        totalCarbohydrates: number;
+        fiber: number;
+        sugar: number;
+        vitaminC: number;
+        calcium: number;
+        iron: number;
+        vitaminD: number;
+        vitaminB6: number;
+        vitaminB12: number;
+        magnesium: number;
+    };
+    shippingAddress: {
+        companyName: string;
+        firstName: string;
+        lastName: string;
+        email: string;
+        areaCode: string;
+        phoneNumber: string;
+        address: string;
+        province: string;
+        district: string;
+        subDistrict: string;
+        postalCode: string;
+        location: string;
+    };
+}
+
+interface StepStatus {
+    step1: string;
+    step2: string;
+    step3: string;
+    step4: string;
+    step5: string;
+    step6: string;
+}
+
 const AddProductLot = () => {
     // for province fetching
     const [geoData, setGeoData] = useState<GeoData[]>([]);
@@ -306,7 +379,7 @@ const handleSelectUsername = (index: number, user: any) => {
     // Step status update function
     const [showShippingAddress, setShowShippingAddress] = useState<boolean>(false);
     const shippingAddressRef = useRef<HTMLDivElement>(null);
-    const [stepStatus, setStepStatus] = useState({
+    const [stepStatus, setStepStatus] = useState<StepStatus>({
         step1: 'in-progress',
         step2: 'not-started',
         step3: 'not-started',
@@ -320,9 +393,9 @@ const handleSelectUsername = (index: number, user: any) => {
     const handleNextClick = (currentStep: number) => {
         const nextStep = currentStep + 1;
         setStepStatus((prevStatus) => {
-            const newStatus = { ...prevStatus, [`step${currentStep}`]: 'completed' };
+            const newStatus = { ...prevStatus, [`step${currentStep}`]: 'completed' } as StepStatus;
             if (nextStep <= 6) {
-                newStatus[`step${nextStep}`] = 'in-progress';
+                newStatus[`step${nextStep}` as keyof StepStatus] = 'in-progress';
             }
             return newStatus;
         });
@@ -334,7 +407,7 @@ const handleSelectUsername = (index: number, user: any) => {
     // end step status update function
 
     // save form Data
-    const [productLotForm, setFormData] = useState({
+    const [productLotForm, setFormData] = useState<ProductLotForm>({
         GeneralInfo: {
             productId: "",  
             productName: "",
@@ -549,7 +622,7 @@ const handleSelectUsername = (index: number, user: any) => {
     
 
     const handleFormDataChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, type, value, checked } = event.target;
+        const { name, type, value, checked } = event.target as HTMLInputElement;
         const keys = name.split(".");
     
         setFormData((prevData) => {
@@ -585,16 +658,47 @@ const handleSelectUsername = (index: number, user: any) => {
             const updatedData = { ...prevData };
 
             // ตรวจสอบว่า `Quality.abnormalType` มีค่าอยู่แล้วหรือไม่
-            if (!updatedData.Quality) updatedData.Quality = {};
-            if (!updatedData.Quality.abnormalType) updatedData.Quality.abnormalType = {};
+            if (!updatedData.Quality) updatedData.Quality = {
+                temp: 0,
+                tempUnit: "Celcius",
+                pH: 0,
+                fat: 0,
+                protein: 0,
+                bacteria: false,
+                bacteriaInfo: "",
+                contaminants: false,
+                contaminantInfo: "",
+                abnormalChar: false,
+                abnormalType: {
+                    smellBad: false,
+                    smellNotFresh: false,
+                    abnormalColor: false,
+                    sour: false,
+                    bitter: false,
+                    cloudy: false,
+                    lumpy: false,
+                    separation: false
+                }
+            };
+            if (!updatedData.Quality.abnormalType) updatedData.Quality.abnormalType = {
+                smellBad: false,
+                smellNotFresh: false,
+                abnormalColor: false,
+                sour: false,
+                bitter: false,
+                cloudy: false,
+                lumpy: false,
+                separation: false
+            };
 
-            updatedData.Quality.abnormalType[name.split('.').pop()!] = checked;
+            const key = name.split('.').pop() as keyof typeof updatedData.Quality.abnormalType;
+            updatedData.Quality.abnormalType[key] = checked;
 
             return updatedData;
         });
     };
 
-    const handleShippingAddressChange = (index: number, event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const handleShippingAddressChange = (index: number, event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = event.target;
         setFormData(prev => {
             const newShippingAddresses = [...prev.shippingAddresses];
@@ -824,67 +928,67 @@ const handleSelectUsername = (index: number, user: any) => {
                 </div>
 
                 {/* Select Milk Tank Section */}
-{/* Select Milk Tank */}
-<div id="section2" className={`flex flex-col items-center w-full h-full text-xl gap-8 mt-20 ${visibleSection >= 2 ? '' : 'hidden'}`}>
-    <h1 className="text-5xl font-bold">Select Milk Tank</h1>
+                {/* Select Milk Tank */}
+                <div id="section2" className={`flex flex-col items-center w-full h-full text-xl gap-8 mt-20 ${visibleSection >= 2 ? '' : 'hidden'}`}>
+                    <h1 className="text-5xl font-bold">Select Milk Tank</h1>
 
-    {/* ✅ Drop-down เลือกแท็งก์ */}
-    <select 
-        name="milkTank" 
-        id="milkTank" 
-        className="border rounded-full p-3 w-1/2 text-center"
-        value="" 
-        onChange={(e) => handleMilkTankSelection(e.target.value)}
-    >
-        <option value="">Select a Milk Tank</option>
-        {milkTanks.map((tank) => (
-            <option key={tank.tankId} value={tank.tankId}>
-                {tank.tankId} ({tank.quantity})
-            </option>
-        ))}
-    </select>
+                    {/* ✅ Drop-down เลือกแท็งก์ */}
+                    <select 
+                        name="milkTank" 
+                        id="milkTank" 
+                        className="border rounded-full p-3 w-1/2 text-center"
+                        value="" 
+                        onChange={(e) => handleMilkTankSelection(e.target.value)}
+                    >
+                        <option value="">Select a Milk Tank</option>
+                        {milkTanks.map((tank) => (
+                            <option key={tank.tankId} value={tank.tankId}>
+                                {tank.tankId} ({tank.quantity})
+                            </option>
+                        ))}
+                    </select>
 
-    {/* ✅ แสดงแท็งก์นมแบบกล่องคลิกได้ */}
-    {milkTanks.map((tank) => (
-        <div 
-            key={tank.tankId}
-            onClick={() => handleMilkTankSelection(tank.tankId)} 
-            className={`cursor-pointer flex flex-col justify-center items-center w-1/2 h-fit gap-5 p-5 border rounded-2xl shadow-xl 
-                ${productLotForm.selectMilkTank.tanks.includes(tank.tankId) ? "bg-[#C2CC8D] text-[#52600A] border-[#52600A]" : "bg-white text-slate-500"}`}
-        >
-            <div className="flex flex-col md:flex-row justify-between items-center w-full">
-                <span className="text-xl md:text-2xl font-semibold">Milk Tank No: 
-                    <p className="font-normal inline">{tank.tankId}</p>
-                </span>
-                <span className="text-xl md:text-2xl font-semibold">Quantity: 
-                    <p className="font-normal inline">{tank.quantity}</p>
-                </span>
-            </div>
-            <div className="flex flex-col md:flex-row justify-between items-center w-full">
-                <span className="text-xl md:text-2xl font-semibold">Farm Name: 
-                    <p className="inline font-normal">{tank.farmName}</p>
-                </span>
-                <span className="text-xl md:text-2xl font-semibold">Temperature: 
-                    <p className="inline font-normal">{tank.temperature}</p>
-                </span>
-            </div>
-            <div className="flex flex-col justify-center items-start w-full">
-                <span className="text-xl md:text-2xl font-semibold">Location: 
-                    <p className="inline font-normal">{tank.location}</p>
-                </span>
-            </div>
-        </div>
-    ))}
+                    {/* ✅ แสดงแท็งก์นมแบบกล่องคลิกได้ */}
+                    {milkTanks.map((tank) => (
+                        <div 
+                            key={tank.tankId}
+                            onClick={() => handleMilkTankSelection(tank.tankId)} 
+                            className={`cursor-pointer flex flex-col justify-center items-center w-1/2 h-fit gap-5 p-5 border rounded-2xl shadow-xl 
+                                ${productLotForm.selectMilkTank.tanks.includes(tank.tankId) ? "bg-[#C2CC8D] text-[#52600A] border-[#52600A]" : "bg-white text-slate-500"}`}
+                        >
+                            <div className="flex flex-col md:flex-row justify-between items-center w-full">
+                                <span className="text-xl md:text-2xl font-semibold">Milk Tank No: 
+                                    <p className="font-normal inline">{tank.tankId}</p>
+                                </span>
+                                <span className="text-xl md:text-2xl font-semibold">Quantity: 
+                                    <p className="font-normal inline">{tank.quantity}</p>
+                                </span>
+                            </div>
+                            <div className="flex flex-col md:flex-row justify-between items-center w-full">
+                                <span className="text-xl md:text-2xl font-semibold">Farm Name: 
+                                    <p className="inline font-normal">{tank.farmName}</p>
+                                </span>
+                                <span className="text-xl md:text-2xl font-semibold">Temperature: 
+                                    <p className="inline font-normal">{tank.temperature}</p>
+                                </span>
+                            </div>
+                            <div className="flex flex-col justify-center items-start w-full">
+                                <span className="text-xl md:text-2xl font-semibold">Location: 
+                                    <p className="inline font-normal">{tank.location}</p>
+                                </span>
+                            </div>
+                        </div>
+                    ))}
 
-    {/* ✅ ปุ่ม Next */}
-    <button
-        type="button"
-        className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8] ${stepStatus.step2 === 'completed' ? 'hidden' : ''}`}
-        onClick={() => handleNextClick(2)}
-    >
-        Next
-    </button>
-</div>
+                    {/* ✅ ปุ่ม Next */}
+                    <button
+                        type="button"
+                        className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8] ${stepStatus.step2 === 'completed' ? 'hidden' : ''}`}
+                        onClick={() => handleNextClick(2)}
+                    >
+                        Next
+                    </button>
+                </div>
 
 
 

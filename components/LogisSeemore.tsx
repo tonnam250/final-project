@@ -6,22 +6,24 @@ import { useEffect, useState } from "react";
 interface LogisSeemoreProps {
     isOpen: boolean;
     onClose: () => void;
+    logistics: any; // เพิ่ม prop นี้เข้ามา
 }
 
-export default function LogisSeemore({ isOpen, onClose }: LogisSeemoreProps) {
+
+export default function LogisSeemore({ isOpen, onClose, logistics }: LogisSeemoreProps) {
     const [data, setData] = useState<any>({ before: [], during: [], after: [] });
 
     useEffect(() => {
-        const storedData = localStorage.getItem("trackingData");
-        if (storedData) {
-            const parsedData = JSON.parse(storedData);
+        if (logistics) {
             setData({
-                before: parsedData?.logistics?.beforeCheckpoints || [],
-                during: parsedData?.logistics?.duringCheckpoints || [],
-                after: parsedData?.logistics?.afterCheckpoints || [],
+                before: logistics.beforeCheckpoints ? [logistics.beforeCheckpoints[0]] : [],
+                during: logistics.duringCheckpoints ? [logistics.duringCheckpoints[0]] : [],
+                after: logistics.afterCheckpoints ? [logistics.afterCheckpoints[0]] : [],
             });
         }
-    }, []);
+    }, [logistics]);
+    
+    
 
     if (!isOpen) return null;
 

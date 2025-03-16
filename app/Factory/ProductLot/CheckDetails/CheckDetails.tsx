@@ -4,9 +4,85 @@ import { useRouter } from "next/navigation";
 import { createProductLot } from "@/services/productlotService";
 
 
+interface Quality {
+    temp?: string;
+    tempUnit?: string;
+    pH?: string;
+    fat?: string;
+    protein?: string;
+    bacteria?: boolean;
+    bacteriaInfo?: string;
+    contaminants?: boolean;
+    contaminantInfo?: string;
+    abnormalChar?: boolean;
+    abnormalType?: {
+        smellBad?: boolean;
+        smellNotFresh?: boolean;
+        abnormalColor?: boolean;
+        sour?: boolean;
+        bitter?: boolean;
+        cloudy?: boolean;
+        lumpy?: boolean;
+        separation?: boolean;
+    };
+}
+
+interface GeneralInfo {
+    productName?: string;
+    category?: string;
+    description?: string;
+    quantity?: string;
+    quantityUnit?: string;
+}
+
+interface Nutrition {
+    calories?: string;
+    totalFat?: string;
+    colestoral?: string;
+    sodium?: string;
+    potassium?: string;
+    totalCarbohydrates?: string;
+    fiber?: string;
+    sugar?: string;
+    vitaminC?: string;
+    calcium?: string;
+    iron?: string;
+    vitaminD?: string;
+    vitaminB6?: string;
+    vitaminB12?: string;
+    magnesium?: string;
+}
+
+interface ShippingAddress {
+    companyName?: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    areaCode?: string;
+    phoneNumber?: string;
+    address?: string;
+    province?: string;
+    district?: string;
+    subDistrict?: string;
+    postalCode?: string;
+    location?: string;
+}
+
+interface Data {
+    GeneralInfo: GeneralInfo;
+    selectMilkTank: Record<string, unknown>;
+    Quality: Quality;
+    nutrition: Nutrition;
+    shippingAddresses: ShippingAddress[];
+}
+
+interface StepStatus {
+    [key: string]: 'completed' | 'in-progress' | 'not-started';
+}
+
 const CheckDetails = () => {
     const router = useRouter();
-    const [data, setData] = useState({
+    const [data, setData] = useState<Data>({
         GeneralInfo: {},
         selectMilkTank: {},
         Quality: {},
@@ -17,7 +93,7 @@ const CheckDetails = () => {
     useEffect(() => {
         const storedData = localStorage.getItem("productLotForm");
         if (storedData) {
-            const parsedData = JSON.parse(storedData);
+            const parsedData: Data = JSON.parse(storedData);
             console.log("Retrieved data:", parsedData); // Debugging line
             setData(parsedData);
         }
@@ -60,7 +136,7 @@ const CheckDetails = () => {
     // Step status update function
     const [showShippingAddress, setShowShippingAddress] = useState<boolean>(false);
     const shippingAddressRef = useRef<HTMLDivElement>(null);
-    const [stepStatus, setStepStatus] = useState({
+    const [stepStatus, setStepStatus] = useState<StepStatus>({
         step1: 'completed',
         step2: 'completed',
         step3: 'completed',
@@ -74,7 +150,7 @@ const CheckDetails = () => {
     const handleNextClick = (currentStep: number) => {
         const nextStep = currentStep + 1;
         setStepStatus((prevStatus) => {
-            const newStatus = { ...prevStatus, [`step${currentStep}`]: 'completed' };
+            const newStatus: StepStatus = { ...prevStatus, [`step${currentStep}`]: 'completed' };
             if (nextStep <= 6) {
                 newStatus[`step${nextStep}`] = 'in-progress';
             }

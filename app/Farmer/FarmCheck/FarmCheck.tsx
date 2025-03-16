@@ -5,6 +5,55 @@ import { useRouter } from "next/navigation";
 import { createMilkTank } from "@/services/rawMilkService";
 
 
+// Define the type for the data state
+interface MilkTankInfo {
+    farmName: string;
+    milkTankNo: string;
+    personInCharge: string;
+    quantity: number;
+    quantityUnit: string;
+    temp: number;
+    tempUnit: string;
+    pH: number;
+    fat: number;
+    protein: number;
+    bacteria: boolean;
+    bacteriaInfo: string;
+    contaminants: boolean;
+    contaminantInfo: string;
+    abnormalChar: boolean;
+    abnormalType: {
+        smellBad: boolean;
+        smellNotFresh: boolean;
+        abnormalColor: boolean;
+        sour: boolean;
+        bitter: boolean;
+        cloudy: boolean;
+        lumpy: boolean;
+        separation: boolean;
+    };
+}
+
+interface ShippingAddress {
+    companyName: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    areaCode: string;
+    phoneNumber: string;
+    address: string;
+    province: string;
+    district: string;
+    subDistrict: string;
+    postalCode: string;
+    location: string;
+}
+
+interface FormData {
+    milkTankInfo: MilkTankInfo;
+    shippingAddress: ShippingAddress;
+}
+
 const FarmCheck = () => {
     const [showShippingAddress, setShowShippingAddress] = useState<boolean>(false);
     const shippingAddressRef = useRef<HTMLDivElement | null>(null);

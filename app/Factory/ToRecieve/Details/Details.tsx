@@ -3,8 +3,56 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 
+interface MilkTankInfo {
+    farmName: string;
+    milkTankNo: string;
+    personInCharge: string;
+    quantity: number;
+    quantityUnit: string;
+    temp: number;
+    tempUnit: string;
+    pH: number;
+    fat: number;
+    protein: number;
+    bacteria: boolean;
+    bacteriaInfo: string;
+    contaminants: boolean;
+    contaminantInfo: string;
+    abnormalChar: boolean;
+    abnormalType: {
+        smellBad: boolean;
+        smellNotFresh: boolean;
+        abnormalColor: boolean;
+        sour: boolean;
+        bitter: boolean;
+        cloudy: boolean;
+        lumpy: boolean;
+        separation: boolean;
+    };
+}
+
+interface ShippingAddress {
+    companyName: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    address: string;
+    areaCode: string;
+    phoneNumber: string;
+    province: string;
+    district: string;
+    subDistrict: string;
+    postalCode: string;
+    location: string;
+}
+
+interface FormData {
+    milkTankInfo: MilkTankInfo;
+    shippingAddress: ShippingAddress;
+}
+
 const Details = () => {
-    const [data, setData] = useState(null);
+    const [data, setData] = useState<FormData | null>(null);
     const router = useRouter();
 
     useEffect(() => {

@@ -17,6 +17,37 @@ interface GeoData {
     postalCode: number;
 }
 
+interface LogisRecieveData {
+    GeneralInfo: {
+        recieveStatus: string;
+        farmName: string;
+        productLot: string;
+        personInCharge: string;
+    };
+    ProductDetail: {
+        deliverTime: string;
+        recieveTime: string;
+        quantity: number;
+        quantityUnit: string;
+        temp: number;
+        tempUnit: string;
+        companyName: string;
+        firstName: string;
+        lastName: string;
+        email: string;
+        areaCode: string;
+        phoneNumber: string;
+        address: string;
+        province: string;
+        district: string;
+        subDistrict: string;
+        postalCode: string;
+        location: string;
+        abnormalType?: { [key: string]: boolean }; // Optional property for abnormalType
+    };
+    [key: string]: any; // Index signature
+}
+
 const Recieving = () => {
 
     const router = useRouter();
@@ -40,7 +71,7 @@ const Recieving = () => {
                 setGeoData(data);
 
                 // ดึงจังหวัดที่ไม่ซ้ำ (ใช้ภาษาไทยให้ตรงกับ selectedProvince)
-                const provinces = Array.from(new Set(data.map((item) => item.provinceNameEn)));
+                const provinces = Array.from(new Set(data.map((item: GeoData) => item.provinceNameEn)));
                 setProvinceList(provinces);
             })
             .catch((err) => console.error("Fetch error:", err));
@@ -50,7 +81,7 @@ const Recieving = () => {
         if (selectedProvince) {
             const filteredDistricts = Array.from(
                 new Set(
-                    geoData.filter((item) => item.provinceNameEn === selectedProvince).map((item) => item.districtNameEn)
+                    geoData.filter((item: GeoData) => item.provinceNameEn === selectedProvince).map((item: GeoData) => item.districtNameEn)
                 )
             );
 
@@ -65,7 +96,7 @@ const Recieving = () => {
         if (selectedDistrict) {
             const filteredSubDistricts = Array.from(
                 new Set(
-                    geoData.filter((item) => item.districtNameEn === selectedDistrict).map((item) => item.subdistrictNameEn)
+                    geoData.filter((item: GeoData) => item.districtNameEn === selectedDistrict).map((item: GeoData) => item.subdistrictNameEn)
                 )
             );
 
@@ -434,16 +465,16 @@ const submitAndNavigate = () => {
                     </div>
                     {/* Farm Name */}
                     <div className="flex flex-col w-full items-start gap-3">
-                        <label htmlFor="farmName" className="font-semibold">Farm Name</label>
+                        <label htmlFor="farmName" className="font-semibold">Factory Name</label>
                         <input type="text" id="farmName"
                             placeholder="Enter your farm name" className="border rounded-full p-3 w-full"
                             name="GeneralInfo.farmName" value={LogisRecieve[0].GeneralInfo.farmName} onChange={(e) => handleLogisRecieveChange(e, 0)} />
                     </div>
                     {/* Milk tank no. */}
                     <div className="flex flex-col w-full items-start gap-3">
-                        <label htmlFor="milkTankNo" className="font-semibold">Milk Tank No.</label>
-                        <input type="text" id="milkTankNo" placeholder="Enter your milk tank number" className="border rounded-full p-3 w-full"
-                            name="GeneralInfo.milkTankNo" value={LogisRecieve[0].GeneralInfo.milkTankNo} onChange={(e) => handleLogisRecieveChange(e, 0)} />
+                        <label htmlFor="productLot" className="font-semibold">Product Lot:</label>
+                        <input type="text" id="productLot" placeholder="Enter your milk tank number" className="border rounded-full p-3 w-full"
+                            name="GeneralInfo.productLot" value={LogisRecieve[0].GeneralInfo.productLot} onChange={(e) => handleLogisRecieveChange(e, 0)} />
                     </div>
                     {/* Person in charge */}
                     <div className="flex flex-col w-full items-start gap-3">

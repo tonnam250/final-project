@@ -4,8 +4,40 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { retailerReceiveProduct } from "@/services/trackingService"; // ✅ Import function
 
+interface DataType {
+    RecipientInfo: {
+        personInCharge: string;
+        location: string;
+        pickUpTime: string;
+    };
+    Quantity: {
+        quantity: number;
+        quantityUnit: string;
+        temp: number;
+        tempUnit: string;
+        pH: number;
+        fat: number;
+        protein: number;
+        bacteria: boolean;
+        bacteriaInfo: string;
+        contaminants: boolean;
+        contaminantInfo: string;
+        abnormalChar: boolean;
+        abnormalType: {
+            smellBad: boolean;
+            smellNotFresh: boolean;
+            abnormalColor: boolean;
+            sour: boolean;
+            bitter: boolean;
+            cloudy: boolean;
+            lumpy: boolean;
+            separation: boolean;
+        };
+    };
+}
+
 const CheckDetails = () => {
-    const [data, setData] = useState(null);
+    const [data, setData] = useState<DataType | null>(null);
     const router = useRouter();
 
     useEffect(() => {
