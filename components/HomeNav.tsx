@@ -27,6 +27,8 @@ const HomeNav = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+  console.log("API_URL:", process.env.NEXT_PUBLIC_API_URL);
+
 
   const scrollToSection = (id: string) => {
     const section = document.getElementById(id);

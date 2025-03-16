@@ -1,6 +1,9 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://127.0.0.1:8080/api/v1/certifications";
+import API_BASE_URL from './apiConfig';
+
+const API_URL = `${API_BASE_URL}/certifications`;
+// ... ใช้ API_URL
 
 // ✅ ดึงใบเซอร์ของฟาร์มของผู้ใช้ที่ล็อกอินอยู่
 export const getUserCertifications = async (includeExpired: boolean = false) => {
