@@ -1,4 +1,6 @@
-const API_URL = "http://127.0.0.1:8080/api/v1/factory/milk/";
+import API_BASE_URL from './apiConfig';
+
+const API_URL = `${API_BASE_URL}/factory/milk`;
 
 export const getFactoryRawMilkTanks = async (mode: "list" | "selection" = "list"): Promise<any> => {
     try {

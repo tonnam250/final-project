@@ -1,4 +1,6 @@
-const API_URL = "http://127.0.0.1:8080/api/v1/product-lots/";
+import API_BASE_URL from './apiConfig';
+
+const API_URL = `${API_BASE_URL}/logistics`;
 
 export const createProductLot = async (data: any): Promise<{ 
     success: boolean; 
