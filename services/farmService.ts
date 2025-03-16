@@ -1,6 +1,4 @@
-import API_BASE_URL from './apiConfig';
-
-const API_URL = `${API_BASE_URL}/farmers`;
+const API_URL = "http://127.0.0.1:8080/api/v1/farmers";
 
 import {
     uploadCertificate,

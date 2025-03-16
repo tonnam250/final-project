@@ -1,9 +1,6 @@
 import axios from "axios"; 
-import API_BASE_URL from './apiConfig';
 
-const API_URL = `${API_BASE_URL}/auth`;
-// ... แล้วใช้ API_URL ปกติ
-
+const API_URL = "http://127.0.0.1:8080/api/v1/auth"; // ✅ แก้ให้ตรงกับ Backend
 
 // ✅ ฟังก์ชัน Login (คืนค่า role และ URL ที่ต้อง Redirect)
 export const login = async (email: string, password: string) => {

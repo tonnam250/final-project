@@ -367,7 +367,7 @@ const handleSaveEditToggle = () => {
     return (
         <div className="flex flex-col text-center w-full justify-center items-center h-full pt-20">
           <h1 className="text-3xl md:text-4xl font-bold my-4 md:my-8">
-             General Information
+            {isCreating ? "Create Your Factory" : "General Information"}
           </h1>
       
           <div className="flex h-full w-11/12 md:w-8/12 h-11/12 p-4 md:p-5 shadow-xl justify-center items-center border rounded-2xl m-2 md:m-5">
