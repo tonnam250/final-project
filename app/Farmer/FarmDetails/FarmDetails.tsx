@@ -73,48 +73,48 @@ const FarmDetails = () => {
                         <div className="flex flex-col space-y-2 gap-3">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Farm Name:</p>
-                                <p>{data.milkTankInfo.farmName}</p>
+                                <p>{data?.milkTankInfo?.farmName}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Tank ID:</p>
-                                <p>{data.milkTankInfo.milkTankNo}</p>
+                                <p>{data?.milkTankInfo?.milkTankNo}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Person in charge:</p>
-                                <p>{data.milkTankInfo.personInCharge}</p>
+                                <p>{data?.milkTankInfo?.personInCharge}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Quantity:</p>
-                                <p>{data.milkTankInfo.quantity} {data.milkTankInfo.quantityUnit}</p>
+                                <p>{data?.milkTankInfo?.quantity} {data?.milkTankInfo?.quantityUnit}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Temperature:</p>
-                                <p>{data.milkTankInfo.temp} {data.milkTankInfo.tempUnit}</p>
+                                <p>{data?.milkTankInfo?.temp} {data?.milkTankInfo?.tempUnit}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">ph:</p>
-                                <p>{data.milkTankInfo.pH}</p>
+                                <p>{data?.milkTankInfo?.pH}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Fat:</p>
-                                <p>{data.milkTankInfo.fat}</p>
+                                <p>{data?.milkTankInfo?.fat}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Protein:</p>
-                                <p>{data.milkTankInfo.protein}</p>
+                                <p>{data?.milkTankInfo?.protein}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Bacteria:</p>
                                 <div className="flex flex-col gap-2">
-                                    <p>{data.milkTankInfo.bacteria === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.bacteriaInfo}</p>
+                                    <p>{data?.milkTankInfo?.bacteria === true ? "True" : "False"}</p>
+                                    <p>{data?.milkTankInfo?.bacteriaInfo}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Contaminants:</p>
                                 <div className="flex flex-col gap-2">
-                                    <p>{data.milkTankInfo.contaminants === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.contaminantInfo}</p>
+                                    <p>{data?.milkTankInfo?.contaminants === true ? "True" : "False"}</p>
+                                    <p>{data?.milkTankInfo?.contaminantInfo}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between">
@@ -132,15 +132,15 @@ const FarmDetails = () => {
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-3">
-                                    <p>{data.milkTankInfo.abnormalChar === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.abnormalType.smellBad === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.abnormalType.smellNotFresh === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.abnormalType.abnormalColor === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.abnormalType.sour === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.abnormalType.bitter === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.abnormalType.cloudy === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.abnormalType.lumpy === true ? "True" : "False"}</p>
-                                    <p>{data.milkTankInfo.abnormalType.separation === true ? "True" : "False"}</p>
+                                    <p>{data?.milkTankInfo?.abnormalChar === true ? "True" : "False"}</p>
+                                    <p>{data?.milkTankInfo?.abnormalType.smellBad === true ? "True" : "False"}</p>
+                                    <p>{data?.milkTankInfo?.abnormalType.smellNotFresh === true ? "True" : "False"}</p>
+                                    <p>{data?.milkTankInfo?.abnormalType.abnormalColor === true ? "True" : "False"}</p>
+                                    <p>{data?.milkTankInfo?.abnormalType.sour === true ? "True" : "False"}</p>
+                                    <p>{data?.milkTankInfo?.abnormalType.bitter === true ? "True" : "False"}</p>
+                                    <p>{data?.milkTankInfo?.abnormalType.cloudy === true ? "True" : "False"}</p>
+                                    <p>{data?.milkTankInfo?.abnormalType.lumpy === true ? "True" : "False"}</p>
+                                    <p>{data?.milkTankInfo?.abnormalType.separation === true ? "True" : "False"}</p>
                                 </div>
                             </div>
                             {/* <div className="flex justify-between">
