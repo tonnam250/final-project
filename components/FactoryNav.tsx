@@ -40,11 +40,11 @@ const FactoryNav = () => {
             </div>
 
             <div className={`flex-col md:flex-row md:flex gap-4 md:gap-24 justify-between items-center w-full ${isMenuOpen ? 'flex' : 'hidden'} md:flex`}>
-                <Link href={'/Factory/FactoryGeneral'} className={`whitespace-nowrap hover:text-[#ffa19d] ${pathname === "/Factory/FactoryGeneral" ? "text-[#ffa19d]" : ""}`}>General Information</Link>
+                <Link href={'/Factory/GeneralInfo'} className={`whitespace-nowrap hover:text-[#ffa19d] ${pathname === "/Factory/FactoryGeneral" ? "text-[#ffa19d]" : ""}`}>General Information</Link>
 
                 <div className="relative w-full md:w-auto text-center">
                     <button onClick={toggleDropdown} className={`whitespace-nowrap hover:text-[#ffa19d] ${pathname.startsWith("/Factory") ? "้hover:text-[#ffa19d]" : ""}`}>
-                        Recieve RM
+                        Recieve Raw Milk
                     </button>
                     {isDropdownOpen && (
                         <div className="absolute mt-2 w-full md:w-40 bg-white rounded-md shadow-lg left-0 md:left-auto">

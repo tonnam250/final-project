@@ -324,28 +324,6 @@ const GeneralInfo = () => {
                     </div>
                     {/* end district + sub-district */}
 
-                    {/* Upload Organic certification */}
-                    <div className="flex flex-col md:flex-row items-center justify-start gap-2 border rounded-full p-2">
-                        <label
-                            htmlFor="file-upload"
-                            className={`cursor-pointer px-4 py-2 bg-[#D23D2D] hover:bg-[#F8EECB] hover:text-[#D23D2D] text-white rounded-full transition ${!isEditable && "opacity-50 cursor-not-allowed"}`}
-                        >
-                            Import file
-                        </label>
-                        <span className="text-sm text-gray-600">
-                            {fileNames.length > 1 ? `${fileNames.length} files selected` : fileNames[0]}
-                        </span>
-                        <input
-                            id="file-upload"
-                            type="file"
-                            className="hidden"
-                            multiple
-                            onChange={handleFileChange}
-                            disabled={!isEditable}
-                        />
-                    </div>
-                    {/* end upload organic certification */}
-
                     {/* location */}
                     <div className="flex flex-col font-medium text-start">
                         <label htmlFor="location">Location</label>

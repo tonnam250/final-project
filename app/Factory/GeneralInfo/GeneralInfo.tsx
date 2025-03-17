@@ -16,7 +16,7 @@ interface GeoData {
     postalCode: number;
 }
 
-const FactoryGeneral = () => {
+const GeneralInfo = () => {
 
     const [isEditable, setIsEditable] = useState<boolean>(true);
 
@@ -311,4 +311,4 @@ const FactoryGeneral = () => {
     );
 };
 
-export default FactoryGeneral;
+export default GeneralInfo;

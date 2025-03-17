@@ -26,7 +26,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     navbar = <FactoryNavbar />;
   } else if (pathname.startsWith('/logistic')) {
     navbar = <LogisNav />;
-  } else if (pathname.startsWith('/retail')) {
+  } else if (pathname.startsWith('/retailer')) {
     navbar = <RetailNav />;
   }
 

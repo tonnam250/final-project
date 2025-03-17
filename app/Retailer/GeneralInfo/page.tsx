@@ -1,9 +1,9 @@
-import FarmGeneralInfo from './FarmGeneralInfo';
+import GeneralInfo from './GeneralInfo';
 
 const Page = () => {
   return (
     <div>
-      <FarmGeneralInfo />
+      <GeneralInfo />
     </div>
   );
 };

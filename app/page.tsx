@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { QrButton } from "@/components/qr-button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 const page = async () => {
   const onScan = (data: string) => {

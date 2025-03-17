@@ -539,6 +539,14 @@ const AddProductLot = () => {
                         </div>
                     </div>
 
+                    {/* Person in charge */}
+                    <div className="flex flex-col w-full items-start gap-3">
+                        <label htmlFor="personInCharge" className="font-semibold">Person in charge</label>
+                        <input type="text" id="personInCharge" placeholder="Enter person in charge" className="border rounded-full p-3 w-full"
+                            name="RecipientInfo.personInCharge" 
+                        />
+                    </div>
+
                     <button
                         type="button"
                         className={`flex text-center self-end bg-[#C2CC8D] text-[#52600A] p-3 rounded-full hover:bg-[#C0E0C8] ${stepStatus.step1 === 'completed' ? 'hidden' : ''}`}

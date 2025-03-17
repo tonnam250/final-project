@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { authen } from "../utils/authen";
 
 const HomeNav = () => {
   const [hasScrolled, setHasScrolled] = useState(false);
@@ -39,6 +42,55 @@ const HomeNav = () => {
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const handleLogin = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    try {
+      const res = await axios.post('/auth/login', { email, password }, {
+        baseURL: process.env.NEXT_PUBLIC_API_URL,
+      });
+
+      // console.log('Login Res: ', res.data);
+      // console.log('Login Status: ', res.status);
+      // console.log('email: ', email, 'password: ', password);
+
+      if (res.status === 200) {
+        const { token, role } = res.data;
+
+        localStorage.setItem('token', token);
+        localStorage.setItem('role', role);
+        localStorage.setItem('user', email);
+
+        if (!role) {
+          router.push('/SignUp/SelectRole');
+        } else {
+          router.push(`/${role}/GeneralInfo`);
+        }
+      } else {
+        setError(res.data.message || 'Failed to login');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Something went wrong');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const { isAuthen } = authen();
+
+  if (isAuthen) {
+    router.push(`/${localStorage.getItem('role')}/GeneralInfo`);
+  }
 
   return (
     <div className={`fixed w-full h-24 flex justify-between px-5 items-center text-white text-xl z-50 transition-all duration-300 bg-[#3D405B] shadow-md"
@@ -105,14 +157,14 @@ const HomeNav = () => {
               </div>
               <div className="flex flex-col gap-3 mt-5 text-[#3D405B]">
                 <label className="text-xl mt-5">Email</label>
-                <input type="email" className="rounded-full p-2" placeholder="Email" />
+                <input type="email" className="rounded-full p-2" placeholder="Email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
                 <label htmlFor="password" className="text-xl mt-3">Password</label>
-                <input type="password" className="rounded-full p-2" placeholder="Password" />
+                <input type="password" className="rounded-full p-2" placeholder="Password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
                 <div className="flex items-center gap-2">
                   <input type="checkbox" className="rounded-xl w-5 h-5" name="rememberMe" id="rememberMe" />
                   <label htmlFor="rememberMe">Remember Me</label>
                 </div>
-                <button className="bg-[#f2cc8f] text-white rounded-full p-2 w-1/3 self-center mt-5 hover:bg-[#F98715]">Sign In</button>
+                <button onClick={handleLogin} className="bg-[#f2cc8f] text-white rounded-full p-2 w-1/3 self-center mt-5 hover:bg-[#F98715]">Sign In</button>
                 <Link href={'/SignUp'} className="text-center mt-3 cursor-pointer">Don't have an account?</Link>
               </div>
             </div>

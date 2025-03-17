@@ -31,7 +31,7 @@ const FarmerNavbar = () => {
       </div>
 
       <div className={`flex-col md:flex-row md:flex gap-4 md:gap-24 justify-end items-center w-full md:w-1/2 ${isMenuOpen ? 'flex' : 'hidden'} md:flex`}>
-        <Link href={'/Farmer/FarmGeneralInfo'} className={`hover:text-[#7B9B9E] ${pathname === "/Farmer/FarmGeneralInfo" ? "text-[#7B9B9E]" : ""}`}>General Information</Link>
+        <Link href={'/Farmer/GeneralInfo'} className={`hover:text-[#7B9B9E] ${pathname === "/Farmer/FarmGeneralInfo" ? "text-[#7B9B9E]" : ""}`}>General Information</Link>
         <Link href={'/Farmer/FarmRawMilk'} className={`hover:text-[#7B9B9E] ${pathname === "/Farmer/FarmRawMilk" ? "text-[#7B9B9E]" : ""}`}>Raw Milk</Link>
         {/* Profile section moved to the top only when menu is collapsed on medium devices */}
         <Link href={'/Farmer/Profile'} className={`flex flex-wrap m-2 items-center border-2 border-[#EFE4DC] rounded-full px-2 md:px-3 py-1 md:py-2 justify-center shadow-md gap-2 md:gap-3 cursor-pointer hover:text-[#7B9B9E] hover:bg-[#E1EABB] ${isMenuOpen ? 'order-first' : ''}`}>
