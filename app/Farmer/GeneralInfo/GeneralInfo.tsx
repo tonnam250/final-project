@@ -27,19 +27,19 @@ const FarmGeneralInfo = () => {
     const [districtList, setDistrictList] = useState<string[]>([]);
     const [subDistrictList, setSubDistrictList] = useState<string[]>([]);
 
-    const [selectedProvince, setSelectedProvince] = useState<string>("");
-    const [selectedDistrict, setSelectedDistrict] = useState<string>("");
-    const [selectedSubDistrict, setSelectedSubDistrict] = useState<string>("");
+    const [province, setprovince] = useState<string>("");
+    const [district, setdistrict] = useState<string>("");
+    const [subdistrict, setsubdistrict] = useState<string>("");
 
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
     const [address, setAddress] = useState("");
-    const [organicCert, setOrganicCert] = useState<File[]>([]);
-    const [location, setLocation] = useState("");
 
-    const formData = new FormData();
+    // const [files, setFiles] = useState<File[]>([]);
+    const [organicCertificateFiles, setOrganicCertificateFiles] = useState<File[]>([]);
+    const [location, setLocation] = useState("");
 
     useEffect(() => {
         fetch("/data/geography.json")
@@ -47,7 +47,7 @@ const FarmGeneralInfo = () => {
             .then((data: GeoData[]) => {
                 setGeoData(data);
 
-                // ดึงจังหวัดที่ไม่ซ้ำ (ใช้ภาษาไทยให้ตรงกับ selectedProvince)
+                // ดึงจังหวัดที่ไม่ซ้ำ (ใช้ภาษาไทยให้ตรงกับ province)
                 const provinces = Array.from(new Set(data.map((item) => item.provinceNameEn)));
                 setProvinceList(provinces);
             })
@@ -55,50 +55,50 @@ const FarmGeneralInfo = () => {
     }, []);
 
     useEffect(() => {
-        if (selectedProvince) {
+        if (province) {
             const filteredDistricts = Array.from(
                 new Set(
-                    geoData.filter((item) => item.provinceNameEn === selectedProvince).map((item) => item.districtNameEn)
+                    geoData.filter((item) => item.provinceNameEn === province).map((item) => item.districtNameEn)
                 )
             );
 
             setDistrictList(filteredDistricts);
-            setSelectedDistrict("");
+            setdistrict("");
             setSubDistrictList([]);
-            setSelectedSubDistrict("");
+            setsubdistrict("");
         }
-    }, [selectedProvince]);
+    }, [province]);
 
     useEffect(() => {
-        if (selectedDistrict) {
+        if (district) {
             const filteredSubDistricts = Array.from(
                 new Set(
-                    geoData.filter((item) => item.districtNameEn === selectedDistrict).map((item) => item.subdistrictNameEn)
+                    geoData.filter((item) => item.districtNameEn === district).map((item) => item.subdistrictNameEn)
                 )
             );
 
             setSubDistrictList(filteredSubDistricts);
-            setSelectedSubDistrict("");
+            setsubdistrict("");
         }
-    }, [selectedDistrict]);
+    }, [district]);
 
     useEffect(() => {
-        if (selectedProvince) {
-            localStorage.setItem("selectedProvince", selectedProvince);
+        if (province) {
+            localStorage.setItem("province", province);
         }
-    }, [selectedProvince]);
+    }, [province]);
 
     useEffect(() => {
-        if (selectedDistrict) {
-            localStorage.setItem("selectedDistrict", selectedDistrict);
+        if (district) {
+            localStorage.setItem("district", district);
         }
-    }, [selectedDistrict]);
+    }, [district]);
 
     useEffect(() => {
-        if (selectedSubDistrict) {
-            localStorage.setItem("selectedSubDistrict", selectedSubDistrict);
+        if (subdistrict) {
+            localStorage.setItem("subdistrict", subdistrict);
         }
-    }, [selectedSubDistrict]);
+    }, [subdistrict]);
 
     const handleSaveEditToggle = () => {
         setIsEditable(!isEditable);
@@ -106,44 +106,62 @@ const FarmGeneralInfo = () => {
 
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
-            setOrganicCert(Array.from(event.target.files));
+            setOrganicCertificateFiles(Array.from(event.target.files));
         }
     }
 
-    const handleSubmit = async (event: React.MouseEvent) => {
-        event.preventDefault();
+    const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();  // Not needed for button clicks
+
         const token = localStorage.getItem('token');
+        if (!token) {
+            alert("No token found. Please log in again.");
+            return;
+        }
+
+        const formData = new FormData();
 
         formData.append('firstName', firstName);
         formData.append('lastName', lastName);
         formData.append('email', email);
         formData.append('phone', phone);
         formData.append('address', address);
-        
-        organicCert.forEach((file) => {
-            formData.append('organicCert', file);
-        });
-
+        formData.append('province', province);
+        formData.append('district', district);
+        formData.append('subdistrict', subdistrict);
         formData.append('location', location);
 
-        try {
+        // เพิ่มไฟล์
+        organicCertificateFiles.forEach(file => {
+            formData.append('organicCertificateFiles', file); // ใช้ชื่อฟิลด์ที่ API คาดหวัง
+        });
 
+        console.log({
+            firstName, lastName, email, phone, address, province, district, subdistrict, organicCertificateFiles, location
+        })
+
+        try {
             const res = await axios.post('/user/update-general-information', formData, {
-                headers: { Authorization: `Bearer ${token}` },
-                baseURL: process.env.NEXT_PUBLIC_API_URL
-            })
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                },
+                baseURL: process.env.NEXT_PUBLIC_API_URL,
+            });
 
             if (res.status === 200) {
                 console.log('Res: ', res);
-                alert("General Information saved!")
-            }
-            else {
-                console.log('Unexpected response status: ', res.status)
+                alert("General Information saved!");
+            } else {
+                console.log('Unexpected response status: ', res.status);
             }
         } catch (err) {
-            console.error(err);
+            console.error('Error updating general information:', err);
+            alert("An error occurred while updating information. Please try again.");
+
         }
     };
+
 
     const handleButtonClick = () => {
         if (isEditable) {
@@ -246,8 +264,8 @@ const FarmGeneralInfo = () => {
                     <div className="flex flex-col w-full text-start font-medium">
                         <label htmlFor="province">Province</label>
                         <select name="province" id="province" className="border border-gray-300 rounded-full p-2 text-center"
-                            value={selectedProvince}
-                            onChange={(e) => setSelectedProvince(e.target.value)}
+                            value={province}
+                            onChange={(e) => setprovince(e.target.value)}
                             disabled={!isEditable}>
                             <option value="">Select province</option>
                             {provinceList.map((prov, index) => (
@@ -264,9 +282,9 @@ const FarmGeneralInfo = () => {
                         <div className="flex flex-col text-start font-medium w-full md:w-6/12">
                             <label htmlFor="district">District</label>
                             <select name="district" id="district" className="border border-gray-300 rounded-full p-2 text-center"
-                                value={selectedDistrict}
-                                onChange={(e) => setSelectedDistrict(e.target.value)}
-                                disabled={!selectedProvince || !isEditable}>
+                                value={district}
+                                onChange={(e) => setdistrict(e.target.value)}
+                                disabled={!province || !isEditable}>
                                 <option value="">Select district</option>
                                 {districtList.map((dist, index) => (
                                     <option key={index} value={dist}>
@@ -279,9 +297,9 @@ const FarmGeneralInfo = () => {
                         <div className="flex flex-col text-start font-medium w-full md:w-6/12">
                             <label htmlFor="subDistrict">Sub-District</label>
                             <select name="subDistrict" id="subDistrict" className="border border-gray-300 rounded-full p-2 text-center"
-                                value={selectedSubDistrict}
-                                onChange={(e) => setSelectedSubDistrict(e.target.value)}
-                                disabled={!selectedDistrict || !isEditable}>
+                                value={subdistrict}
+                                onChange={(e) => setsubdistrict(e.target.value)}
+                                disabled={!district || !isEditable}>
                                 <option value="">Select sub-district</option>
                                 {subDistrictList.map((subDist, index) => (
                                     <option key={index} value={subDist}>
@@ -303,8 +321,14 @@ const FarmGeneralInfo = () => {
                             Import file
                         </label>
                         <span className="text-sm text-gray-600">
-                            {fileNames.length > 1 ? `${fileNames.length} files selected` : fileNames[0]}
+                            {organicCertificateFiles.length > 1
+                                ? `${organicCertificateFiles.length} files selected`
+                                : organicCertificateFiles.length === 1
+                                    ? organicCertificateFiles[0].name
+                                    : "No files selected"
+                            }
                         </span>
+
                         <input
                             id="file-upload"
                             type="file"
