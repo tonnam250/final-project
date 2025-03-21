@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { authen } from "../utils/authen";
 
 const HomeNav = () => {
@@ -43,6 +43,11 @@ const HomeNav = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
+  const capitalize = (str: string) => {
+    if (!str) return str; // ถ้า string เป็นค่าว่างให้คืนค่าเดิม
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  };
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -55,42 +60,71 @@ const HomeNav = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post('/auth/login', { email, password }, {
+      // ล็อกอิน
+      const res = await axios.post("/auth/login", { email, password }, {
         baseURL: process.env.NEXT_PUBLIC_API_URL,
       });
 
-      // console.log('Login Res: ', res.data);
-      // console.log('Login Status: ', res.status);
-      // console.log('email: ', email, 'password: ', password);
+      console.log("Login Response:", res.data);
 
       if (res.status === 200) {
-        const { token, role } = res.data;
+        const { token } = res.data;
 
-        localStorage.setItem('token', token);
-        localStorage.setItem('role', role);
-        localStorage.setItem('user', email);
+        if (!token) {
+          console.error("Token not found!");
+          setError("Token not found!");
+          return;
+        }
 
-        if (!role) {
-          router.push('/SignUp/SelectRole');
-        } else {
-          router.push(`/${role}/GeneralInfo`);
+        localStorage.setItem("token", token);
+
+        try {
+          // ดึงข้อมูลผู้ใช้
+          const userRes = await axios.get("/user/me", {
+            baseURL: process.env.NEXT_PUBLIC_API_URL,
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          // console.log("User Response:", userRes.data);
+
+          if (userRes.status === 200) {
+            const userRole = userRes.data.role;
+            console.log("User Role:", userRole);
+            localStorage.setItem("role", userRole);
+
+            
+            if (!userRole) {
+              alert("Role not selected.")
+              router.push("/SignUp/SelectRole");
+            }
+            
+            const capRole = capitalize(userRole);
+            
+            router.push(`/${capRole}/GeneralInfo`);
+          } else {
+            setError("Failed to fetch user data");
+          }
+        } catch (err) {
+          console.error("Error fetching user data:", err);
+          setError(err.response?.data?.message || "Something went wrong");
         }
       } else {
-        setError(res.data.message || 'Failed to login');
+        setError(res.data.message || "Failed to login");
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Something went wrong');
-      console.error(err);
+      console.error("Login Error:", err);
+      setError(err.response?.data?.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
   };
 
-  const { isAuthen } = authen();
 
-  if (isAuthen) {
-    router.push(`/${localStorage.getItem('role')}/GeneralInfo`);
-  }
+  // const { isAuthen } = authen();
+
+  // if (isAuthen) {
+  //   router.push(`/${localStorage.getItem('role')}/GeneralInfo`);
+  // }
 
   return (
     <div className={`fixed w-full h-24 flex justify-between px-5 items-center text-white text-xl z-50 transition-all duration-300 bg-[#3D405B] shadow-md"
@@ -152,7 +186,7 @@ const HomeNav = () => {
               <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-semibold text-[#3D405B]">Sign In</h1>
                 <svg onClick={hideLoginSidebar} xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 text-[#3D405B] cursor-pointer" viewBox="0 0 24 24">
-                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
+                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </div>
               <div className="flex flex-col gap-3 mt-5 text-[#3D405B]">

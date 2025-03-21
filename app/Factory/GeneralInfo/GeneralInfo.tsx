@@ -1,6 +1,10 @@
 "use client";
 
+import { authen } from "@/utils/authen";
+import { redirect } from "next/dist/server/api-utils";
 import { useState, useEffect } from "react";
+import { useRouter } from 'next/navigation';
+import axios from "axios";
 
 interface GeoData {
     id: number;
@@ -44,6 +48,14 @@ const GeneralInfo = () => {
     const [selectedDistrict, setSelectedDistrict] = useState<string>("");
     const [selectedSubDistrict, setSelectedSubDistrict] = useState<string>("");
 
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
+    const [address, setAddress] = useState("");
+    const [organicCer, setOrganicCer] = useState("");
+    const [location, setLocation] = useState("");
+
     useEffect(() => {
         fetch("/data/geography.json")
             .then((res) => res.json())
@@ -85,37 +97,48 @@ const GeneralInfo = () => {
         }
     }, [selectedDistrict]);
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.MouseEvent) => {
         event.preventDefault();
-        setIsEditable(false);
 
-        const formData = new FormData(event.currentTarget);
-        formData.append("province", selectedProvince);
-        formData.append("district", selectedDistrict);
-        formData.append("subDistrict", selectedSubDistrict);
+        try {
+            const token = localStorage.getItem('token');
+            const res = await axios.post('/user/update-general-information', {
+                firstName, lastName, email, phone, address, selectedProvince, selectedDistrict,
+                selectedSubDistrict, organicCer, location
+            }, {
+                headers: { Authorization: `Bearer ${token}` },
+                baseURL: process.env.NEXT_PUBLIC_API_URL
+            })
 
-        // Handle form submission logic here
-        // For example, you can send formData to an API endpoint
-        // fetch('/api/submit', {
-        //     method: 'POST',
-        //     body: formData,
-        // }).then(response => {
-        //     // Handle response
-        // }).catch(error => {
-        //     // Handle error
-        // });
-    };
-
-    const handleButtonClick = () => {
-        if (isEditable) {
-            const form = document.querySelector('form');
-            if (form) {
-                form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+            if (res.status === 200) {
+                console.log('Res: ', res);
+                alert("General Information saved!")
             }
-        } else {
-            handleSaveEditToggle();
+            else {
+                console.log('Unexpected response status: ', res.status)
+            }
+        } catch (err) {
+            console.error(err);
         }
     };
+
+    // const handleButtonClick = () => {
+    //     if (isEditable) {
+    //         const form = document.querySelector('form');
+    //         if (form) {
+    //             form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+    //         }
+    //     } else {
+    //         handleSaveEditToggle();
+    //     }
+    // };
+
+    const { isAuthen } = authen();
+    const router = useRouter();
+
+    if (!isAuthen) {
+        router.push('/')
+    }
 
     return (
         <div className="flex flex-col text-center w-full justify-center items-center text- h-full pt-20">
@@ -134,6 +157,8 @@ const GeneralInfo = () => {
                                 className="border border-gray-300 rounded-full p-2 w-full"
                                 required
                                 disabled={!isEditable}
+                                value={firstName}
+                                onChange={(e) => setFirstName(e.target.value)}
                             />
                         </div>
                         {/* end first name */}
@@ -148,6 +173,8 @@ const GeneralInfo = () => {
                                 className="border border-gray-300 rounded-full p-2 w-full"
                                 required
                                 disabled={!isEditable}
+                                value={lastName}
+                                onChange={(e) => setFirstName(e.target.value)}
                             />
                         </div>
                         {/* end lastName */}
@@ -164,6 +191,8 @@ const GeneralInfo = () => {
                             placeholder="Example@gmail.com"
                             required
                             disabled={!isEditable}
+                            value={email}
+                            onChange={(e) => setFirstName(e.target.value)}
                         />
                     </div>
                     {/* end email */}
@@ -172,20 +201,6 @@ const GeneralInfo = () => {
                     <div className="flex flex-col text-start">
                         <label htmlFor="tel" className="font-medium">Phone Number</label>
                         <div className="flex flex-col md:flex-row gap-2">
-
-                            {/* Area Code */}
-                            <div className="flex flex-col">
-                                <label htmlFor="areaCode" className="sr-only">Area Code</label>
-                                <select
-                                    name="areaCode"
-                                    id="areaCode"
-                                    className="border border-gray-300 rounded-full p-2 w-full md:w-20 text-center"
-                                    required
-                                    disabled={!isEditable}
-                                >
-                                    <option value="+66">+66</option>
-                                </select>
-                            </div>
 
                             {/* Phone Input */}
                             <input

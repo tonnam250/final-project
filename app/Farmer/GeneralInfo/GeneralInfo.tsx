@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import axios from "axios";
+import { Fish } from "lucide-react";
 
 interface GeoData {
     id: number;
@@ -17,17 +19,8 @@ interface GeoData {
 }
 
 const FarmGeneralInfo = () => {
-    const [fileNames, setFileNames] = useState<string[]>(["No file selected."]);
+    const [fileNames, setFileNames] = useState<string[]>(["No file selected."]); //oraganic certificate
     const [isEditable, setIsEditable] = useState<boolean>(true);
-
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files) {
-            const files = Array.from(event.target.files).map((file) => file.name);
-            setFileNames(files.length ? files : ["ยังไม่ได้เลือกไฟล์"]);
-        } else {
-            setFileNames(["ยังไม่ได้เลือกไฟล์"]);
-        }
-    };
 
     const [geoData, setGeoData] = useState<GeoData[]>([]);
     const [provinceList, setProvinceList] = useState<string[]>([]);
@@ -37,6 +30,16 @@ const FarmGeneralInfo = () => {
     const [selectedProvince, setSelectedProvince] = useState<string>("");
     const [selectedDistrict, setSelectedDistrict] = useState<string>("");
     const [selectedSubDistrict, setSelectedSubDistrict] = useState<string>("");
+
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
+    const [address, setAddress] = useState("");
+    const [organicCert, setOrganicCert] = useState<File[]>([]);
+    const [location, setLocation] = useState("");
+
+    const formData = new FormData();
 
     useEffect(() => {
         fetch("/data/geography.json")
@@ -101,14 +104,45 @@ const FarmGeneralInfo = () => {
         setIsEditable(!isEditable);
     };
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        setIsEditable(false);
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files) {
+            setOrganicCert(Array.from(event.target.files));
+        }
+    }
 
-        const formData = new FormData(event.currentTarget);
-        formData.append("province", selectedProvince);
-        formData.append("district", selectedDistrict);
-        formData.append("subDistrict", selectedSubDistrict);
+    const handleSubmit = async (event: React.MouseEvent) => {
+        event.preventDefault();
+        const token = localStorage.getItem('token');
+
+        formData.append('firstName', firstName);
+        formData.append('lastName', lastName);
+        formData.append('email', email);
+        formData.append('phone', phone);
+        formData.append('address', address);
+        
+        organicCert.forEach((file) => {
+            formData.append('organicCert', file);
+        });
+
+        formData.append('location', location);
+
+        try {
+
+            const res = await axios.post('/user/update-general-information', formData, {
+                headers: { Authorization: `Bearer ${token}` },
+                baseURL: process.env.NEXT_PUBLIC_API_URL
+            })
+
+            if (res.status === 200) {
+                console.log('Res: ', res);
+                alert("General Information saved!")
+            }
+            else {
+                console.log('Unexpected response status: ', res.status)
+            }
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     const handleButtonClick = () => {
@@ -123,7 +157,7 @@ const FarmGeneralInfo = () => {
         <div className="flex flex-col text-center w-full justify-center items-center text- h-full pt-20">
             <h1 className="text-5xl md:text-4xl font-bold my-4 md:my-8">General Information</h1>
             <div className="flex h-full w-11/12 md:w-8/12 h-11/12 p-4 md:p-5 shadow-xl justify-center items-center border rounded-2xl m-2 md:m-5">
-                <form id="farmGeneralInfoForm" action="" className="flex flex-col gap-4 w-full" onSubmit={handleSubmit}>
+                <form id="farmGeneralInfoForm" action="" className="flex flex-col gap-4 w-full">
                     <div className="flex flex-col md:flex-row gap-4 md:gap-5 text-start w-full">
 
                         {/* first name */}
@@ -136,6 +170,8 @@ const FarmGeneralInfo = () => {
                                 className="border border-gray-300 rounded-full p-2 w-full"
                                 required
                                 disabled={!isEditable}
+                                value={firstName}
+                                onChange={(e) => setFirstName(e.target.value)}
                             />
                         </div>
                         {/* end first name */}
@@ -150,6 +186,8 @@ const FarmGeneralInfo = () => {
                                 className="border border-gray-300 rounded-full p-2 w-full"
                                 required
                                 disabled={!isEditable}
+                                value={lastName}
+                                onChange={(e) => setLastName(e.target.value)}
                             />
                         </div>
                         {/* end lastName */}
@@ -166,6 +204,8 @@ const FarmGeneralInfo = () => {
                             placeholder="Example@gmail.com"
                             required
                             disabled={!isEditable}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
                     </div>
                     {/* end email */}
@@ -174,20 +214,6 @@ const FarmGeneralInfo = () => {
                     <div className="flex flex-col text-start">
                         <label htmlFor="tel" className="font-medium">Phone Number</label>
                         <div className="flex flex-col md:flex-row gap-2">
-
-                            {/* Area Code */}
-                            <div className="flex flex-col">
-                                <label htmlFor="areaCode" className="sr-only">Area Code</label>
-                                <select
-                                    name="areaCode"
-                                    id="areaCode"
-                                    className="border border-gray-300 rounded-full p-2 w-full md:w-20 text-center"
-                                    required
-                                    disabled={!isEditable}
-                                >
-                                    <option value="+66">+66</option>
-                                </select>
-                            </div>
 
                             {/* Phone Input */}
                             <input
@@ -198,6 +224,8 @@ const FarmGeneralInfo = () => {
                                 placeholder="Enter your phone number"
                                 required
                                 disabled={!isEditable}
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
                             />
                         </div>
                     </div>
@@ -206,7 +234,11 @@ const FarmGeneralInfo = () => {
                     {/* Address */}
                     <div className="flex flex-col text-start font-medium">
                         <label htmlFor="address">Address</label>
-                        <textarea name="address" id="address" className="border border-gray-300 rounded-3xl p-2 flex-1 w-full" disabled={!isEditable}></textarea>
+                        <textarea name="address" id="address" className="border border-gray-300 rounded-3xl p-2 flex-1 w-full" disabled={!isEditable}
+                            value={address}
+                            onChange={(e) => setAddress(e.target.value)}
+                        >
+                        </textarea>
                     </div>
                     {/* end Address */}
 
@@ -262,7 +294,7 @@ const FarmGeneralInfo = () => {
                     {/* end district + sub-district */}
 
                     {/* Upload Organic certification */}
-                    <label htmlFor="" className="text-start font-semibold">Uplaod Organic Certification</label>
+                    <label htmlFor="" className="text-start font-semibold">Upload Organic Certification</label>
                     <div className="flex flex-col md:flex-row items-center justify-start gap-2 border p-2 rounded-full">
                         <label
                             htmlFor="file-upload"
@@ -278,8 +310,8 @@ const FarmGeneralInfo = () => {
                             type="file"
                             className="hidden"
                             multiple
-                            onChange={handleFileChange}
                             disabled={!isEditable}
+                            onChange={handleFileUpload}
                         />
                     </div>
                     {/* end upload organic certification */}
@@ -294,24 +326,17 @@ const FarmGeneralInfo = () => {
                             className="border border-gray-300 rounded-full p-2 flex-1 w-full"
                             placeholder="Enter a location"
                             disabled={!isEditable}
+                            value={location}
+                            onChange={(e) => setLocation(e.target.value)}
                         />
                     </div>
 
                     <button
                         type="button"
                         className="flex items-center justify-center text- md:text-xl bg-[#abc32f] hover: w-full md:w-1/6 rounded-full p-2 px-3 text-white self-center"
-                        onClick={handleButtonClick}
+                        onClick={handleSubmit}
                     >
                         {isEditable ? "Save" : "Edit"}
-                        {isEditable ? (
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="ml-2 w-6 h-6">
-                                <path fill="currentColor" d="M15 9H5V5h10m-3 14a3 3 0 0 1-3-3a3 3 0 0 1 3-3a3 3 0 0 1-3 3a3 3 0 0 1-3-3m5-16H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7z" />
-                            </svg>
-                        ) : (
-                            <svg xmlns="http://www.w3.org/2000/svg" className="ml-2 w-6 h-6" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="m14.06 9l.94.94L5.92 19H5v-.92zm3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83l3.75 3.75l1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94z" />
-                            </svg>
-                        )}
                     </button>
                 </form>
             </div >

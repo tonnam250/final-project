@@ -9,6 +9,8 @@ const page = async () => {
     console.log("Scanned data:", data);
   };
 
+  
+
   return (
     <div className="flex flex-col w-full h-full">
 

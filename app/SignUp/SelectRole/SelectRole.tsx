@@ -9,8 +9,6 @@ const roles = ['FARMER', 'FACTORY', 'LOGISTIC', 'RETAILER'];
 const SelectRole = () => {
     const router = useRouter();
 
-    const [selectedRole, setSelectedRole] = useState('');
-
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
@@ -25,28 +23,29 @@ const SelectRole = () => {
     const capitalize = (str: string) => {
         if (!str) return str; // ถ้า string เป็นค่าว่างให้คืนค่าเดิม
         return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-      };
+    };
 
     const handleSelectRole = async (role: string) => {
-
-        setSelectedRole(role);
         setLoading(true);
         setError(null);
 
         let newRole = capitalize(role);
 
-        console.log('Selected role: ', selectedRole);
         console.log('Sending role: ', role);
 
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.post('/user/setup-role', { role: selectedRole }, {headers: { Authorization: `Bearer ${token}`},
+            const res = await axios.post('/user/setup-role', { role: role }, {
+                headers: { Authorization: `Bearer ${token}` },
                 baseURL: process.env.NEXT_PUBLIC_API_URL,
-            } );
+            });
+
+            console.log('Role: ', role)
 
             if (res.status === 200) {
-                localStorage.setItem('role', capitalize(selectedRole));
+                localStorage.setItem('role', capitalize(role));
                 router.push(`/${newRole}/GeneralInfo`);
+                console.log('Response: ', res);
             } else {
                 setError(res.data.message || 'Failed to set role.');
             }
@@ -68,8 +67,8 @@ const SelectRole = () => {
 
             {/* Select Role */}
             <div className="flex flex-col w-full h-full justify-center items-center gap-10 z-30 px-4 md:px-0">
-            {error && <div className="text-red-500 text-xl">{error}</div>}
-            {loading && <div className="text-white text-xl">Loading...</div>}
+                {error && <div className="text-red-500 text-xl">{error}</div>}
+                {loading && <div className="text-white text-xl">Loading...</div>}
                 <h1 className="text-3xl md:text-5xl font-bold text-white">Select Role</h1>
                 <div className="flex flex-col justify-center items-center w-full h-full">
                     <div className="flex flex-col md:flex-row gap-5 w-full h-full justify-center items-center md:p-10">
