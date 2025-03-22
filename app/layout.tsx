@@ -35,15 +35,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   //   }
   // }
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
+  // useEffect(() => {
+  //   const token = localStorage.getItem('token');
 
-    if (!token && !['/', '/signup'].includes(pathname)) {
-      redirect('/')  // Redirect to login if not authenticated
-    } else {
+  //   if (!token && !['/', '/signup'].includes(pathname)) {
+  //     redirect('/')  // Redirect to login if not authenticated
+  //   } else {
 
-    }
-  }, [pathname, router])
+  //   }
+  // }, [pathname, router])
 
   let navbar = null;
   if (pathname === '/' || pathname.startsWith('/signup') || pathname.startsWith('/tracking')) {

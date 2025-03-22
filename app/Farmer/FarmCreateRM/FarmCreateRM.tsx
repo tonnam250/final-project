@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter } from 'next/navigation';
 import { Dialog } from '@headlessui/react';
 import { resolve } from "path";
+import axios from "axios";
 
 interface GeoData {
     id: number;
@@ -153,40 +154,33 @@ const FarmCreateRM = () => {
 
     const router = useRouter();
 
-    // save form Data
-    
-    
-    const [formData, setFormData] = useState<FormData>({
-        GeneralInfo: {
-            recieveStatus: "",
+    const [formData, setFormData] = useState({
+        milkTankInfo: {
             farmName: "",
-            productLot: "",
-            personInCharge: ""
-        },
-        ProductDetail: {
-            deliverTime: "",
-            recieveTime: "",
-            quantity: 0,
-            quantityUnit: "Ton",
-            temp: 0,
-            tempUnit: "Celcius",
-            pH: 0,
+            milkTankNo: "",
+            personInCharge: "",
+            quantity: {
+                value: 0,
+                suffix: "L"
+            },
+            temperature: {
+                value: 0,
+                suffix: "C"
+            },
+            phOfMilk: 0,
             fat: 0,
             protein: 0,
-            bacteria: false,
-            bacteriaInfo: "",
-            contaminants: false,
-            contaminantInfo: "",
-            abnormalChar: false,
-            abnormalType: {
-                smellBad: false,
-                smellNotFresh: false,
-                abnormalColor: false,
-                sour: false,
-                bitter: false,
-                cloudy: false,
-                lumpy: false,
-                separation: false
+            bacteriaTesting: {
+                value: false,
+                additionalInfo: ""
+            },
+            contaminants: {
+                value: false,
+                additionalInfo: ""
+            },
+            abnormalCharacteristics: {
+                value: false,
+                choice: []
             },
             location: ""
         },
@@ -195,7 +189,7 @@ const FarmCreateRM = () => {
             firstName: "",
             lastName: "",
             email: "",
-            phoneNumber: "",
+            phone: "",
             address: "",
             province: "",
             district: "",
@@ -205,85 +199,62 @@ const FarmCreateRM = () => {
         }
     });
 
-    // ✅ ควบคุมการแสดงผลของ abnormalType
-    const [showAbnormalInfo, setShowAbnormalInfo] = useState(false);
+    const handleNormalInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
 
-    // ✅ โหลดข้อมูลจาก localStorage เมื่อหน้าเว็บโหลด
-    useEffect(() => {
-        if (typeof window !== "undefined") {
-            const savedData = localStorage.getItem("formData");
-            if (savedData) {
-                setFormData(JSON.parse(savedData));
-            }
-        }
-    }, []); 0
-
-    // ✅ บันทึกข้อมูลลง localStorage ทุกครั้งที่ formData เปลี่ยน
-    useEffect(() => {
-        if (typeof window !== "undefined") {
-            localStorage.setItem("formData", JSON.stringify(formData));
-        }
-    }, [formData]);
-
-    // ✅ ฟังก์ชัน handleFormDataChange รองรับ text, select และ checkbox
-    const handleFormDataChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        const { name, type, value } = event.target;
-        const checked = (event.target as HTMLInputElement).checked;
-        const keys = name.split(".");
-
-        setFormData((prevData) => {
-            const updatedData = { ...prevData }; // Clone ข้อมูลเดิม
-            let temp: any = updatedData;
-
-            for (let i = 0; i < keys.length - 1; i++) {
-                temp = temp[keys[i]];
-            }
-
-            // ถ้าเป็น checkbox ให้ใช้ checked ถ้าไม่ใช่ให้ใช้ value
-            temp[keys[keys.length - 1]] = type === "checkbox" ? checked : value;
-
-            // อัปเดต province, district และ subdistrict
-            if (name === "shippingAddress.province") {
-                setSelectedProvince(value);
-            } else if (name === "shippingAddress.district") {
-                setSelectedDistrict(value);
-            } else if (name === "shippingAddress.subDistrict") {
-                setSelectedSubDistrict(value);
-            }
-
-            return updatedData;
-        });
-    };
-
-    // ✅ ฟังก์ชัน handleAbnormalChange → เช็ค abnormalChar และโชว์ abnormalType
-    const handleAbnormalChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        handleFormDataChange(event);
-        setShowAbnormalInfo(event.target.checked);
-    };
-
-    // ✅ ฟังก์ชัน handleNestedCheckboxChange สำหรับ abnormalType
-    const handleNestedCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, checked } = event.target;
-
-        setFormData((prevData) => ({
-            ...prevData,
-            ProductDetail: {
-                ...prevData.ProductDetail,
-                abnormalType: {
-                    ...prevData.ProductDetail.abnormalType,
-                    [name.split('.').pop()!]: checked
-                }
+        setFormData((data) => ({
+            ...data,
+            milkTankInfo: {
+                ...data.milkTankInfo,
+                ...(name in data.milkTankInfo ? { [name]: value } : {})
+                
+            },
+            shippingAddress: {
+                ...data.shippingAddress,
+                ...(name in data.shippingAddress ? { [name]: value } : {})
             }
         }));
     };
 
-    // ✅ ฟังก์ชัน Submit → บันทึกข้อมูลลง localStorage
-    const saveToLocalStorage = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleNestedCheckBox = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value, type, checked } = e.target;
+        const newValue = type === "checkbox" ? checked : value;
+
+        setFormData((data) => ({
+            ...data,
+            milkTankInfo: {
+                ...data.milkTankInfo,
+                [name]: name === "value"
+                ? { ...data.milkTankInfo.quantity, value: newValue } : name === "additionalInfo"
+                
+            }
+        }))
+    }
+
+    const handleCheckBox = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, checked } = e.target;
+
+
+    }
+
+    const createRM = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
-        localStorage.setItem("formData", JSON.stringify(formData));
-        console.log(formData);
-    };
-    // end save form Data
+        const token = localStorage.getItem('token');
+
+        try {
+            const res = await axios.post('/raw-milk/', formData, {
+                baseURL: process.env.NEXT_PUBLIC_API_URL,
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            console.log('Sent res: ', res);
+        } catch (err) {
+            console.error(err);
+            console.log('Error creating Raw milk: ', err);
+        }
+    }
 
     return (
         <div className="flex flex-col justify-center items-center w-full min-h-screen">
@@ -342,7 +313,7 @@ const FarmCreateRM = () => {
             </div>
             {/* End Detail Status */}
 
-            <form className="flex flex-col w-5/6 h-full p-20 m-10" onSubmit={saveToLocalStorage}>
+            <form className="flex flex-col w-5/6 h-full p-20 m-10">
                 {/* Milk Tank Info Section */}
                 <div className="flex flex-col items-center w-full h-full text-xl gap-5">
                     <h1 className="text-5xl font-bold">Milk Tank Info</h1>
@@ -351,7 +322,7 @@ const FarmCreateRM = () => {
                         <label htmlFor="farmName" className="font-semibold">Farm Name</label>
                         <input type="text" id="farmName"
                             placeholder="Enter your farm name" className="border rounded-full p-3 w-full"
-                            name="GeneralInfo.farmName" value={formData.GeneralInfo.farmName} onChange={handleFormDataChange} />
+                            name="GeneralInfo.farmName" value={formData.milkTankInfo.farmName} onChange={setFormData.milkTankInfo.farmName} />
                     </div>
                     {/* Milk tank no. */}
                     <div className="flex flex-col w-full items-start gap-3">
