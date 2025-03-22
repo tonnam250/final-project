@@ -21,39 +21,26 @@ interface GeoData {
 }
 
 const GeneralInfo = () => {
-
+    const [fileNames, setFileNames] = useState<string[]>(["No file selected."]); //oraganic certificate
     const [isEditable, setIsEditable] = useState<boolean>(true);
-
-    const handleSaveEditToggle = () => {
-        setIsEditable(!isEditable);
-    };
-
-    const [fileNames, setFileNames] = useState<string[]>(["No file selected."]);
-
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files) {
-            const files = Array.from(event.target.files).map((file) => file.name);
-            setFileNames(files.length ? files : ["ยังไม่ได้เลือกไฟล์"]);
-        } else {
-            setFileNames(["ยังไม่ได้เลือกไฟล์"]);
-        }
-    };
 
     const [geoData, setGeoData] = useState<GeoData[]>([]);
     const [provinceList, setProvinceList] = useState<string[]>([]);
     const [districtList, setDistrictList] = useState<string[]>([]);
     const [subDistrictList, setSubDistrictList] = useState<string[]>([]);
 
-    const [selectedProvince, setSelectedProvince] = useState<string>("");
-    const [selectedDistrict, setSelectedDistrict] = useState<string>("");
-    const [selectedSubDistrict, setSelectedSubDistrict] = useState<string>("");
+    const [province, setprovince] = useState<string>("");
+    const [district, setdistrict] = useState<string>("");
+    const [subdistrict, setsubdistrict] = useState<string>("");
 
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
     const [address, setAddress] = useState("");
-    const [organicCer, setOrganicCer] = useState("");
+
+    // const [files, setFiles] = useState<File[]>([]);
+    const [organicCertificateFiles, setOrganicCertificateFiles] = useState<File[]>([]);
     const [location, setLocation] = useState("");
 
     useEffect(() => {
@@ -62,7 +49,7 @@ const GeneralInfo = () => {
             .then((data: GeoData[]) => {
                 setGeoData(data);
 
-                // ดึงจังหวัดที่ไม่ซ้ำ (ใช้ภาษาไทยให้ตรงกับ selectedProvince)
+                // ดึงจังหวัดที่ไม่ซ้ำ (ใช้ภาษาไทยให้ตรงกับ province)
                 const provinces = Array.from(new Set(data.map((item) => item.provinceNameEn)));
                 setProvinceList(provinces);
             })
@@ -70,81 +57,126 @@ const GeneralInfo = () => {
     }, []);
 
     useEffect(() => {
-        if (selectedProvince) {
+        if (province) {
             const filteredDistricts = Array.from(
                 new Set(
-                    geoData.filter((item) => item.provinceNameEn === selectedProvince).map((item) => item.districtNameEn)
+                    geoData.filter((item) => item.provinceNameEn === province).map((item) => item.districtNameEn)
                 )
             );
 
             setDistrictList(filteredDistricts);
-            setSelectedDistrict("");
+            setdistrict("");
             setSubDistrictList([]);
-            setSelectedSubDistrict("");
+            setsubdistrict("");
         }
-    }, [selectedProvince]);
+    }, [province]);
 
     useEffect(() => {
-        if (selectedDistrict) {
+        if (district) {
             const filteredSubDistricts = Array.from(
                 new Set(
-                    geoData.filter((item) => item.districtNameEn === selectedDistrict).map((item) => item.subdistrictNameEn)
+                    geoData.filter((item) => item.districtNameEn === district).map((item) => item.subdistrictNameEn)
                 )
             );
 
             setSubDistrictList(filteredSubDistricts);
-            setSelectedSubDistrict("");
+            setsubdistrict("");
         }
-    }, [selectedDistrict]);
+    }, [district]);
 
-    const handleSubmit = async (event: React.MouseEvent) => {
-        event.preventDefault();
+    useEffect(() => {
+        if (province) {
+            localStorage.setItem("province", province);
+        }
+    }, [province]);
+
+    useEffect(() => {
+        if (district) {
+            localStorage.setItem("district", district);
+        }
+    }, [district]);
+
+    useEffect(() => {
+        if (subdistrict) {
+            localStorage.setItem("subdistrict", subdistrict);
+        }
+    }, [subdistrict]);
+
+    const handleSaveEditToggle = () => {
+        setIsEditable(!isEditable);
+    };
+
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files) {
+            setOrganicCertificateFiles(Array.from(event.target.files));
+        }
+    }
+
+    const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();  // Not needed for button clicks
+
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert("No token found. Please log in again.");
+            return;
+        }
+
+        const formData = new FormData();
+
+        formData.append('firstName', firstName);
+        formData.append('lastName', lastName);
+        formData.append('email', email);
+        formData.append('phone', phone);
+        formData.append('address', address);
+        formData.append('province', province);
+        formData.append('district', district);
+        formData.append('subdistrict', subdistrict);
+        formData.append('location', location);
+
+        // เพิ่มไฟล์
+        organicCertificateFiles.forEach(file => {
+            formData.append('organicCertificateFiles', file); // ใช้ชื่อฟิลด์ที่ API คาดหวัง
+        });
+
+        console.log({
+            firstName, lastName, email, phone, address, province, district, subdistrict, organicCertificateFiles, location
+        })
 
         try {
-            const token = localStorage.getItem('token');
-            const res = await axios.post('/user/update-general-information', {
-                firstName, lastName, email, phone, address, selectedProvince, selectedDistrict,
-                selectedSubDistrict, organicCer, location
-            }, {
-                headers: { Authorization: `Bearer ${token}` },
-                baseURL: process.env.NEXT_PUBLIC_API_URL
-            })
+            const res = await axios.post('/user/update-general-information', formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                },
+                baseURL: process.env.NEXT_PUBLIC_API_URL,
+            });
 
             if (res.status === 200) {
                 console.log('Res: ', res);
-                alert("General Information saved!")
-            }
-            else {
-                console.log('Unexpected response status: ', res.status)
+                alert("General Information saved!");
+            } else {
+                console.log('Unexpected response status: ', res.status);
             }
         } catch (err) {
-            console.error(err);
+            console.error('Error updating general information:', err);
+            alert("An error occurred while updating information. Please try again.");
+
         }
     };
 
-    // const handleButtonClick = () => {
-    //     if (isEditable) {
-    //         const form = document.querySelector('form');
-    //         if (form) {
-    //             form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-    //         }
-    //     } else {
-    //         handleSaveEditToggle();
-    //     }
-    // };
 
-    const { isAuthen } = authen();
-    const router = useRouter();
-
-    if (!isAuthen) {
-        router.push('/')
-    }
-
+    const handleButtonClick = () => {
+        if (isEditable) {
+            document.getElementById("farmGeneralInfoForm")?.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
+        } else {
+            handleSaveEditToggle();
+        }
+    };
     return (
         <div className="flex flex-col text-center w-full justify-center items-center text- h-full pt-20">
             <h1 className="text-3xl md:text-4xl font-bold my-4 md:my-8">General Information</h1>
             <div className="flex h-full w-11/12 md:w-8/12 h-11/12 p-4 md:p-5 shadow-xl justify-center items-center border rounded-2xl m-2 md:m-5">
-                <form action="" className="flex flex-col gap-4 w-full" onSubmit={handleSubmit}>
+                <form action="" className="flex flex-col gap-4 w-full">
                     <div className="flex flex-col md:flex-row gap-4 md:gap-5 text-start w-full">
 
                         {/* first name */}
@@ -227,8 +259,8 @@ const GeneralInfo = () => {
                     <div className="flex flex-col w-full text-start font-medium">
                         <label htmlFor="province">Province</label>
                         <select name="province" id="province" className="border border-gray-300 rounded-full p-2 text-center"
-                            value={selectedProvince}
-                            onChange={(e) => setSelectedProvince(e.target.value)}
+                            value={province}
+                            onChange={(e) => setprovince(e.target.value)}
                             disabled={!isEditable}>
                             <option value="">Select province</option>
                             {provinceList.map((prov, index) => (
@@ -245,9 +277,9 @@ const GeneralInfo = () => {
                         <div className="flex flex-col text-start font-medium w-full md:w-6/12">
                             <label htmlFor="district">District</label>
                             <select name="district" id="district" className="border border-gray-300 rounded-full p-2 text-center"
-                                value={selectedDistrict}
-                                onChange={(e) => setSelectedDistrict(e.target.value)}
-                                disabled={!selectedProvince || !isEditable}>
+                                value={district}
+                                onChange={(e) => setdistrict(e.target.value)}
+                                disabled={!province || !isEditable}>
                                 <option value="">Select district</option>
                                 {districtList.map((dist, index) => (
                                     <option key={index} value={dist}>
@@ -260,9 +292,9 @@ const GeneralInfo = () => {
                         <div className="flex flex-col text-start font-medium w-full md:w-6/12">
                             <label htmlFor="subDistrict">Sub-District</label>
                             <select name="subDistrict" id="subDistrict" className="border border-gray-300 rounded-full p-2 text-center"
-                                value={selectedSubDistrict}
-                                onChange={(e) => setSelectedSubDistrict(e.target.value)}
-                                disabled={!selectedDistrict || !isEditable}>
+                                value={subdistrict}
+                                onChange={(e) => setsubdistrict(e.target.value)}
+                                disabled={!district || !isEditable}>
                                 <option value="">Select sub-district</option>
                                 {subDistrictList.map((subDist, index) => (
                                     <option key={index} value={subDist}>
@@ -279,20 +311,26 @@ const GeneralInfo = () => {
                     <div className="flex flex-col md:flex-row items-center justify-start gap-2 border rounded-full p-2">
                         <label
                             htmlFor="file-upload"
-                            className="cursor-pointer px-4 py-2 bg-[#C98986] text-[#F7FCD4] rounded-full hover:bg-[#6C0E23] transition"
+                            className={`cursor-pointer px-4 py-2 bg-[#C98986] text-[#F7FCD4] rounded-full hover:bg-[#6C0E23] transition ${!isEditable && "opacity-50 cursor-not-allowed"}`} 
                         >
                             Import file
                         </label>
                         <span className="text-sm text-gray-600">
-                            {fileNames.length > 1 ? `${fileNames.length} files selected` : fileNames[0]}
+                            {organicCertificateFiles.length > 1
+                                ? `${organicCertificateFiles.length} files selected`
+                                : organicCertificateFiles.length === 1
+                                    ? organicCertificateFiles[0].name
+                                    : "No files selected"
+                            }                        
                         </span>
+
                         <input
                             id="file-upload"
                             type="file"
                             className="hidden"
                             multiple
-                            onChange={handleFileChange}
                             disabled={!isEditable}
+                            onChange={handleFileUpload}
                         />
                     </div>
                     {/* end upload organic certification */}
@@ -300,25 +338,24 @@ const GeneralInfo = () => {
                     {/* location */}
                     <div className="flex flex-col font-medium text-start">
                         <label htmlFor="location">Location</label>
-                        <input type="text" name="location" id="location" className="border border-gray-300 rounded-full p-2 flex-1 w-full"
-                            disabled={!isEditable} />
+                        <input
+                            type="text"
+                            name="location"
+                            id="location"
+                            className="border border-gray-300 rounded-full p-2 flex-1 w-full"
+                            placeholder="Enter a location"
+                            disabled={!isEditable}
+                            value={location}
+                            onChange={(e) => setLocation(e.target.value)}
+                        />
                     </div>
 
                     <button
                         type="button"
                         className="flex items-center justify-center text- md:text-xl bg-[#C98986] hover: w-full md:w-1/6 rounded-full p-2 px-3 text-[#F7FCD4] self-center"
-                        onClick={handleButtonClick}
+                        onClick={handleSubmit}
                     >
                         {isEditable ? "Save" : "Edit"}
-                        {isEditable ? (
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="ml-2 w-6 h-6">
-                                <path fill="currentColor" d="M15 9H5V5h10m-3 14a3 3 0 0 1-3-3a3 3 0 0 1 3-3a3 3 0 0 1-3 3a3 3 0 0 1-3-3m5-16H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7z" />
-                            </svg>
-                        ) : (
-                            <svg xmlns="http://www.w3.org/2000/svg" className="ml-2 w-6 h-6" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="m14.06 9l.94.94L5.92 19H5v-.92zm3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83l3.75 3.75l1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94z" />
-                            </svg>
-                        )}
                     </button>
                 </form>
             </div>
