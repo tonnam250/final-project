@@ -37,7 +37,6 @@ const FarmGeneralInfo = () => {
     const [phone, setPhone] = useState("");
     const [address, setAddress] = useState("");
 
-    // const [files, setFiles] = useState<File[]>([]);
     const [organicCertificateFiles, setOrganicCertificateFiles] = useState<File[]>([]);
     const [location, setLocation] = useState("");
 
@@ -152,6 +151,7 @@ const FarmGeneralInfo = () => {
             if (res.status === 200) {
                 console.log('Res: ', res);
                 alert("General Information saved!");
+                setIsEditable(false)
             } else {
                 console.log('Unexpected response status: ', res.status);
             }
@@ -159,15 +159,6 @@ const FarmGeneralInfo = () => {
             console.error('Error updating general information:', err);
             alert("An error occurred while updating information. Please try again.");
 
-        }
-    };
-
-
-    const handleButtonClick = () => {
-        if (isEditable) {
-            document.getElementById("farmGeneralInfoForm")?.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
-        } else {
-            handleSaveEditToggle();
         }
     };
 

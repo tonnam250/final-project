@@ -1,7 +1,7 @@
 "use client";
 
 // app/layout.tsx
-import { usePathname } from 'next/navigation';
+import { redirect, usePathname, useRouter } from 'next/navigation';
 import HomeNav from '../components/HomeNav';
 import FarmerNavbar from '../components/FarmerNavbar';
 import FactoryNavbar from '../components/FactoryNav';
@@ -9,6 +9,8 @@ import LogisNav from '../components/LogisNav';
 import RetailNav from '../components/RetailNav';
 import './globals.css'; // Ensure the correct path to the CSS file
 import { Raleway } from 'next/font/google';
+import { useEffect } from 'react';
+import axios from 'axios';
 
 const raleway = Raleway({
   subsets: ['latin'],
@@ -16,6 +18,32 @@ const raleway = Raleway({
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname().toLowerCase();
+  const router = useRouter();
+
+  // const getUserRole = async () => {
+  //   const token = localStorage.getItem('token');
+
+  //   if (!token) {
+  //     redirect('/');
+  //   }
+
+  //   try {
+  //     const res = await axios.get('/user/me', {
+  //       baseURL: process.env.NEXT_PUBLIC_API_URL,
+  //       headers: { Authorization: `Bearer ${token}`}
+  //     })
+  //   }
+  // }
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+
+    if (!token && !['/', '/signup'].includes(pathname)) {
+      redirect('/')  // Redirect to login if not authenticated
+    } else {
+
+    }
+  }, [pathname, router])
 
   let navbar = null;
   if (pathname === '/' || pathname.startsWith('/signup') || pathname.startsWith('/tracking')) {

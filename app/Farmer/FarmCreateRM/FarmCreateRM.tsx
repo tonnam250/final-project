@@ -154,6 +154,8 @@ const FarmCreateRM = () => {
     const router = useRouter();
 
     // save form Data
+    
+    
     const [formData, setFormData] = useState<FormData>({
         GeneralInfo: {
             recieveStatus: "",
@@ -193,7 +195,6 @@ const FarmCreateRM = () => {
             firstName: "",
             lastName: "",
             email: "",
-            areaCode: "+66",
             phoneNumber: "",
             address: "",
             province: "",
