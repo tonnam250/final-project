@@ -30,33 +30,27 @@ interface Data {
 }
 
 const GeneralInfo = () => {
-    const [fileNames, setFileNames] = useState<string[]>(["No file selected."]);
+    const [fileNames, setFileNames] = useState<string[]>(["No file selected."]); //oraganic certificate
     const [isEditable, setIsEditable] = useState<boolean>(true);
-
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files) {
-            const files = Array.from(event.target.files).map((file) => file.name);
-            setFileNames(files.length ? files : ["ยังไม่ได้เลือกไฟล์"]);
-        } else {
-            setFileNames(["ยังไม่ได้เลือกไฟล์"]);
-        }
-    };
 
     const [geoData, setGeoData] = useState<GeoData[]>([]);
     const [provinceList, setProvinceList] = useState<string[]>([]);
     const [districtList, setDistrictList] = useState<string[]>([]);
     const [subDistrictList, setSubDistrictList] = useState<string[]>([]);
 
-    const [selectedProvince, setSelectedProvince] = useState<string>("");
-    const [selectedDistrict, setSelectedDistrict] = useState<string>("");
-    const [selectedSubDistrict, setSelectedSubDistrict] = useState<string>("");
+    const [province, setprovince] = useState<string>("");
+    const [district, setdistrict] = useState<string>("");
+    const [subdistrict, setsubdistrict] = useState<string>("");
 
-    const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number }>({
-        lat: 35.8799866,
-        lng: 76.5048004,
-    });
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
+    const [address, setAddress] = useState("");
 
-    const [data, setData] = useState<Data | null>(null);
+    // const [files, setFiles] = useState<File[]>([]);
+    const [organicCertificateFiles, setOrganicCertificateFiles] = useState<File[]>([]);
+    const [location, setLocation] = useState("");
 
     useEffect(() => {
         fetch("/data/geography.json")
@@ -64,7 +58,7 @@ const GeneralInfo = () => {
             .then((data: GeoData[]) => {
                 setGeoData(data);
 
-                // ดึงจังหวัดที่ไม่ซ้ำ (ใช้ภาษาไทยให้ตรงกับ selectedProvince)
+                // ดึงจังหวัดที่ไม่ซ้ำ (ใช้ภาษาไทยให้ตรงกับ province)
                 const provinces = Array.from(new Set(data.map((item) => item.provinceNameEn)));
                 setProvinceList(provinces);
             })
@@ -72,113 +66,121 @@ const GeneralInfo = () => {
     }, []);
 
     useEffect(() => {
-        fetch("/data/recipient-info.json")
-            .then((res) => res.json())
-            .then((data: Data) => {
-                setData(data);
-            })
-            .catch((err) => console.error("Fetch error:", err));
-    }, []);
-
-    useEffect(() => {
-        if (selectedProvince) {
+        if (province) {
             const filteredDistricts = Array.from(
                 new Set(
-                    geoData.filter((item) => item.provinceNameEn === selectedProvince).map((item) => item.districtNameEn)
+                    geoData.filter((item) => item.provinceNameEn === province).map((item) => item.districtNameEn)
                 )
             );
 
             setDistrictList(filteredDistricts);
-            setSelectedDistrict("");
+            setdistrict("");
             setSubDistrictList([]);
-            setSelectedSubDistrict("");
+            setsubdistrict("");
         }
-    }, [selectedProvince]);
+    }, [province]);
 
     useEffect(() => {
-        if (selectedDistrict) {
+        if (district) {
             const filteredSubDistricts = Array.from(
                 new Set(
-                    geoData.filter((item) => item.districtNameEn === selectedDistrict).map((item) => item.subdistrictNameEn)
+                    geoData.filter((item) => item.districtNameEn === district).map((item) => item.subdistrictNameEn)
                 )
             );
 
             setSubDistrictList(filteredSubDistricts);
-            setSelectedSubDistrict("");
+            setsubdistrict("");
         }
-    }, [selectedDistrict]);
+    }, [district]);
 
     useEffect(() => {
-        if (selectedProvince) {
-            localStorage.setItem("selectedProvince", selectedProvince);
+        if (province) {
+            localStorage.setItem("province", province);
         }
-    }, [selectedProvince]);
+    }, [province]);
 
     useEffect(() => {
-        if (selectedDistrict) {
-            localStorage.setItem("selectedDistrict", selectedDistrict);
+        if (district) {
+            localStorage.setItem("district", district);
         }
-    }, [selectedDistrict]);
+    }, [district]);
 
     useEffect(() => {
-        if (selectedSubDistrict) {
-            localStorage.setItem("selectedSubDistrict", selectedSubDistrict);
+        if (subdistrict) {
+            localStorage.setItem("subdistrict", subdistrict);
         }
-    }, [selectedSubDistrict]);
+    }, [subdistrict]);
 
     const handleSaveEditToggle = () => {
         setIsEditable(!isEditable);
     };
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        setIsEditable(false);
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files) {
+            setOrganicCertificateFiles(Array.from(event.target.files));
+        }
+    }
 
-        const formData = new FormData(event.currentTarget);
-        formData.append("province", selectedProvince);
-        formData.append("district", selectedDistrict);
-        formData.append("subDistrict", selectedSubDistrict);
+    const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();  // Not needed for button clicks
 
-        // Handle form submission logic here
-        // For example, you can send formData to an API endpoint
-        // fetch('/api/submit', {
-        //     method: 'POST',
-        //     body: formData,
-        // }).then(response => {
-        //     // Handle response
-        // }).catch(error => {
-        //     // Handle error
-        // });
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert("No token found. Please log in again.");
+            return;
+        }
+
+        const formData = new FormData();
+
+        formData.append('firstName', firstName);
+        formData.append('lastName', lastName);
+        formData.append('email', email);
+        formData.append('phone', phone);
+        formData.append('address', address);
+        formData.append('province', province);
+        formData.append('district', district);
+        formData.append('subdistrict', subdistrict);
+        formData.append('location', location);
+
+        // เพิ่มไฟล์
+        organicCertificateFiles.forEach(file => {
+            formData.append('organicCertificateFiles', file); // ใช้ชื่อฟิลด์ที่ API คาดหวัง
+        });
+
+        console.log({
+            firstName, lastName, email, phone, address, province, district, subdistrict, organicCertificateFiles, location
+        })
+
+        try {
+            const res = await axios.post('/user/update-general-information', formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                },
+                baseURL: process.env.NEXT_PUBLIC_API_URL,
+            });
+
+            if (res.status === 200) {
+                console.log('Res: ', res);
+                alert("General Information saved!");
+            } else {
+                console.log('Unexpected response status: ', res.status);
+            }
+        } catch (err) {
+            console.error('Error updating general information:', err);
+            alert("An error occurred while updating information. Please try again.");
+
+        }
     };
+
 
     const handleButtonClick = () => {
         if (isEditable) {
-            const form = document.querySelector("form");
-            if (form) {
-                form.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
-            }
+            document.getElementById("farmGeneralInfoForm")?.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
         } else {
             handleSaveEditToggle();
         }
     };
-
-    // const fetchCoordinates = async (address: string) => {
-    //     const response = await fetch(
-    //         `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_API}`
-    //     );
-    //     const data = await response.json();
-    //     if (data.results && data.results.length > 0) {
-    //         const location = data.results[0].geometry.location;
-    //         setMapCenter({ lat: location.lat, lng: location.lng });
-    //     } else {
-    //         console.error("Geocoding API error:", data);
-    //     }
-    // };
-
-    // const handleLocationChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    //     const address = event.target.value;
-    //     fetchCoordinates(address);
-    // };
 
     return (
         <div className="flex flex-col text-center w-full justify-center items-center text- h-full pt-20">
@@ -197,6 +199,8 @@ const GeneralInfo = () => {
                                 className="border border-gray-300 rounded-full p-2 w-full"
                                 required
                                 disabled={!isEditable}
+                                value={firstName}
+                                onChange={(e) => setFirstName(e.target.value)}
                             />
                         </div>
                         {/* end first name */}
@@ -211,6 +215,8 @@ const GeneralInfo = () => {
                                 className="border border-gray-300 rounded-full p-2 w-full"
                                 required
                                 disabled={!isEditable}
+                                value={firstName}
+                                onChange={(e) => setFirstName(e.target.value)}
                             />
                         </div>
                         {/* end lastName */}
@@ -227,6 +233,8 @@ const GeneralInfo = () => {
                             placeholder="Example@gmail.com"
                             required
                             disabled={!isEditable}
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
                         />
                     </div>
                     {/* end email */}
@@ -235,22 +243,6 @@ const GeneralInfo = () => {
                     <div className="flex flex-col text-start">
                         <label htmlFor="tel" className="font-medium">Phone Number</label>
                         <div className="flex flex-col md:flex-row gap-2">
-
-                            {/* Area Code */}
-                            <div className="flex flex-col">
-                                <label htmlFor="areaCode" className="sr-only">Area Code</label>
-                                <select
-                                    name="areaCode"
-                                    id="areaCode"
-                                    className="border border-gray-300 rounded-full p-2 w-full md:w-20 text-center"
-                                    required
-                                    disabled={!isEditable}
-                                >
-                                    <option value="+66">+66</option>
-                                    <option value="+1">+1</option>
-                                    <option value="+44">+44</option>
-                                </select>
-                            </div>
 
                             {/* Phone Input */}
                             <input
@@ -261,6 +253,8 @@ const GeneralInfo = () => {
                                 placeholder="Enter your phone number"
                                 required
                                 disabled={!isEditable}
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
                             />
                         </div>
                     </div>
@@ -277,8 +271,8 @@ const GeneralInfo = () => {
                     <div className="flex flex-col w-full text-start font-medium">
                         <label htmlFor="province">Province</label>
                         <select name="province" id="province" className="border border-gray-300 rounded-full p-2 text-center"
-                            value={selectedProvince}
-                            onChange={(e) => setSelectedProvince(e.target.value)}
+                            value={province}
+                            onChange={(e) => setprovince(e.target.value)}
                             disabled={!isEditable}>
                             <option value="">Select province</option>
                             {provinceList.map((prov, index) => (
@@ -295,9 +289,9 @@ const GeneralInfo = () => {
                         <div className="flex flex-col text-start font-medium w-full md:w-6/12">
                             <label htmlFor="district">District</label>
                             <select name="district" id="district" className="border border-gray-300 rounded-full p-2 text-center"
-                                value={selectedDistrict}
-                                onChange={(e) => setSelectedDistrict(e.target.value)}
-                                disabled={!selectedProvince || !isEditable}>
+                                value={district}
+                                onChange={(e) => setdistrict(e.target.value)}
+                                disabled={!province || !isEditable}>
                                 <option value="">Select district</option>
                                 {districtList.map((dist, index) => (
                                     <option key={index} value={dist}>
@@ -310,9 +304,9 @@ const GeneralInfo = () => {
                         <div className="flex flex-col text-start font-medium w-full md:w-6/12">
                             <label htmlFor="subDistrict">Sub-District</label>
                             <select name="subDistrict" id="subDistrict" className="border border-gray-300 rounded-full p-2 text-center"
-                                value={selectedSubDistrict}
-                                onChange={(e) => setSelectedSubDistrict(e.target.value)}
-                                disabled={!selectedDistrict || !isEditable}>
+                                value={subdistrict}
+                                onChange={(e) => setsubdistrict(e.target.value)}
+                                disabled={!district || !isEditable}>
                                 <option value="">Select sub-district</option>
                                 {subDistrictList.map((subDist, index) => (
                                     <option key={index} value={subDist}>
@@ -334,11 +328,9 @@ const GeneralInfo = () => {
                             className="border border-gray-300 rounded-full p-2 flex-1 w-full"
                             placeholder="Enter a location"
                             disabled={!isEditable}
+                            value={location}
+                            onChange={(e) => setLocation(e.target.value)}
                         />
-
-                        {/* <MapProvider>
-                            <MapComponent center={mapCenter} />
-                        </MapProvider> */}
                     </div>
 
                     <button
@@ -347,19 +339,10 @@ const GeneralInfo = () => {
                         onClick={handleButtonClick}
                     >
                         {isEditable ? "Save" : "Edit"}
-                        {isEditable ? (
-                            <svg xmlns="http://www.w3.org/2000/svg" className="ml-2 w-6 h-6" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="M21 7v12q0 .825-.587 1.413T19 21H5q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h12zm-9 11q1.25 0 2.125-.875T15 15t-.875-2.125T12 12t-2.125.875T9 15t.875 2.125T12 18m-6-8h9V6H6z" />
-                            </svg>
-                        ) : (
-                            <svg xmlns="http://www.w3.org/2000/svg" className="ml-2 w-6 h-6" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="m14.06 9l.94.94L5.92 19H5v-.92zm3.6-6c-.25 0-.51.1-.7.29l-1.83 1.83l3.75 3.75l1.83-1.83c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29m-3.6 3.19L3 17.25V21h3.75L17.81 9.94z" />
-                            </svg>
-                        )}
                     </button>
                 </form>
             </div>
-            {data && (
+            {/* {data && (
                 <div className="flex flex-col gap-4">
                     <div className="flex justify-between">
                         <p className="font-semibold">Person in charge:</p>
@@ -370,7 +353,7 @@ const GeneralInfo = () => {
                         <p>{data.RecipientInfo.location}</p>
                     </div>
                 </div>
-            )}
+            )} */}
         </div>
     );
 };
