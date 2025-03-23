@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
+import axios from "axios";
 
 interface MilkTankInfo {
     farmName: string;
@@ -53,14 +54,36 @@ interface FormData {
 
 const FarmDetails = () => {
 
-    const [data, setData] = useState<FormData | null>(null);
+    const [data, setData] = useState(null);
+    const pathName = usePathname();
+    const searchParams = useSearchParams();
+    const id = searchParams.get('id');
 
     useEffect(() => {
-        const storedData = localStorage.getItem("formData");
-        if (storedData) {
-            setData(JSON.parse(storedData));
+        if (!id) {
+            return;
         }
-    }, []);
+
+        const fetchData = async () => {
+            const token = localStorage.getItem('token');
+
+            try {
+                const res = await axios.get(`/raw-milk/${id}`, {
+                    baseURL: process.env.NEXT_PUBLIC_API_URL,
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                setData(res.data);
+            } catch (err) {
+                alert("No data found.");
+                console.log("Fetching data error: ", err);
+            }
+        };
+
+        fetchData();
+    }, [id]);
+
+    if (!data) return <p>Loading...</p>;
 
     return (
         <div className="flex flex-col w-full h-full min-h-screen items-center justify-center pt-24 bg-gray-100">
@@ -73,7 +96,7 @@ const FarmDetails = () => {
                         <div className="flex flex-col space-y-2 gap-3">
                             <div className="flex justify-between">
                                 <p className="font-semibold">Farm Name:</p>
-                                <p>{data?.milkTankInfo?.farmName}</p>
+                                <p>{data.milkTankInfo.farmName}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Tank ID:</p>
@@ -85,15 +108,15 @@ const FarmDetails = () => {
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Quantity:</p>
-                                <p>{data?.milkTankInfo?.quantity} {data?.milkTankInfo?.quantityUnit}</p>
+                                <p>{data?.milkTankInfo?.quantity.value} {data?.milkTankInfo?.quantity.suffix}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Temperature:</p>
-                                <p>{data?.milkTankInfo?.temp} {data?.milkTankInfo?.tempUnit}</p>
+                                <p>{data?.milkTankInfo?.temperature.value} {data?.milkTankInfo?.temperature.suffix}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">ph:</p>
-                                <p>{data?.milkTankInfo?.pH}</p>
+                                <p>{data?.milkTankInfo?.phOfMilk}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Fat:</p>
@@ -105,52 +128,30 @@ const FarmDetails = () => {
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Bacteria:</p>
-                                <div className="flex flex-col gap-2">
-                                    <p>{data?.milkTankInfo?.bacteria === true ? "True" : "False"}</p>
-                                    <p>{data?.milkTankInfo?.bacteriaInfo}</p>
+                                <div className="flex flex-col gap-2 text-end">
+                                    <p>{data?.milkTankInfo?.bacteriaTesting.value === true ? 'True' : 'False'}</p>
+                                    <p>{data?.milkTankInfo?.bacteriaTesting.additionalInfo}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Contaminants:</p>
-                                <div className="flex flex-col gap-2">
-                                    <p>{data?.milkTankInfo?.contaminants === true ? "True" : "False"}</p>
-                                    <p>{data?.milkTankInfo?.contaminantInfo}</p>
+                                <div className="flex flex-col gap-2 text-end">
+                                    <p>{data?.milkTankInfo?.contaminants.value === true ? 'True' : 'False'}</p>
+                                    <p>{data?.milkTankInfo?.contaminants.additionalInfo}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between">
                                 <div className="flex flex-col gap-3">
                                     <p className="font-semibold">Abnormal characteristic:</p>
-                                    <div className="flex flex-col gap-3">
-                                        <p className="font-semibold">Smell Bad:</p>
-                                        <p className="font-semibold">Smell Not Fresh:</p>
-                                        <p className="font-semibold">Abnormal Color:</p>
-                                        <p className="font-semibold">Sour:</p>
-                                        <p className="font-semibold">Bitter:</p>
-                                        <p className="font-semibold">Cloudy:</p>
-                                        <p className="font-semibold">Lumpy:</p>
-                                        <p className="font-semibold">Separation of milk and water:</p>
-                                    </div>
-                                </div>
-                                <div className="flex flex-col gap-3">
-                                    <p>{data?.milkTankInfo?.abnormalChar === true ? "True" : "False"}</p>
-                                    <p>{data?.milkTankInfo?.abnormalType.smellBad === true ? "True" : "False"}</p>
-                                    <p>{data?.milkTankInfo?.abnormalType.smellNotFresh === true ? "True" : "False"}</p>
-                                    <p>{data?.milkTankInfo?.abnormalType.abnormalColor === true ? "True" : "False"}</p>
-                                    <p>{data?.milkTankInfo?.abnormalType.sour === true ? "True" : "False"}</p>
-                                    <p>{data?.milkTankInfo?.abnormalType.bitter === true ? "True" : "False"}</p>
-                                    <p>{data?.milkTankInfo?.abnormalType.cloudy === true ? "True" : "False"}</p>
-                                    <p>{data?.milkTankInfo?.abnormalType.lumpy === true ? "True" : "False"}</p>
-                                    <p>{data?.milkTankInfo?.abnormalType.separation === true ? "True" : "False"}</p>
+                                    {data?.milkTankInfo?.abnormalCharacteristics?.choices?.length > 0 ? (
+                                        data.milkTankInfo.abnormalCharacteristics.choices.map((choice, index) => (
+                                            <p key={index} className="font-normal">{choice}</p>
+                                        ))
+                                    ) : (
+                                        <p className="font-normal">No abnormal characteristics</p>
+                                    )}
                                 </div>
                             </div>
-                            {/* <div className="flex justify-between">
-                                <p className="font-semibold">Added By:</p>
-                                <p></p>
-                            </div>
-                            <div className="flex justify-between">
-                                <p className="font-semibold">Added On:</p>
-                                <p></p>
-                            </div> */}
                         </div>
                     </div>
 
@@ -181,8 +182,7 @@ const FarmDetails = () => {
                             <div className="flex justify-between">
                                 <p className="font-semibold">Phone:</p>
                                 <div className="flex gap-2">
-                                    <p>{data.shippingAddress.areaCode}</p>
-                                    <p>{data.shippingAddress.phoneNumber}</p>
+                                    <p>{data.shippingAddress.phone}</p>
                                 </div>
                             </div>
                             <div className="flex justify-between">
@@ -199,15 +199,15 @@ const FarmDetails = () => {
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Sub-district:</p>
-                                <p>{data.shippingAddress.subDistrict}</p>
+                                <p>{data.shippingAddress.subdistrict}</p>
                             </div>
                             <div className="flex justify-between">
                                 <p className="font-semibold">Postal Code:</p>
-                                <p>{data.shippingAddress.postalCode}</p>
+                                <p>{data.shippingAddress.zipCode}</p>
                             </div>
                             <div className="flex justify-between">
-                                <p className="font-semibold">Location URL:</p>
-                                <p className="w-1/2 whitespace-normal break-all">{data.shippingAddress.location}</p>
+                                <p className="font-semibold">Location:</p>
+                                <p>{data.shippingAddress.location}</p>
                             </div>
                         </div>
                     </div>
