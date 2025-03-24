@@ -31,9 +31,9 @@ const FarmRawMilk = () => {
     fetchData();
   }, [])
 
-  const navigateTo = (id) => {
-    router.push(`/Farmer/FarmDetails?id=${id}`)
-  }
+  // const navigateTo = (id) => {
+  //   router.push(`/Farmer/FarmDetails?id=${id}`)
+  // }
 
   return (
     <div className="flex flex-col w-full h-full min-h-screen">

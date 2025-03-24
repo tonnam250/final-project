@@ -1,9 +1,32 @@
+import React, {useEffect, useState} from "react";
 import Link from 'next/link';
+import axios from "axios";
+import {headers} from "next/headers";
+import {useRouter} from "next/navigation";
 
-const ProductLot = async () => {
+const ProductLot = () => {
+    const [data, setData] = useState<any[]>([]);
+    const router = useRouter();
 
-    const res = await fetch('http://localhost:3000/data/productLotData.json');
-    const data = await res.json();
+    useEffect(() => {
+        const fetchData = async() =>{
+            const token = localStorage.getItem('token');
+
+            try{
+                const res = await axios.get('', {
+                    baseURL: process.env.NEXT_PUBLIC_API_URL,
+                    headers: { Authorization: `Bearer ${token}` }
+                })
+
+                setData(res.data);
+                console.log('Data: ', res.data);
+            }   catch (err){
+                console.error('Error fetching data: ', err);
+            }
+        };
+        fetchData();
+    }, [])
+
 
     return (
         <div className="flex flex-col w-full h-full min-h-screen items-center justify-center pt-20">
@@ -18,7 +41,7 @@ const ProductLot = async () => {
 
                 {/* Product lot item */}
                 <div className="flex flex-col justify-center items-center w-full h-full my-10 gap-8">
-                    {data.map((item: { productLot: string, name: string, personInCharge: string, status: string }, index: number) => (
+                    {data.map((item: {productLot: string, name: string, personInCharge: string, status: string }, index: number) => (
                         <div key={index} className="flex flex-col justify-center items-center w-full md:w-1/3 h-40 gap-5 bg-white text-slate-500 shadow-xl border rounded-2xl p-5">
                             <div className="flex flex-col md:flex-row justify-between items-center w-full h-1/2">
                                 <span className="text-xl md:text-2xl font-semibold">Product Lot no: <p className="font-normal inline">{item.productLot}</p></span>

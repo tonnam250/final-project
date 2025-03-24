@@ -302,6 +302,26 @@ const FarmCreateRM = () => {
             alert("Please fill your information.")
             return;
         }
+        try{
+            const response = await axios.post(
+                "/rawmilk",
+                formData,
+                {
+                    headers:{
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+            console.log("Success:", response.data);
+        alert("Data submitted successfully!");
+
+        // ถ้าส่งสำเร็จให้ redirect หรือ reset form
+        router.push("/FarmDetails"); // 
+    } catch (error) {
+        console.error("Error submitting data:", error);
+        alert("Failed to submit data. Please try again.");
+        }
 
         // try {
         //     const res = await axios.post('/raw-milk/', formData, {

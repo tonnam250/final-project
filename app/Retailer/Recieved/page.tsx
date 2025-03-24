@@ -1,9 +1,31 @@
-import Link from 'next/link';
+import React, {useEffect, useState} from "react";
+import Link from "next/link";
+import axios from "axios";
+import {headers} from "next/headers";
+import{useRouter} from "next/navigation";
 
-const Recieve = async () => {
+const Recieve = () => {
+    const [data, setData] = useState<any[]>([]);
+    const router = useRouter();
 
-    const res = await fetch('http://localhost:3000/data/RecievedData.json');
-    const data = await res.json();
+    useEffect(() => {
+        const fetchData = async() => {
+            const token = localStorage.getItem('token');
+
+            try{
+                const res = await axios.get('', {
+                    baseURL: process.env.NEXT_PUBLIC_API_URL,
+                    headers: {Authorization: `Bearer ${token}`}
+                })
+
+                setData(res.data);
+                console.log('Data: ', res.data);
+            }   catch(err){
+                console.error('Erroe fetching data: ', err);
+            }
+        };
+        fetchData();
+    }, [])
 
     return (
         <div className="flex flex-col w-full h-full min-h-screen">
