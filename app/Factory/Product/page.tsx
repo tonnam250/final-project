@@ -1,18 +1,27 @@
-import React, { useEffect, useState } from "react";
-import Link from 'next/link';
+import Link from "next/link";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { headers } from "next/headers";
-import { useRouter } from "next/navigation";
 
+const Page = () => {
+    const [data, setData] = useState<any[]>([]);
 
-const Page = async () => {
-    let data = [];
-    try {
-        const res = await fetch('http://localhost:3000/data/productData.json');
-        data = await res.json();
-    } catch (error) {
-        console.error('Failed to fetch product data:', error);
-    }
+    useEffect(() => {
+        const fetchData = async () => {
+            const token = localStorage.getItem('token');
+
+            try {
+                const res = await axios.get('/product/me', {
+                    baseURL: process.env.NEXT_PUBLIC_API_URL,
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                
+            } catch (err) {
+                console.log("Fetching data error: ", err)
+            }
+        };
+
+    }, [])
 
     return (
         <div className="flex flex-col items-center min-h-screen pt-20 bg-slate-100">
