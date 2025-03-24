@@ -1,7 +1,8 @@
+"use client";
+
 import React, {useEffect, useState} from "react";
 import Link from "next/link";
 import axios from "axios";
-import {headers} from "next/headers";
 import{useRouter} from "next/navigation";
 
 const RecieveRM = () => {
