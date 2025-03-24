@@ -1,3 +1,5 @@
+"use client"
+
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -13,14 +15,17 @@ const Page = () => {
                 const res = await axios.get('/product/me', {
                     baseURL: process.env.NEXT_PUBLIC_API_URL,
                     headers: { Authorization: `Bearer ${token}` }
+
+                    setData(res.data);
                 });
 
-                
+
             } catch (err) {
                 console.log("Fetching data error: ", err)
             }
         };
 
+        fetchData();
     }, [])
 
     return (
