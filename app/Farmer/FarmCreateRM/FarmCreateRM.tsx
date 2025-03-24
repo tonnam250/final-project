@@ -6,6 +6,7 @@ import { Dialog, Field } from '@headlessui/react';
 import { resolve } from "path";
 import axios from "axios";
 
+
 interface GeoData {
     id: number;
     provinceCode: number;
@@ -289,39 +290,51 @@ const FarmCreateRM = () => {
             }
         });
     };
-
-    const handleSubmit = async (e: React.MouseEvent) => {
-        e.preventDefault();
-
-        const token = localStorage.getItem('token');
-
-        // localStorage.setItem('CreateRM', JSON.stringify(formData));
-        console.log('Submitted data: ', localStorage.getItem('CreateRM'))
-
-        if (!formData.milkTankInfo.farmName || !formData.shippingAddress.email) {
-            alert("Please fill your information.")
-            return;
-        }
+    const handleSubmit = async()=>{
         try{
-            const response = await axios.post(
-                "/rawmilk",
-                formData,
-                {
-                    headers:{
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`
-                    }
-                }
-            );
-            console.log("Success:", response.data);
-        alert("Data submitted successfully!");
+            const response = await axios.post("http://127.0.0.1:5000/qrcode/farmer",{
+                milkTankNo: formData.milkTankInfo.milkTankNo,
+                farmer_id:"",
+                destination_factory: "Factory A"
+            });
 
-        // ถ้าส่งสำเร็จให้ redirect หรือ reset form
-        router.push("/FarmDetails"); // 
-    } catch (error) {
-        console.error("Error submitting data:", error);
-        alert("Failed to submit data. Please try again.");
+            setQrCode(response.data.qrcode_image);
+        }   catch (error){
+            console.error("Error generating QR Code:", error);
         }
+    };
+    // const handleSubmit = async (e: React.MouseEvent) => {
+    //     e.preventDefault();
+
+    //     const token = localStorage.getItem('token');
+
+    //     // localStorage.setItem('CreateRM', JSON.stringify(formData));
+    //     console.log('Submitted data: ', localStorage.getItem('CreateRM'))
+
+    //     if (!formData.milkTankInfo.farmName || !formData.shippingAddress.email) {
+    //         alert("Please fill your information.")
+    //         return;
+    //     }
+    //     try{
+    //         const response = await axios.post(
+    //             "/rawmilk",
+    //             formData,
+    //             {
+    //                 headers:{
+    //                     "Content-Type": "application/json",
+    //                     Authorization: `Bearer ${token}`
+    //                 }
+    //             }
+    //         );
+    //         console.log("Success:", response.data);
+    //     alert("Data submitted successfully!");
+
+    //     // ถ้าส่งสำเร็จให้ redirect หรือ reset form
+    //     router.push("/FarmDetails"); // 
+    // } catch (error) {
+    //     console.error("Error submitting data:", error);
+    //     alert("Failed to submit data. Please try again.");
+    //     }
 
         // try {
         //     const res = await axios.post('/raw-milk/', formData, {
