@@ -36,6 +36,7 @@ const DeliveredRM = () => {
             </div>
             <div className="flex flex-col justify-center items-center w-full h-full mt-10 px-4 md:px-0">
                 <h1 className="text-4xl md:text-6xl font-bold text-center">To Receive Order</h1>
+                <h1 className="text-4xl md:text-6xl font-bold text-center">To Receive Order</h1>
 
                 {/* Delivered item */}
                 <div className="flex flex-col justify-center items-center w-full h-full my-10 gap-8">
@@ -61,6 +62,7 @@ const DeliveredRM = () => {
                             </div>
                             <div className="flex flex-col md:flex-row justify-between items-center w-full">
                                 <span className="text-xl md:text-2xl font-semibold">Person In Charge: <p className="inline font-normal">{item.milkTankInfo.personInCharge}</p></span>
+                                <Link href={`/Factory/Toreceive/Details?tankId=${item.milkTankInfo.tankId}`} className="text-lg md:text-xl underline italic cursor-pointer mt-2 md:mt-0">More info</Link>
                                 <Link href={`/Factory/Toreceive/Details?tankId=${item.milkTankInfo.tankId}`} className="text-lg md:text-xl underline italic cursor-pointer mt-2 md:mt-0">More info</Link>
                                 </div>
                             <Link href={`/Factory/Receiving?tankId=${item.milkTankInfo.tankId}`} className="bg-[#198754] text-white p-2 w-full rounded-xl hover:bg-[#3eb055] text-center">receive Now</Link>
