@@ -87,7 +87,7 @@ const Delivered = () => {
                                 <>
                                     {item.status === "Pending" && (
                                         <Link
-                                         href={`/Logistic/Recieving?id=${item.trackingId}&lotId=${item.productLotId}`}
+                                         href={`/Logistic/Receiving?id=${item.trackingId}&lotId=${item.productLotId}`}
                                         className="bg-[#198754] text-white p-2 w-full rounded-xl hover:bg-[#3eb055] text-center"
                                         >
                                             Receive
@@ -95,7 +95,7 @@ const Delivered = () => {
                                     )}
                                     {item.status === "SpecialMatch" && (
                                         <Link
-                                            href={`/Logistic/Recieving?id=${item.trackingId}`}
+                                            href={`/Logistic/Receiving?id=${item.trackingId}`}
                                             className="bg-[#0d6efd] text-white p-2 w-full rounded-xl hover:bg-[#3a8ffd] text-center"
                                         >
                                             Receive Again

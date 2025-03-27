@@ -87,10 +87,10 @@ const Delivered = () => {
                                 </div>
 
                                 <button
-                                    onClick={() => router.push(`/Retail/Recieving?trackingId=${item.trackingId}`)}
+                                    onClick={() => router.push(`/Retail/Receiving?trackingId=${item.trackingId}`)}
                                     className="bg-[#198754] text-white p-2 w-full rounded-xl hover:bg-[#3eb055] text-center"
                                 >
-                                    Recieve
+                                    Receive
                                 </button>
                             </div>
                         ))

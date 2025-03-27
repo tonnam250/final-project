@@ -63,7 +63,7 @@ const CheckDetails = () => {
 
     return (
         <div className="flex flex-col justify-center items-center pt-20 w-full h-full min-h-screen">
-            <h1 className="text-5xl font-bold mt-10">Recieving Details</h1>
+            <h1 className="text-5xl font-bold mt-10">Receiving Details</h1>
             {data && (
                 <div className="flex flex-col md:flex-row justify-between gap-10 w-full p-4 md:p-14">
                     {/* Recipient Info */}

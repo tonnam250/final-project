@@ -42,7 +42,7 @@ const CheckDetails = () => {
     const router = useRouter();
 
     useEffect(() => {
-        const storedData = localStorage.getItem("recievedForm");
+        const storedData = localStorage.getItem("receivedForm");
         if (storedData) {
             setData(JSON.parse(storedData));
         }
@@ -58,7 +58,7 @@ const CheckDetails = () => {
             const response = await retailerReceiveProduct(data.trackingId, data);
             if (response && response.message) {
                 alert("Submitted Successfully!");
-                router.push(`/Retail/Recieving/Details?trackingId=${encodeURIComponent(data.trackingId)}`);
+                router.push(`/Retail/Receiving/Details?trackingId=${encodeURIComponent(data.trackingId)}`);
                 // localStorage.clear(); // Clear the form data in localStorage after submission
             } else {
                 alert("Submission failed. Please try again.");
