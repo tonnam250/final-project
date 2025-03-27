@@ -8,9 +8,9 @@ import { fetchFactoryProductLots } from "@/services/productlotService";  // ✅ 
 const ProductLot = () => {
     const [data, setData] = useState<any[]>([]);  // ✅ Default เป็น array เปล่า
     const statusMap = {
-        0: "Pending",
-        1: "In Transit",
-        2: "Recieved"
+        0: "Pending",      
+        1: "In Transit",    
+        2: "Received"      
     };
 
     useEffect(() => {
