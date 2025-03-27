@@ -378,7 +378,7 @@ const AddProduct = () => {
                         </div>
                         {/* cholesterol */}
                         <div className="flex flex-col w-full items-start gap-3">
-                            <label htmlFor="cholesterol" className="font-semibold">cholesterol (mg)</label>
+                            <label htmlFor="cholesterol" className="font-semibold">Cholesterol (mg)</label>
                             <input type="number" name="Nutrition.cholesterol" id="cholesterol" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01"
                                 value={addProductForm?.Nutrition?.cholesterol || ""} onChange={handleFormDataChange} />
                         </div>

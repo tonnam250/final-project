@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import GeneralInfo from "@/app/Logistic/GeneralInfo/GeneralInfo";
 import { fetchFactoryProducts, fetchProductDetails } from "@/services/productService";
-import { fetchRetailers, fetchRetailerByID, fetchRetailerUsernames} from "@/services/retailerService";
+import { fetchRetailers, fetchRetailerByID, fetchRetailerUsernames } from "@/services/retailerService";
 import { getFactoryRawMilkTanks } from "@/services/rawMilkFacService";
 
 
@@ -118,151 +118,151 @@ const AddProductLot = () => {
     const [filteredRetailers, setFilteredRetailers] = useState<any[]>([]);
     const [showRetailerDropdown, setShowRetailerDropdown] = useState<boolean>(false);
     const [usernames, setUsernames] = useState<any[]>([]);
-const [filteredUsernames, setFilteredUsernames] = useState<any[]>([]);
-const [showUsernameDropdown, setShowUsernameDropdown] = useState<boolean>(false);
+    const [filteredUsernames, setFilteredUsernames] = useState<any[]>([]);
+    const [showUsernameDropdown, setShowUsernameDropdown] = useState<boolean>(false);
 
-// ✅ ดึง Usernames เมื่อ
-
-
-
-//ชิปปิ้งแอดเดรส//
-const fetchRetailersData = async (searchQuery: string) => {
-    try {
-        const data = await fetchRetailers(searchQuery);
-        setRetailers(data);
-        setFilteredRetailers(data);
-    } catch (error) {
-        console.error("❌ Error fetching retailers:", error);
-    }
-};
-
-const handleRetailerSearch = async (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
-    const searchText = event.target.value.trim();
-    handleShippingAddressChange(index, event);
-
-    if (searchText.length < 2) {
-        setFilteredRetailers([]);
-        setShowRetailerDropdown(false);
-        return;
-    }
-
-    try {
-        const data = await fetchRetailers(searchText);
-
-        // 🟢 ใช้ฟังก์ชันกรอง
-        const filtered = filterSelectedRetailers(data, index);
-
-        setFilteredRetailers(filtered);
-        setShowRetailerDropdown(filtered.length > 0);
-    } catch (error) {
-        console.error("❌ Error fetching retailers:", error);
-    }
-};
-
-const filterSelectedRetailers = (data: any[], currentIndex: number) => {
-    const selectedRetailerIds = productLotForm.shippingAddresses
-        .filter((_, idx) => idx !== currentIndex) // ยกเว้นตัวเอง
-        .map(address => address.retailerId);
-
-    // กรองออก
-    return data.filter(retailer => !selectedRetailerIds.includes(retailer.retailer_id));
-};
+    // ✅ ดึง Usernames เมื่อ
 
 
 
+    //ชิปปิ้งแอดเดรส//
+    const fetchRetailersData = async (searchQuery: string) => {
+        try {
+            const data = await fetchRetailers(searchQuery);
+            setRetailers(data);
+            setFilteredRetailers(data);
+        } catch (error) {
+            console.error("❌ Error fetching retailers:", error);
+        }
+    };
 
-const handleSelectRetailer = async (index: number, retailer: any) => {
-    console.log("🟢 Selecting Retailer:", retailer.retailer_id);
+    const handleRetailerSearch = async (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
+        const searchText = event.target.value.trim();
+        handleShippingAddressChange(index, event);
 
-    setFormData(prev => {
-        const newShippingAddresses = [...prev.shippingAddresses];
-        newShippingAddresses[index] = {
-            ...newShippingAddresses[index],
-            retailerId: retailer.retailer_id,
-            companyName: retailer.company_name,
-            email: retailer.email,
-            phoneNumber: retailer.telephone,
-            address: retailer.address,
-            province: retailer.province,
-            district: retailer.district,
-            subDistrict: retailer.subdistrict,
-            postalCode: retailer.post_code,
-            location: retailer.location_link,
-            firstName: "", // 🟢 เคลียร์ First Name
-            lastName: "",  // 🟢 เคลียร์ Last Name
-            usernames: [], // 🟢 รีเซ็ต usernames
-        };
-        return { ...prev, shippingAddresses: newShippingAddresses };
-    });
+        if (searchText.length < 2) {
+            setFilteredRetailers([]);
+            setShowRetailerDropdown(false);
+            return;
+        }
 
-    try {
-        // ✅ ดึง Usernames ใหม่
-        const usernames = await fetchRetailerUsernames(retailer.retailer_id);
+        try {
+            const data = await fetchRetailers(searchText);
+
+            // 🟢 ใช้ฟังก์ชันกรอง
+            const filtered = filterSelectedRetailers(data, index);
+
+            setFilteredRetailers(filtered);
+            setShowRetailerDropdown(filtered.length > 0);
+        } catch (error) {
+            console.error("❌ Error fetching retailers:", error);
+        }
+    };
+
+    const filterSelectedRetailers = (data: any[], currentIndex: number) => {
+        const selectedRetailerIds = productLotForm.shippingAddresses
+            .filter((_, idx) => idx !== currentIndex) // ยกเว้นตัวเอง
+            .map(address => address.retailerId);
+
+        // กรองออก
+        return data.filter(retailer => !selectedRetailerIds.includes(retailer.retailer_id));
+    };
+
+
+
+
+    const handleSelectRetailer = async (index: number, retailer: any) => {
+        console.log("🟢 Selecting Retailer:", retailer.retailer_id);
+
         setFormData(prev => {
             const newShippingAddresses = [...prev.shippingAddresses];
-            newShippingAddresses[index].usernames = usernames;
+            newShippingAddresses[index] = {
+                ...newShippingAddresses[index],
+                retailerId: retailer.retailer_id,
+                companyName: retailer.company_name,
+                email: retailer.email,
+                phoneNumber: retailer.telephone,
+                address: retailer.address,
+                province: retailer.province,
+                district: retailer.district,
+                subDistrict: retailer.subdistrict,
+                postalCode: retailer.post_code,
+                location: retailer.location_link,
+                firstName: "", // 🟢 เคลียร์ First Name
+                lastName: "",  // 🟢 เคลียร์ Last Name
+                usernames: [], // 🟢 รีเซ็ต usernames
+            };
             return { ...prev, shippingAddresses: newShippingAddresses };
         });
 
-        console.log("✅ Updated usernames:", usernames);
-    } catch (error) {
-        console.error("❌ Error fetching usernames:", error);
-    }
+        try {
+            // ✅ ดึง Usernames ใหม่
+            const usernames = await fetchRetailerUsernames(retailer.retailer_id);
+            setFormData(prev => {
+                const newShippingAddresses = [...prev.shippingAddresses];
+                newShippingAddresses[index].usernames = usernames;
+                return { ...prev, shippingAddresses: newShippingAddresses };
+            });
 
-    setShowRetailerDropdown(false);
-};
+            console.log("✅ Updated usernames:", usernames);
+        } catch (error) {
+            console.error("❌ Error fetching usernames:", error);
+        }
+
+        setShowRetailerDropdown(false);
+    };
 
 
 
 
-// ✅ ค้นหา Username
-const handleUsernameSearch = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
-    const searchText = event.target.value.trim();
-    handleShippingAddressChange(index, event); // ✅ เซฟลง local storage
+    // ✅ ค้นหา Username
+    const handleUsernameSearch = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
+        const searchText = event.target.value.trim();
+        handleShippingAddressChange(index, event); // ✅ เซฟลง local storage
 
-    const allUsernames = productLotForm.shippingAddresses[index]?.usernames || [];
+        const allUsernames = productLotForm.shippingAddresses[index]?.usernames || [];
 
-    if (searchText.length < 2 || allUsernames.length === 0) {
-        // ❗ ถ้ายังไม่มี usernames หรือยังไม่เลือก retailer
-        setFilteredUsernames([]);
+        if (searchText.length < 2 || allUsernames.length === 0) {
+            // ❗ ถ้ายังไม่มี usernames หรือยังไม่เลือก retailer
+            setFilteredUsernames([]);
+            setShowUsernameDropdown(false);
+            return;
+        }
+
+        const filtered = allUsernames.filter(user =>
+            user.first_name.toLowerCase().includes(searchText) || user.last_name.toLowerCase().includes(searchText)
+        );
+
+        setFilteredUsernames(filtered);
+        setShowUsernameDropdown(true);
+    };
+
+
+
+    // ✅ อัปเดตค่าหลังเลือก Username
+    const handleSelectUsername = (index: number, user: any) => {
+        setFormData(prev => {
+            const updatedAddresses = [...prev.shippingAddresses];
+            updatedAddresses[index] = {
+                ...updatedAddresses[index],
+                firstName: user.first_name, // ✅ เซ็ตค่าตรงๆ ไม่มีเงื่อนไข
+                lastName: user.last_name,   // ✅ ใช้ค่า last_name ตามที่ได้มา
+            };
+
+            return { ...prev, shippingAddresses: updatedAddresses };
+        });
+
         setShowUsernameDropdown(false);
-        return;
-    }
-
-    const filtered = allUsernames.filter(user =>
-        user.first_name.toLowerCase().includes(searchText) || user.last_name.toLowerCase().includes(searchText)
-    );
-
-    setFilteredUsernames(filtered);
-    setShowUsernameDropdown(true);
-};
+    };
 
 
-
-// ✅ อัปเดตค่าหลังเลือก Username
-const handleSelectUsername = (index: number, user: any) => {
-    setFormData(prev => {
-        const updatedAddresses = [...prev.shippingAddresses];
-        updatedAddresses[index] = {
-            ...updatedAddresses[index],
-            firstName: user.first_name, // ✅ เซ็ตค่าตรงๆ ไม่มีเงื่อนไข
-            lastName: user.last_name,   // ✅ ใช้ค่า last_name ตามที่ได้มา
-        };
-
-        return { ...prev, shippingAddresses: updatedAddresses };
-    });
-
-    setShowUsernameDropdown(false);
-};
-
-
-//จบชิปปิ้ง///    
-//ช่องนม///
+    //จบชิปปิ้ง///    
+    //ช่องนม///
     useEffect(() => {
         const fetchMilkTanks = async () => {
             try {
                 const response = await getFactoryRawMilkTanks("selection"); // ✅ ต้องระบุ "selection"
-                
+
                 if (response) {
                     console.log("✅ Filtered Milk Tanks:", response); // Debugging
                     setMilkTanks(response);
@@ -271,18 +271,18 @@ const handleSelectUsername = (index: number, user: any) => {
                 console.error("❌ Error fetching milk tanks:", error);
             }
         };
-    
+
         fetchMilkTanks();
     }, []);
-    
-    
+
+
 
     const handleMilkTankSelection = (tankId: string) => {
         setFormData((prevData) => {
             const updatedTanks = prevData.selectMilkTank.tanks.includes(tankId)
                 ? prevData.selectMilkTank.tanks.filter(id => id !== tankId) // ✅ ถ้าเลือกซ้ำให้เอาออก
                 : [...prevData.selectMilkTank.tanks, tankId]; // ✅ ถ้ายังไม่เลือกให้เพิ่มเข้าไป
-    
+
             return {
                 ...prevData,
                 selectMilkTank: { ...prevData.selectMilkTank, tanks: updatedTanks }
@@ -290,9 +290,9 @@ const handleSelectUsername = (index: number, user: any) => {
         });
     };
 
-//จบนม///
+    //จบนม///
 
-///ช่องโปรดัก////
+    ///ช่องโปรดัก////
     useEffect(() => {
         const fetchProducts = async () => {
             try {
@@ -304,8 +304,8 @@ const handleSelectUsername = (index: number, user: any) => {
         };
         fetchProducts();
     }, []);
-    
-    
+
+
     const handleProductSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         const searchText = event.target.value;
         setFormData(prev => ({
@@ -315,22 +315,22 @@ const handleSelectUsername = (index: number, user: any) => {
                 productName: searchText
             }
         }));
-    
+
         if (!searchText) {
             // ✅ ถ้าไม่มี searchText → แสดงสินค้าทั้งหมด
             setFilteredProducts(products);
             setShowDropdown(true);
             return;
         }
-    
+
         const filtered = products.filter((product) =>
             product.productName.toLowerCase().includes(searchText.toLowerCase())
         );
         setFilteredProducts(filtered);
         setShowDropdown(filtered.length > 0);
     };
-    
-    
+
+
 
     const handleSelectProduct = (product: any) => {
         setFormData(prev => ({
@@ -344,15 +344,15 @@ const handleSelectUsername = (index: number, user: any) => {
                 quantityUnit: product.Nutrition?.quantityUnit || "Ton" // ✅ ย้ายมาอยู่ที่ GeneralInfo
             }
         }));
-    
+
         setShowDropdown(false);
     };
-    
-    
 
-    
-    
-/////จบช่องโปรดัก///
+
+
+
+
+    /////จบช่องโปรดัก///
     useEffect(() => {
         fetch("/data/geography.json")
             .then((res) => res.json())
@@ -427,7 +427,7 @@ const handleSelectUsername = (index: number, user: any) => {
     // save form Data
     const [productLotForm, setFormData] = useState<ProductLotForm>({
         GeneralInfo: {
-            productId: "",  
+            productId: "",
             productName: "",
             category: "",
             description: "",
@@ -478,7 +478,7 @@ const handleSelectUsername = (index: number, user: any) => {
         },
         // เปลี่ยนจาก shippingAddress เป็น shippingAddresses เป็น array ของ object
         shippingAddresses: [{
-            retailerId: "", 
+            retailerId: "",
             companyName: "",
             firstName: "",
             lastName: "",
@@ -493,13 +493,13 @@ const handleSelectUsername = (index: number, user: any) => {
             location: ""
         }]
     });
-    
+
 
     useEffect(() => {
         const selectedProductId = productLotForm.GeneralInfo.productId; // ✅ ดึง productId จาก form
-    
+
         if (!selectedProductId) return; // ✅ ถ้าไม่มีค่าให้หยุดทำงาน
-    
+
         const fetchDetails = async () => {
             const productData = await fetchProductDetails(selectedProductId);
             if (productData) {
@@ -539,13 +539,13 @@ const handleSelectUsername = (index: number, user: any) => {
         };
         fetchDetails();
     }, [productLotForm.GeneralInfo.productId]); // ✅ ใช้ productId เป็น dependency
-    
-    
-     
+
+
+
     useEffect(() => {
         productLotForm.shippingAddresses.forEach(async (address, index) => {
             if (!address.retailerId) return; // ✅ ข้ามถ้าไม่มี retailerId
-    
+
             try {
                 // ✅ ดึงข้อมูล Retailer
                 const retailerData = await fetchRetailerByID(address.retailerId);
@@ -567,7 +567,7 @@ const handleSelectUsername = (index: number, user: any) => {
                         return { ...prev, shippingAddresses: updatedAddresses };
                     });
                 }
-    
+
                 // ✅ ดึง Usernames ใหม่
                 const usernames = await fetchRetailerUsernames(address.retailerId);
                 setFormData(prev => {
@@ -575,20 +575,20 @@ const handleSelectUsername = (index: number, user: any) => {
                     updatedAddresses[index].usernames = usernames;
                     return { ...prev, shippingAddresses: updatedAddresses };
                 });
-    
+
                 console.log(`✅ Updated retailer & usernames for ${address.retailerId}`);
             } catch (error) {
                 console.error(`❌ Error fetching data for retailer ${address.retailerId}:`, error);
             }
         });
     }, [productLotForm.shippingAddresses.map(addr => addr.retailerId).join(",")]); // ✅ ติดตาม retailerId เปลี่ยน
-    
-    
+
+
     // ✅ ดึง Usernames เมื่อเลือก Retailer
     useEffect(() => {
         productLotForm.shippingAddresses.forEach(async (address, index) => {
             if (!address.retailerId) return; // ✅ ถ้าไม่มี retailerId ข้ามไป
-    
+
             try {
                 const usernames = await fetchRetailerUsernames(address.retailerId);
                 setFormData(prev => {
@@ -596,24 +596,24 @@ const handleSelectUsername = (index: number, user: any) => {
                     newShippingAddresses[index].usernames = usernames;
                     return { ...prev, shippingAddresses: newShippingAddresses };
                 });
-    
+
                 console.log(`✅ Updated usernames for retailer ${address.retailerId}:`, usernames);
             } catch (error) {
                 console.error(`❌ Error fetching usernames for retailer ${address.retailerId}:`, error);
             }
         });
     }, [productLotForm.shippingAddresses.map(addr => addr.retailerId).join(",")]); // ✅ ติดตาม retailerId เปลี่ยน
-    
 
-    
+
+
     const addShippingAddress = () => {
         console.log("📌 Before Add:", productLotForm.shippingAddresses);
-    
+
         setFormData(prev => {
             const updatedShippingAddresses = [
                 ...prev.shippingAddresses,
                 {
-                    retailerId: "", 
+                    retailerId: "",
                     companyName: "",
                     firstName: "",
                     lastName: "",
@@ -629,30 +629,30 @@ const handleSelectUsername = (index: number, user: any) => {
                     usernames: [] // ✅ เพิ่ม usernames ในแต่ละ Shipping Address
                 }
             ];
-            
+
             console.log("✅ After Add:", updatedShippingAddresses);
-    
+
             return { ...prev, shippingAddresses: updatedShippingAddresses };
         });
     };
-    
-    
-    
+
+
+
 
     const handleFormDataChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, type, value, checked } = event.target as HTMLInputElement;
         const keys = name.split(".");
-    
+
         setFormData((prevData) => {
             const updatedData = { ...prevData };
             let temp: any = updatedData;
-    
+
             // ใช้ reduce เพื่อเข้าถึง Object ซ้อนกัน
             temp = keys.slice(0, -1).reduce((obj, key) => {
                 if (!obj[key]) obj[key] = {};
                 return obj[key];
             }, updatedData);
-    
+
             // ✅ ตรวจสอบว่าค่าเป็น number หรือไม่
             if (type === "number") {
                 temp[keys[keys.length - 1]] = value === "" ? "" : parseFloat(value);
@@ -661,11 +661,11 @@ const handleSelectUsername = (index: number, user: any) => {
             } else {
                 temp[keys[keys.length - 1]] = value;
             }
-    
+
             return updatedData;
         });
     };
-    
+
 
 
     // ฟังก์ชันสำหรับอัปเดต checkbox ที่อยู่ใน object ซ้อนกัน
@@ -723,13 +723,13 @@ const handleSelectUsername = (index: number, user: any) => {
             newShippingAddresses[index] = { ...newShippingAddresses[index], [name]: value };
             return { ...prev, shippingAddresses: newShippingAddresses };
         });
-    
+
         // หากมีการเปลี่ยน province, district, หรือ subDistrict ให้จัดการแยกเพิ่มเติม
         if (name === "province") setSelectedProvince(value);
         if (name === "district") setSelectedDistrict(value);
         if (name === "subDistrict") setSelectedSubDistrict(value);
     };
-    
+
 
     const [showAbnormalInfo, setShowAbnormalInfo] = useState(false);
 
@@ -745,15 +745,15 @@ const handleSelectUsername = (index: number, user: any) => {
         setShowAbnormalInfo(event.target.checked);
     };
 
-    
+
 
     const saveToLocalStorage = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const formDataWithShipping = { ...productLotForm,  selectMilkTank: { ...productLotForm.selectMilkTank } };
+        const formDataWithShipping = { ...productLotForm, selectMilkTank: { ...productLotForm.selectMilkTank } };
         localStorage.setItem("productLotForm", JSON.stringify(formDataWithShipping));
         console.log("Saved data:", formDataWithShipping); // Debugging line
     };
-    
+
 
     const router = useRouter();
 
@@ -888,8 +888,8 @@ const handleSelectUsername = (index: number, user: any) => {
                             onChange={handleProductSearch} // ✅ ใช้ handleProductSearch ที่เรียก handleFormDataChange
                             onFocus={() => {
                                 // ✅ เมื่อ focus → โชว์ dropdown ทั้งหมดเลย
-                                setFilteredProducts(products); 
-                                setShowDropdown(true); 
+                                setFilteredProducts(products);
+                                setShowDropdown(true);
                             }}
                         />
                         {showDropdown && (
@@ -956,11 +956,11 @@ const handleSelectUsername = (index: number, user: any) => {
                     <h1 className="text-5xl font-bold">Select Milk Tank</h1>
 
                     {/* ✅ Drop-down เลือกแท็งก์ */}
-                    <select 
-                        name="milkTank" 
-                        id="milkTank" 
+                    <select
+                        name="milkTank"
+                        id="milkTank"
                         className="border rounded-full p-3 w-1/2 text-center"
-                        value="" 
+                        value=""
                         onChange={(e) => handleMilkTankSelection(e.target.value)}
                     >
                         <option value="">Select a Milk Tank</option>
@@ -973,30 +973,30 @@ const handleSelectUsername = (index: number, user: any) => {
 
                     {/* ✅ แสดงแท็งก์นมแบบกล่องคลิกได้ */}
                     {milkTanks.map((tank) => (
-                        <div 
+                        <div
                             key={tank.tankId}
-                            onClick={() => handleMilkTankSelection(tank.tankId)} 
+                            onClick={() => handleMilkTankSelection(tank.tankId)}
                             className={`cursor-pointer flex flex-col justify-center items-center w-1/2 h-fit gap-5 p-5 border rounded-2xl shadow-xl 
                                 ${productLotForm.selectMilkTank.tanks.includes(tank.tankId) ? "bg-[#C2CC8D] text-[#52600A] border-[#52600A]" : "bg-white text-slate-500"}`}
                         >
                             <div className="flex flex-col md:flex-row justify-between items-center w-full">
-                                <span className="text-xl md:text-2xl font-semibold">Milk Tank No: 
+                                <span className="text-xl md:text-2xl font-semibold">Milk Tank No:
                                     <p className="font-normal inline">{tank.tankId}</p>
                                 </span>
-                                <span className="text-xl md:text-2xl font-semibold">Quantity: 
+                                <span className="text-xl md:text-2xl font-semibold">Quantity:
                                     <p className="font-normal inline">{tank.quantity}</p>
                                 </span>
                             </div>
                             <div className="flex flex-col md:flex-row justify-between items-center w-full">
-                                <span className="text-xl md:text-2xl font-semibold">Farm Name: 
+                                <span className="text-xl md:text-2xl font-semibold">Farm Name:
                                     <p className="inline font-normal">{tank.farmName}</p>
                                 </span>
-                                <span className="text-xl md:text-2xl font-semibold">Temperature: 
+                                <span className="text-xl md:text-2xl font-semibold">Temperature:
                                     <p className="inline font-normal">{tank.temperature}</p>
                                 </span>
                             </div>
                             <div className="flex flex-col justify-center items-start w-full">
-                                <span className="text-xl md:text-2xl font-semibold">Location: 
+                                <span className="text-xl md:text-2xl font-semibold">Location:
                                     <p className="inline font-normal">{tank.location}</p>
                                 </span>
                             </div>
@@ -1180,39 +1180,39 @@ const handleSelectUsername = (index: number, user: any) => {
                     {/* Calories */}
                     <div className="flex flex-col w-full items-start gap-3">
                         <label htmlFor="calories" className="font-semibold">Calories per 100 grams  </label>
-                        <input type="number" name="nutrition.calories" id="calories" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.calories} onChange={handleFormDataChange}/>                    </div>
+                        <input type="number" name="nutrition.calories" id="calories" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.calories} onChange={handleFormDataChange} />                    </div>
                     {/* Total Fat */}
                     <div className="flex flex-col w-full items-start gap-3">
                         <label htmlFor="totalFat" className="font-semibold">Total Fat (g)</label>
-                        <input type="number" name="nutrition.totalFat" id="totalFat" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.totalFat} onChange={handleFormDataChange}/>                        
+                        <input type="number" name="nutrition.totalFat" id="totalFat" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.totalFat} onChange={handleFormDataChange} />
                     </div>
                     {/* cholesterol */}
                     <div className="flex flex-col w-full items-start gap-3">
-                        <label htmlFor="cholesterol" className="font-semibold">cholesterol (mg)</label>
-                        <input type="number" name="nutrition.cholesterol" id="cholesterol" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.cholesterol} onChange={handleFormDataChange}/>                        
+                        <label htmlFor="cholesterol" className="font-semibold">Cholesterol (mg)</label>
+                        <input type="number" name="nutrition.cholesterol" id="cholesterol" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.cholesterol} onChange={handleFormDataChange} />
                     </div>
                     {/* Sodium */}
                     <div className="flex flex-col w-full items-start gap-3">
                         <label htmlFor="sodium" className="font-semibold">Sodium (mg)</label>
-                        <input type="number" name="nutrition.sodium" id="sodium" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.sodium} onChange={handleFormDataChange}/>                        
+                        <input type="number" name="nutrition.sodium" id="sodium" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.sodium} onChange={handleFormDataChange} />
                     </div>
                     {/* Potassium */}
                     <div className="flex flex-col w-full items-start gap-3">
                         <label htmlFor="potassium" className="font-semibold">Potassium (mg)</label>
-                        <input type="number" name="nutrition.potassium" id="potassium" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.potassium} onChange={handleFormDataChange}/>                        
+                        <input type="number" name="nutrition.potassium" id="potassium" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.potassium} onChange={handleFormDataChange} />
                     </div>
                     {/* Total Carbohydrates */}
                     <div className="flex flex-col w-full items-start gap-3">
                         <label htmlFor="totalCarbohydrates" className="font-semibold">Total Carbohydrates (g)</label>
-                        <input type="number" name="nutrition.totalCarbohydrates" id="totalCarbohydrates" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.totalCarbohydrates} onChange={handleFormDataChange}/>                        
+                        <input type="number" name="nutrition.totalCarbohydrates" id="totalCarbohydrates" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.totalCarbohydrates} onChange={handleFormDataChange} />
                         <div className="flex w-full items-start gap-3">
                             <div className="flex flex-col w-1/2 items-start gap-3">
                                 <label htmlFor="fiber" className="font-semibold" >Dietary Fiber (g)</label>
-                                <input type="number" name="nutrition.fiber" id="fiber" className="border rounded-full w-full p-3" placeholder="0.00" step="0.01" value={productLotForm.nutrition.fiber} onChange={handleFormDataChange}/>                                
+                                <input type="number" name="nutrition.fiber" id="fiber" className="border rounded-full w-full p-3" placeholder="0.00" step="0.01" value={productLotForm.nutrition.fiber} onChange={handleFormDataChange} />
                             </div>
                             <div className="flex flex-col w-1/2 items-start gap-3">
                                 <label htmlFor="sugar" className="font-semibold">Sugar (g)</label>
-                                <input type="number" name="nutrition.sugar" id="sugar" className="border rounded-full w-full p-3" placeholder="0.00" step="0.01" value={productLotForm.nutrition.sugar} onChange={handleFormDataChange}/>                                
+                                <input type="number" name="nutrition.sugar" id="sugar" className="border rounded-full w-full p-3" placeholder="0.00" step="0.01" value={productLotForm.nutrition.sugar} onChange={handleFormDataChange} />
                             </div>
                         </div>
                     </div>
@@ -1220,29 +1220,29 @@ const handleSelectUsername = (index: number, user: any) => {
                     <div className="flex flex-col w-full items-start gap-3">
                         <label htmlFor="temp" className="font-semibold">Temperature</label>
                         <div className="flex w-full items-start gap-3">
-                        <input type="number" name="nutrition.temp" id="temp" className="border p-3 rounded-full borcder w-4/5" placeholder="0.00" step="0.01" value={productLotForm.nutrition.temp} onChange={handleFormDataChange}/>                            
-                        <select name="nutrition.tempUnit" id="tempUnit" className="border rounded-full p-3 w-1/6 font-semibold" value={productLotForm.nutrition.tempUnit} onChange={handleFormDataChange}>
-                            <option value="Celcius">°C</option>
-                            <option value="Farenheit">°F</option>
-                        </select>
+                            <input type="number" name="nutrition.temp" id="temp" className="border p-3 rounded-full borcder w-4/5" placeholder="0.00" step="0.01" value={productLotForm.nutrition.temp} onChange={handleFormDataChange} />
+                            <select name="nutrition.tempUnit" id="tempUnit" className="border rounded-full p-3 w-1/6 font-semibold" value={productLotForm.nutrition.tempUnit} onChange={handleFormDataChange}>
+                                <option value="Celcius">°C</option>
+                                <option value="Farenheit">°F</option>
+                            </select>
                         </div>
                     </div>
                     {/* pH of Milk */}
                     <div className="flex flex-col w-full items-start gap-3">
                         <label htmlFor="pH" className="font-semibold">pH of Milk</label>
-                        <input type="number" name="nutrition.pH" id="pH" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.pH} onChange={handleFormDataChange}/>                        
+                        <input type="number" name="nutrition.pH" id="pH" className="p-3 border rounded-full w-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.pH} onChange={handleFormDataChange} />
                     </div>
                     {/* Fat + Protein */}
                     <div className="flex w-full items-start gap-3">
                         {/* Fat */}
                         <div className="flex flex-col w-1/2 items-start gap-3">
                             <label htmlFor="fat" className="font-semibold">Fat (%)</label>
-                            <input type="number" name="nutrition.fat" id="fat" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01" value={productLotForm.nutrition.fat} onChange={handleFormDataChange}/>                            
+                            <input type="number" name="nutrition.fat" id="fat" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01" value={productLotForm.nutrition.fat} onChange={handleFormDataChange} />
                         </div>
                         {/* Protein */}
                         <div className="flex flex-col w-1/2 items-start gap-3">
                             <label htmlFor="protein" className="font-semibold">Protein (%)</label>
-                            <input type="number" name="nutrition.protein" id="protein" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01" value={productLotForm.nutrition.protein} onChange={handleFormDataChange}/>                            
+                            <input type="number" name="nutrition.protein" id="protein" className="p-3 border rounded-full w-full" placeholder="0.00%" step="0.01" value={productLotForm.nutrition.protein} onChange={handleFormDataChange} />
                         </div>
                     </div>
                     {/* Vitamins and Minerals */}
@@ -1250,36 +1250,36 @@ const handleSelectUsername = (index: number, user: any) => {
                         <div className="flex w-full items-start gap-3">
                             <div className="flex flex-col w-1/2 items-start gap-3">
                                 <label htmlFor="vitaminC" className="font-semibold">Vitamin C (%)</label>
-                                <input type="number" name="nutrition.vitaminC" id="vitaminC" className="border p-3 w-full rounded-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.vitaminC} onChange={handleFormDataChange}/>                                
+                                <input type="number" name="nutrition.vitaminC" id="vitaminC" className="border p-3 w-full rounded-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.vitaminC} onChange={handleFormDataChange} />
                             </div>
                             <div className="flex flex-col w-1/2 items-start gap-3">
                                 <label htmlFor="calcium" className="font-semibold">Calcium (%)</label>
-                                <input type="number" name="nutrition.calcium" id="calcium" className="border p-3 w-full rounded-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.calcium} onChange={handleFormDataChange}/>                                
+                                <input type="number" name="nutrition.calcium" id="calcium" className="border p-3 w-full rounded-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.calcium} onChange={handleFormDataChange} />
                             </div>
                         </div>
                         <div className="flex w-full items-start gap-3">
                             <div className="flex flex-col w-1/2 items-start gap-3">
                                 <label htmlFor="iron" className="font-semibold">Iron (%)</label>
-                                <input type="number" name="nutrition.iron" id="iron" className="border p-3 w-full rounded-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.iron} onChange={handleFormDataChange}/>                                
+                                <input type="number" name="nutrition.iron" id="iron" className="border p-3 w-full rounded-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.iron} onChange={handleFormDataChange} />
                             </div>
                             <div className="flex flex-col w-1/2 items-start gap-3">
                                 <label htmlFor="vitaminD" className="font-semibold">Vitamin D (%)</label>
-                                <input type="number" name="nutrition.vitaminD" id="vitaminD" className="border p-3 w-full rounded-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.vitaminD} onChange={handleFormDataChange}/>                                
+                                <input type="number" name="nutrition.vitaminD" id="vitaminD" className="border p-3 w-full rounded-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.vitaminD} onChange={handleFormDataChange} />
                             </div>
                         </div>
                         <div className="flex w-full items-start gap-3">
                             <div className="flex flex-col w-1/2 items-start gap-3">
                                 <label htmlFor="vitaminB6" className="font-semibold">Vitamin B6 (%)</label>
-                                <input type="number" name="nutrition.vitaminB6" id="vitaminB6" className="border p-3 w-full rounded-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.vitaminB6} onChange={handleFormDataChange}/>                                
+                                <input type="number" name="nutrition.vitaminB6" id="vitaminB6" className="border p-3 w-full rounded-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.vitaminB6} onChange={handleFormDataChange} />
                             </div>
                             <div className="flex flex-col w-1/2 items-start gap-3">
                                 <label htmlFor="vitaminB12" className="font-semibold">Vitamin B12 (%)</label>
-                                <input type="number" name="nutrition.vitaminB12" id="vitaminB12" className="border p-3 w-full rounded-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.vitaminB12} onChange={handleFormDataChange}/>                                
+                                <input type="number" name="nutrition.vitaminB12" id="vitaminB12" className="border p-3 w-full rounded-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.vitaminB12} onChange={handleFormDataChange} />
                             </div>
                         </div>
                         <div className="flex flex-col w-full items-start gap-3">
                             <label htmlFor="magnesium" className="font-semibold">Magnesium (%)</label>
-                            <input type="number" name="nutrition.magnesium" id="magnesium" className="border rounded-full p-3 w-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.magnesium} onChange={handleFormDataChange}/>                            
+                            <input type="number" name="nutrition.magnesium" id="magnesium" className="border rounded-full p-3 w-full" placeholder="0.00" step="0.01" value={productLotForm.nutrition.magnesium} onChange={handleFormDataChange} />
                         </div>
                     </div>
 
@@ -1301,87 +1301,87 @@ const handleSelectUsername = (index: number, user: any) => {
                             <div className="flex flex-col w-full gap-5">
                                 <label htmlFor={`companyName-${index}`} className="font-semibold">Company Name</label>
                                 <input type="text" name="companyName" id={`companyName-${index}`} className="border p-3 rounded-full" placeholder="Enter your company name"
-                                    value={address.companyName}  onChange={(e) => handleRetailerSearch(index, e)} onFocus={async () => {
+                                    value={address.companyName} onChange={(e) => handleRetailerSearch(index, e)} onFocus={async () => {
                                         let data = retailers;
-                                    
+
                                         if (retailers.length === 0) {
                                             const fetched = await fetchRetailers(""); // ดึงทั้งหมด
                                             setRetailers(fetched);
                                             data = fetched;
                                         }
-                                    
+
                                         // 🟢 กรองก่อนโชว์
                                         const filtered = filterSelectedRetailers(data, index);
                                         setFilteredRetailers(filtered);
                                         setShowRetailerDropdown(filtered.length > 0);
                                     }}
-                                    />
+                                />
 
                                 {/* ✅ Dropdown แสดงรายการ */}
-    {showRetailerDropdown && (
-        <ul className="absolute w-full bg-white border rounded-md shadow-lg max-h-40 overflow-y-auto">
-            {filteredRetailers.map((retailer) => (
-                <li
-                    key={retailer.retailer_id}
-                    className="p-2 cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSelectRetailer(index, retailer)}
-                >
-                    {retailer.company_name}
-                </li>
-            ))}
-        </ul>
-    )}
+                                {showRetailerDropdown && (
+                                    <ul className="absolute w-full bg-white border rounded-md shadow-lg max-h-40 overflow-y-auto">
+                                        {filteredRetailers.map((retailer) => (
+                                            <li
+                                                key={retailer.retailer_id}
+                                                className="p-2 cursor-pointer hover:bg-gray-100"
+                                                onClick={() => handleSelectRetailer(index, retailer)}
+                                            >
+                                                {retailer.company_name}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
                             </div>
                             {/* First name + Last name */}
-<div className="flex items-center w-full gap-5">
-    <div className="flex flex-col w-1/2 gap-3 relative">
-        <label htmlFor={`firstName-${index}`} className="font-semibold">First Name</label>
-        <input 
-            type="text" 
-            name="firstName" 
-            id={`firstName-${index}`} 
-            className="border p-3 rounded-full" 
-            placeholder="Enter first name"
-            value={address.firstName} 
-            onChange={(e) => handleUsernameSearch(index, e)}
-            onFocus={() => {
-                const allUsernames = productLotForm.shippingAddresses[index]?.usernames || [];
-                    if (allUsernames.length > 0) {
-                    setFilteredUsernames(allUsernames);  // ✅ ใช้ข้อมูล usernames ที่โหลดไว้แล้ว
-                    setShowUsernameDropdown(true);
-                }
-            }}
-        />
-        
-        {/* Dropdown Results */}
-        {showUsernameDropdown && filteredUsernames.length > 0 && (
-            <ul className="absolute w-full bg-white border rounded-lg shadow-lg mt-1 z-50">
-                {filteredUsernames.map((user, idx) => (
-                    <li
-                        key={idx}
-                        className="p-3 cursor-pointer hover:bg-gray-200"
-                        onClick={() => handleSelectUsername(index, user)}
-                    >
-                        {user.first_name} {user.last_name}
-                    </li>
-                ))}
-            </ul>
-        )}
-    </div>
+                            <div className="flex items-center w-full gap-5">
+                                <div className="flex flex-col w-1/2 gap-3 relative">
+                                    <label htmlFor={`firstName-${index}`} className="font-semibold">First Name</label>
+                                    <input
+                                        type="text"
+                                        name="firstName"
+                                        id={`firstName-${index}`}
+                                        className="border p-3 rounded-full"
+                                        placeholder="Enter first name"
+                                        value={address.firstName}
+                                        onChange={(e) => handleUsernameSearch(index, e)}
+                                        onFocus={() => {
+                                            const allUsernames = productLotForm.shippingAddresses[index]?.usernames || [];
+                                            if (allUsernames.length > 0) {
+                                                setFilteredUsernames(allUsernames);  // ✅ ใช้ข้อมูล usernames ที่โหลดไว้แล้ว
+                                                setShowUsernameDropdown(true);
+                                            }
+                                        }}
+                                    />
 
-    <div className="flex flex-col w-1/2 gap-3">
-        <label htmlFor={`lastName-${index}`} className="font-semibold">Last Name</label>
-        <input 
-            type="text" 
-            name="lastName" 
-            id={`lastName-${index}`} 
-            className="border p-3 rounded-full" 
-            placeholder="Enter last name"
-            value={address.lastName} 
-            onChange={(e) => handleShippingAddressChange(index, e)}
-        />
-    </div>
-</div>
+                                    {/* Dropdown Results */}
+                                    {showUsernameDropdown && filteredUsernames.length > 0 && (
+                                        <ul className="absolute w-full bg-white border rounded-lg shadow-lg mt-1 z-50">
+                                            {filteredUsernames.map((user, idx) => (
+                                                <li
+                                                    key={idx}
+                                                    className="p-3 cursor-pointer hover:bg-gray-200"
+                                                    onClick={() => handleSelectUsername(index, user)}
+                                                >
+                                                    {user.first_name} {user.last_name}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
+
+                                <div className="flex flex-col w-1/2 gap-3">
+                                    <label htmlFor={`lastName-${index}`} className="font-semibold">Last Name</label>
+                                    <input
+                                        type="text"
+                                        name="lastName"
+                                        id={`lastName-${index}`}
+                                        className="border p-3 rounded-full"
+                                        placeholder="Enter last name"
+                                        value={address.lastName}
+                                        onChange={(e) => handleShippingAddressChange(index, e)}
+                                    />
+                                </div>
+                            </div>
 
                             {/* Email */}
                             <div className="flex flex-col w-full gap-3">
@@ -1418,7 +1418,7 @@ const handleSelectUsername = (index: number, user: any) => {
                             </div>
                             {/* Address */}
                             <div className="flex flex-col text-start font-medium w-full h-40 gap-3">
-                                <label htmlFor={`address-${index}`}>Address</label>
+                                <label htmlFor={`address-${index}`} className="font-bold">Address</label>
                                 <textarea name="address" id={`address-${index}`} className="border border-gray-300 rounded-3xl p-3 flex-1 w-full"
                                     value={address.address} onChange={(e) => handleShippingAddressChange(index, e)}></textarea>
                             </div>
