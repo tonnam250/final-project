@@ -1418,7 +1418,7 @@ const AddProductLot = () => {
                             </div>
                             {/* Address */}
                             <div className="flex flex-col text-start font-medium w-full h-40 gap-3">
-                                <label htmlFor={`address-${index}`} className="font-bold">Address</label>
+                                <label htmlFor={`address-${index}`}>Address</label>
                                 <textarea name="address" id={`address-${index}`} className="border border-gray-300 rounded-3xl p-3 flex-1 w-full"
                                     value={address.address} onChange={(e) => handleShippingAddressChange(index, e)}></textarea>
                             </div>

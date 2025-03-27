@@ -234,7 +234,7 @@ const CheckProductDetails = () => {
                                 <p>{data?.Nutrition?.totalFat}</p>
                             </div>
                             <div className="flex justify-between">
-                                <p className="font-semibold">cholesterol:</p>
+                                <p className="font-semibold">Cholesterol:</p>
                                 <p>{data?.Nutrition?.cholesterol}</p>
                             </div>
                             <div className="flex justify-between">
